@@ -6,6 +6,10 @@ A model for simulating the indoor climate and energy use of greenhouses with sup
 ## Maintainers
 * David Katzin, `david.katzin@wur.nl`, `david.katzin1@gmail.com`
 
+## Cite as
+
+Katzin, Van Mourik, Kempkes, Van Henten (2020), "GreenLight - an open source model for greenhouses with supplemental lighting: evaluation of heat requirements under LED and HPS lamps", Biosystems Engineering (submitted).
+
 ## Compatability
 The code in this repository has been tested for compatibility with MATLAB 2015b and onwards. The [DyMoMa](https://github.com/davkat1/DyMoMa/) package is required in order to use this model. The current version uses [DyMoMa v1.0.0](https://github.com/davkat1/DyMoMa/releases/tag/v1.0.0).
 
