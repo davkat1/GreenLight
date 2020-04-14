@@ -1,5 +1,5 @@
 function setGlParams(gl)
-%SETGLPARAMS Set parameters for a GreenLight model. Use that parameters from Vanthoor (2011)
+%SETGLPARAMS Set parameters for a GreenLight model. Use the parameters from Vanthoor (2011) [2] for a Dutch greenhouse
 % Inputs:
 %   gl   - a DynamicModel object to be used as a GreenLight model
 %
@@ -22,21 +22,9 @@ function setGlParams(gl)
 %   [6] Dueck, T., Elings, A., Kempkes, F., Knies, P., Garcia, N., Heij, G., 
 % 		Janse, J., Kaarsemaker, R., Korsten, P., Maaswinkel, R., et al. (2004). 
 % 		Energie in kengetallen : op zoek naar een nieuwe balans.
-% Lamp parameters are based on:
-%   [7] De Zwart, H.F., Baeza, E., Van Breugel, B., Mohammadkhani, V., 
-%       and Janssen, H. (2017). De uitstralingmonitor. 52.
-% Several other parameters are based on:
-%   [8] Dueck, T., De Gelder, A., Janse, J., Kempkes, F., Baar, P.H., and 
+% Other parameters are based on:
+%   [7] Dueck, T., De Gelder, A., Janse, J., Kempkes, F., Baar, P.H., and 
 %       Valstar, W. (2014). Het nieuwe belichten onder diffuus glas (Wageningen).
-%   [9] Dueck, T. A., Janse, J., Eveleens, B. A., Kempkes, F. L. K., & Marcelis, L. F. M. (2012). 
-%       Growth of Tomatoes under Hybrid LED and HPS Lighting. Acta Horticulturae, 1(952), 335–342. 
-%   [10] Nelson, J. A., & Bugbee, B. (2014). Economic Analysis of Greenhouse Lighting: 
-%       Light Emitting Diodes vs. High Intensity Discharge Fixtures. PLoS ONE, 9(6), e99010. 
-%   [11] Dueck, T., Janse, J., Schapendonk, A. H. C. M., Kempkes, F., 
-%       Eveleens, B., Scheffers, K., … Marcelis, L. F. M. (2010). 
-%       Lichtbenuttig van tomaat onder LED en SON-T belichting. Wageningen.
-% 	[12] Heuvelink, E. (1996) Tomato growth and yield: quantitative analysis and synthesis.
-% 		 (Wageningen University)
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -350,7 +338,7 @@ function setGlParams(gl)
     % There are no grow pipes so these parameters are not important, but
     % they cannot be 0 because the ODE for the grow pipe still exists
     addParam(gl, 'lGroPipe', 1.655); 			% Length of grow pipes per gh floor area                                                    	m m^{-2}                                1.25 
-    addParam(gl, 'phiGroPipeE', 35e-3); 		% External diameter of grow pipes 																m                                       28e-3 [8]
+    addParam(gl, 'phiGroPipeE', 35e-3); 		% External diameter of grow pipes 																m                                       28e-3 [7]
     addParam(gl, 'phiGroPipeI', (35e-3)-(1.2e-3));% Internal diameter of grow pipes 															m                                       24e-3 
        
     addParam(gl, 'aGroPipe', pi*gl.p.lGroPipe*gl.p.phiGroPipeE); % Surface area of pipes for floor area                                                   m^{2}{pipe} m^{-2}{floor}

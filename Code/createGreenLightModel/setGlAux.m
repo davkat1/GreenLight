@@ -13,6 +13,12 @@ function setGlAux(gl)
 % Other sources are:
 %   [4] De Zwart, H. F. Analyzing energy-saving options in greenhouse cultivation 
 %       using a simulation model. (Landbouwuniversiteit Wageningen, 1996).
+% The model is described and evaluated in:
+%   [5] Katzin, D., van Mourik, S., Kempkes, F., & Van Henten, E. J. (2020). 
+%       GreenLight - An open source model for greenhouses with supplemental 
+%       lighting: Evaluation of heat requirements under LED and HPS lamps. 
+%       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
+%
 % Inputs:
 %   gl    - a DynamicModel object to be used as a GreenLight model.
 
@@ -27,7 +33,7 @@ function setGlAux(gl)
     d = gl.d;    
     
     
-    %% lumped cover layers  - Section 3 [1]
+    %% lumped cover layers  - Section 3 [1], Section A.1 [5]
     % shadow screen and permanent shadow screen
     
     % PAR transmission coefficient of the shadow screen layer [-]
@@ -184,16 +190,19 @@ function setGlAux(gl)
     addAux(gl, 'rhoBlScrPar', u.blScr*p.rhoBlScrPar);
     
     % PAR transmission coefficient of the old cover and blackout screen [-]
+    % Equation A9 [5]
     addAux(gl, 'tauCovBlScrPar', tau12(gl.a.tauCovParOld, gl.a.tauBlScrPar, ...
         gl.a.rhoCovParOldUp, gl.a.rhoCovParOldDn, ...
         gl.a.rhoBlScrPar, gl.a.rhoBlScrPar));
     
     % PAR up reflection coefficient of the old cover and blackout screen [-]
+    % Equation A10 [5]
     addAux(gl, 'rhoCovBlScrParUp', rhoUp(gl.a.tauCovParOld, gl.a.tauBlScrPar, ...
         gl.a.rhoCovParOldUp, gl.a.rhoCovParOldDn, ...
         gl.a.rhoBlScrPar, gl.a.rhoBlScrPar));
     
     % PAR down reflection coefficient of the old cover and blackout screen [-]
+    % Equation A11 [5]
     addAux(gl, 'rhoCovBlScrParDn', rhoDn(gl.a.tauCovParOld, gl.a.tauBlScrPar, ...
         gl.a.rhoCovParOldUp, gl.a.rhoCovParOldDn, ...
         gl.a.rhoBlScrPar, gl.a.rhoBlScrPar));
@@ -221,11 +230,13 @@ function setGlAux(gl)
     
     % all layers
     % PAR transmission coefficient of the cover [-]
+    % Equation A12 [5]
     addAux(gl, 'tauCovPar', tau12(gl.a.tauCovBlScrPar, p.tauLampPar, ...
         gl.a.rhoCovBlScrParUp, gl.a.rhoCovBlScrParDn, ...
         p.rhoLampPar, p.rhoLampPar));
     
     % PAR reflection coefficient of the cover [-]
+    % Equation A13 [5]
     addAux(gl, 'rhoCovPar', rhoUp(gl.a.tauCovBlScrPar, p.tauLampPar, ...
         gl.a.rhoCovBlScrParUp, gl.a.rhoCovBlScrParDn, ...
         p.rhoLampPar, p.rhoLampPar));
@@ -293,16 +304,19 @@ function setGlAux(gl)
     %% Global, PAR, and NIR heat fluxes - Section 5.1 [1]
     
     % Lamp electrical input [W m^{-2}]
+    % Equation A16 [5]
     addAux(gl, 'qLampIn', p.thetaLampMax*u.lamp);
     
     % Interlight electrical input [W m^{-2}]
+    % Equation A26 [5]
     addAux(gl, 'qIntLampIn', p.thetaIntLampMax*u.intLamp);
     
     % PAR above the canopy from the sun [W m^{-2}]
-    % Equation 27 [1]
+    % Equation 27 [1], Equation A14 [5]
     addAux(gl, 'rParGhSun', (1-p.etaGlobAir).*gl.a.tauCovPar.*p.etaGlobPar.*d.iGlob); 
     
     % PAR above the canopy from the lamps [W m^{-2}] 
+    % Eqiation A15 [5]
     addAux(gl, 'rParGhLamp', p.etaLampPar*gl.a.qLampIn);
     
     % Global radiation above the canopy from the sun [W m^{-2}]
@@ -328,6 +342,7 @@ function setGlAux(gl)
     addAux(gl, 'rParSunCanDown', gl.a.rParGhSun.*(1-p.rhoCanPar).*(1-exp(-p.k1Par*gl.a.lai)));
     
     % PAR from the lamps directly absorbed by the canopy [W m^{-2}]
+    % Equation A17 [5]
     addAux(gl, 'rParLampCanDown', gl.a.rParGhLamp.*(1-p.rhoCanPar).*(1-exp(-p.k1Par*gl.a.lai)));
     
     % PAR from the sun absorbed by the canopy after reflection from the floor [W m^{-2}]
@@ -336,6 +351,7 @@ function setGlAux(gl)
         (1-p.rhoCanPar).*(1-exp(-p.k2Par*gl.a.lai))));
     
     % PAR from the lamps absorbed by the canopy after reflection from the floor [W m^{-2}]
+    % Equation A18 [5]
     addAux(gl, 'rParLampFlrCanUp', gl.a.rParGhLamp.*exp(-p.k1Par*gl.a.lai)*p.rhoFlrPar* ...
         (1-p.rhoCanPar).*(1-exp(-p.k2Par*gl.a.lai)));
     
@@ -344,6 +360,7 @@ function setGlAux(gl)
     addAux(gl, 'rParSunCan', gl.a.rParSunCanDown + gl.a.rParSunFlrCanUp);
     
     % Total PAR from the lamps absorbed by the canopy [W m^{-2}]
+    % Equation A19 [5]
     addAux(gl, 'rParLampCan', gl.a.rParLampCanDown + gl.a.rParLampFlrCanUp);
     
     % Virtual NIR transmission for the cover-canopy-floor lumped model [-]
@@ -387,14 +404,15 @@ function setGlAux(gl)
     addAux(gl, 'rNirSunCan', (1-p.etaGlobAir).*gl.a.aCanNir.*p.etaGlobNir.*d.iGlob);
     
     % NIR from the lamps absorbed by the canopy [W m^{-2}]
+    % Equation A20 [5]
     addAux(gl, 'rNirLampCan', p.etaLampNir.*gl.a.qLampIn.*(1-p.rhoCanNir).*(1-exp(-p.kNir*gl.a.lai)));
-    % perhaps a "virtual absorption coefficient" should be applied here too?
-    
+        
     % NIR from the sun absorbed by the floor [W m^{-2}]
     % Equation 33 [1]
     addAux(gl, 'rNirSunFlr', (1-p.etaGlobAir).*gl.a.aFlrNir.*p.etaGlobNir.*d.iGlob);
     
     % NIR from the lamps absorbed by the floor [W m^{-2}]
+    % Equation A22 [5]
     addAux(gl, 'rNirLampFlr', (1-p.rhoFlrNir).*exp(-p.kNir*gl.a.lai).*p.etaLampNir.*gl.a.qLampIn);
     
     % PAR from the sun absorbed by the floor [W m^{-2}]
@@ -402,9 +420,11 @@ function setGlAux(gl)
     addAux(gl, 'rParSunFlr', (1-p.rhoFlrPar).*exp(-p.k1Par*gl.a.lai).*gl.a.rParGhSun);
     
     % PAR from the lamps absorbed by the floor [W m^{-2}]
+    % Equation A21 [5]
     addAux(gl, 'rParLampFlr', (1-p.rhoFlrPar).*exp(-p.k1Par*gl.a.lai).*gl.a.rParGhLamp);
     
 	% PAR and NIR from the lamps absorbed by the greenhouse air [W m^{-2}]
+    % Equation A23 [5]
 	addAux(gl, 'rLampAir', (p.etaLampPar+p.etaLampNir)*gl.a.qLampIn - gl.a.rParLampCan - ...
 		gl.a.rNirLampCan - gl.a.rParLampFlr - gl.a.rNirLampFlr);
 	
@@ -418,9 +438,11 @@ function setGlAux(gl)
     addAux(gl, 'rGlobSunCovE', (gl.a.aCovPar*p.etaGlobPar+gl.a.aCovNir*p.etaGlobNir).*d.iGlob);
     
     % PAR from the interlights to the canopy lamps [W m^{-2}] 
+    % Equation A24 [5]
     addAux(gl, 'rParIntLampCan', p.etaIntLampPar*gl.a.qIntLampIn);
     
     % NIR from the interlight absorbed by the canopy [W m^{-2}]
+    % Equation A25 [5]
     addAux(gl, 'rNirIntLampCan', p.etaIntLampNir.*gl.a.qLampIn);
     
     %% FIR heat fluxes - Section 5.2 [1]
@@ -438,6 +460,7 @@ function setGlAux(gl)
 	
 	% FIR between greenhouse objects [W m^{-2}]
 	% Table 3 [1]
+    % Table A1 [5]
 	
 	% FIR between canopy and cover [W m^{-2}]
     addAux(gl, 'rCanCovIn', fir(gl.a.aCan, p.epsCan, gl.a.epsCovFir, ...
@@ -621,13 +644,13 @@ function setGlAux(gl)
     addAux(gl, 'fLeakage', ifElse('d.wind<p.minWind',p.minWind*p.cLeakage,p.cLeakage*d.wind));
     
 	% Total ventilation through the roof [m^{3} m^{-2} s^{-1}]
-	% Equation 71 [1]
+	% Equation 71 [1], Equation A42 [5]
     addAux(gl, 'fVentRoof', ifElse([getDefStr(gl.a.etaRoof) '>=p.etaRoofThr'],p.etaInsScr*gl.a.fVentRoof2+p.cLeakTop*gl.a.fLeakage,...
         p.etaInsScr*(max(u.thScr,u.blScr).*gl.a.fVentRoof2+(1-max(u.thScr,u.blScr)).*gl.a.fVentRoofSide2.*gl.a.etaRoof)...
         +p.cLeakTop*gl.a.fLeakage));
     
 	% Total ventilation through side vents [m^{3} m^{-2} s^{-1}]
-	% Equation 72 [1]
+	% Equation 72 [1], Equation A43 [5]
     addAux(gl, 'fVentSide', ifElse([getDefStr(gl.a.etaRoof) '>=p.etaRoofThr'],p.etaInsScr*gl.a.fVentSide2+(1-p.cLeakTop)*gl.a.fLeakage,...
         p.etaInsScr*(max(u.thScr,u.blScr).*gl.a.fVentSide2+(1-max(u.thScr,u.blScr)).*gl.a.fVentRoofSide2.*gl.a.etaSide)...
         +(1-p.cLeakTop)*gl.a.fLeakage));
@@ -687,7 +710,7 @@ function setGlAux(gl)
     addAux(gl, 'rhoAirMean', 0.5*(gl.a.rhoTop+gl.a.rhoAir));
     
 	% Air flux through the thermal screen [m s^{-1}]
-	% Equation 40 [1]
+	% Equation 40 [1], Equation A36 [5]
     % There is a mistake in [1], see equation 5.68, pg. 91, [4]
     % tOut, rhoOut, should be tTop, rhoTop
     % There is also a mistake in [4], whenever sqrt is taken, abs should be included
@@ -695,10 +718,12 @@ function setGlAux(gl)
         ((1-u.thScr)./gl.a.rhoAirMean).*sqrt(0.5*gl.a.rhoAirMean.*(1-u.thScr).*p.g.*abs(gl.a.rhoAir-gl.a.rhoTop)));
     
     % Air flux through the blackout screen [m s^{-1}]
+    % Equation A37 [5]
     addAux(gl, 'fBlScr', u.blScr*p.kBlScr.*(abs((x.tAir-x.tTop)).^0.66) + ... 
         ((1-u.blScr)./gl.a.rhoAirMean).*sqrt(0.5*gl.a.rhoAirMean.*(1-u.blScr).*p.g.*abs(gl.a.rhoAir-gl.a.rhoTop)));
     
     % Air flux through the screencs [m s^{-1}]
+    % Equation A38 [5]
     addAux(gl, 'fScr', min(gl.a.fThScr,gl.a.fBlScr));
         
     % Setpoint for closing the thermal screen [°C]
@@ -733,6 +758,7 @@ function setGlAux(gl)
         x.tAir,x.tThScr));
     
 	% Between air in main compartment and blackout screen [W m^{-2}]
+    % Equations A28, A32 [5]
     addAux(gl, 'hAirBlScr', sensible(1.7.*u.blScr.*nthroot(abs(x.tAir-x.tBlScr),3),...
         x.tAir,x.tBlScr));
 		
@@ -797,14 +823,17 @@ function setGlAux(gl)
         x.tCovIn, x.tCovE));
 
     % Between lamps and air in main compartment [W m^{-2}]
+    % Equation A29 [5]
     addAux(gl, 'hLampAir', sensible(p.cHecLampAir, x.tLamp, x.tAir));
     
     % Between grow pipes and air in main compartment [W m^{-2}]
+    % Equations A31, A33 [5]
     addAux(gl, 'hGroPipeAir', sensible(...
         1.99*pi*p.phiGroPipeE*p.lGroPipe*(abs(x.tGroPipe-x.tAir)).^0.32, ...
         x.tGroPipe, x.tAir));
         
    % Between interlights and air in main compartment [W m^{-2}]
+   % Equation A30 [5]
     addAux(gl, 'hIntLampAir', sensible(p.cHecIntLampAir, x.tIntLamp, x.tAir));
   
     %% Canopy transpiration - Section 8 [1]
@@ -862,6 +891,7 @@ function setGlAux(gl)
         x.vpAir, satVp(x.tThScr)));
     
     % Condensation from main compartment on blackout screen [kg m^{-2} s^{-1}]
+    % Equation A39 [5]
     addAux(gl, 'mvAirBlScr', cond(1.7*u.blScr.*nthroot(abs(x.tAir-x.tBlScr),3), ...
         x.vpAir, satVp(x.tBlScr)));
     
@@ -1014,6 +1044,7 @@ function setGlAux(gl)
     addAux(gl, 'mcLeafHar', ifElse('x.cLeaf<p.cLeafMax',0, x.cLeaf-p.cLeafMax));
     
     % Fruit harvest [mg{CH2O} m^{-2] s^{-1}]
+    % Equation A45 [5]
     addAux(gl, 'mcFruitHar', ifElse('x.cFruit<p.cFruitMax',0,x.cFruit-p.cFruitMax));
     
 	%% CO2 Fluxes - Section 7 [1]
@@ -1064,6 +1095,7 @@ function setGlAux(gl)
     addAux(gl, 'hGeoPipe', DynamicElement('0',0));
     
     %% Lamp cooling
+    % Equation A34 [5]
     addAux(gl, 'hLampCool', p.etaLampCool*gl.a.qLampIn);
     
     
@@ -1084,19 +1116,19 @@ end
 
 function de = tau12(tau1, tau2, ~, rho1Dn, rho2Up, ~)
 % Transmission coefficient of a double layer [-]
-% Equation 14 [1]
+% Equation 14 [1], Equation A4 [5]
     de = tau1.*tau2./(1-rho1Dn.*rho2Up);    
 end
 
 function de = rhoUp(tau1, ~, rho1Up, rho1Dn, rho2Up, ~)
 % Reflection coefficient of the top layer of a double layer [-]
-% Equation 15 [1]
+% Equation 15 [1], Equation A5 [5]
     de = rho1Up + (tau1.^2.*rho2Up)./(1-rho1Dn.*rho2Up);
 end
 
 function de = rhoDn(~, tau2, ~, rho1Dn, rho2Up, rho2Dn)
 % Reflection coefficient of the top layer of a double layer [-]
-% Equation 15 [1]
+% Equation 15 [1], Equation A6 [5]
     de = rho2Dn + (tau2.^2.*rho1Dn)./(1-rho1Dn.*rho2Up);
 end
 

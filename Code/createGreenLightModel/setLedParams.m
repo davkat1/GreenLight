@@ -15,7 +15,12 @@ function setLedParams(gl)
 %       on Leaf Temperature under Sunlight, High Pressure Sodium and Light 
 %       Emitting Diodes. PLOS ONE, 10(10), e0138930. 
 %       https://doi.org/10.1371/journal.pone.0138930
-% 	[4] Frank Kempkes, personal communication
+%   [4] De Zwart, H. F., Baeza, E., Van Breugel, B., Mohammadkhani, V., 
+%       & Janssen, H. (2017). De uitstralingmonitor.
+%   [5] Katzin, D., van Mourik, S., Kempkes, F., & Van Henten, E. J. (2020). 
+%       GreenLight - An open source model for greenhouses with supplemental 
+%       lighting: Evaluation of heat requirements under LED and HPS lamps. 
+%       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -23,22 +28,22 @@ function setLedParams(gl)
                                                 % Parameter                                                                                     unit                    Value and reference
     %% Lamp parameters
     % LED
-    setParam(gl, 'thetaLampMax', 116);                  % Maximum intensity of lamps																	[W m^{-2}]                              Pg. 48 [1] (measured capacity divided by 144 m2)
-    setParam(gl, 'heatCorrection', 0);   			% correction for temperature setpoint when lamps are on 										[C]   									0
+    setParam(gl, 'thetaLampMax', 116);              % Maximum intensity of lamps																	[W m^{-2}]                              Pg. 48 [1] (measured capacity divided by 144 m2)
+    setParam(gl, 'heatCorrection', 0);   			% correction for temperature setpoint when lamps are on 										[C]   									0 
     setParam(gl, 'etaLampPar', 0.31);               % fraction of lamp input converted to PAR 														[-]                                     [3] gives 0.33 with a lamp of 1.7 umol/J. This lamp is 1.6 umol/J [2], i.e. 6% less efficient as the one in [3]
     setParam(gl, 'etaLampNir', 0.02);               % fraction of lamp input converted to NIR 														[-]                                     [3]
     setParam(gl, 'tauLampPar', 0.95);               % transmissivity of lamp layer to PAR 															[-]                                     Pg. 22 [1] (light loss due to armatures)
-    setParam(gl, 'rhoLampPar', 0);                  % reflectivity of lamp layer to PAR 															[-]                                     0
+    setParam(gl, 'rhoLampPar', 0);                  % reflectivity of lamp layer to PAR 															[-]                                     0 [4]
     setParam(gl, 'tauLampNir', 0.95);               % transmissivity of lamp layer to NIR 															[-]                                     Pg. 22 [1] (light loss due to armatures)
-    setParam(gl, 'rhoLampNir', 0);                  % reflectivity of lamp layer to NIR 															[-]                                     0
+    setParam(gl, 'rhoLampNir', 0);                  % reflectivity of lamp layer to NIR 															[-]                                     0 [4]
     setParam(gl, 'tauLampFir', 0.95);               % transmissivity of lamp layer to FIR 															[-]                                     Pg. 22 [1] (light loss due to armatures)
     setParam(gl, 'aLamp', 0.05);                    % lamp area 																					[m^{2}{lamp} m^{-2}{floor}]             Pg. 22 [1] (light loss due to armatures)
     setParam(gl, 'epsLampTop', 0.88);               % emissivity of top side of lamp 																[-]                                     assumed that lamps act the same as heating pipes
     setParam(gl, 'epsLampBottom', 0.88);            % emissivity of bottom side of lamp 															[-]                                     assumed that lamps act the same as heating pipes
-    setParam(gl, 'capLamp', 10);                    % heat capacity of lamp 																		[J K^{-1} m^{-2}]                       
-    setParam(gl, 'cHecLampAir', 2.3);                % heat exchange coefficient of lamp                                                             [W m^{-2} K^{-1}]                       
-    setParam(gl, 'etaLampCool', 0.63);                 % fraction of lamp input removed by cooling                                                     [-]                                     Estimate based on pg. 50 [1]
-    setParam(gl, 'zetaLampPar', 5.2);            % J to umol conversion of PAR output of lamp                                                    [umol{PAR} J^{-1}]                      Efficacy of 1.6 umol/J [2], divided by 0.31 fraction to PAR (see above)
+    setParam(gl, 'capLamp', 10);                    % heat capacity of lamp 																		[J K^{-1} m^{-2}]                       [5]
+    setParam(gl, 'cHecLampAir', 2.3);               % heat exchange coefficient of lamp                                                             [W m^{-2} K^{-1}]                       [5]
+    setParam(gl, 'etaLampCool', 0.63);              % fraction of lamp input removed by cooling                                                     [-]                                     Estimate based on pg. 50 [1]
+    setParam(gl, 'zetaLampPar', 5.2);               % J to umol conversion of PAR output of lamp                                                    [umol{PAR} J^{-1}]                      Efficacy of 1.6 umol/J [2], divided by 0.31 fraction to PAR (see above)
 
     % Reset other parameters that may depend on parameters changed above
     setDepParams(gl);    
