@@ -2,7 +2,7 @@ function setGlOdes(gl)
 %SETGLODES Define ODEs for the GreenLight greenhouse model, with the addition of lamps and growpipes
 % Should be used after the states, aux states, and control rules have been set.
 %
-% Based on the electronic appendices of:
+% Based on the electronic appendices (the case of a Dutch greenhouse) of:
 %   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J. & de Visser, P. H. B. 
 %       A methodology for model-based greenhouse design: Part 1, a greenhouse climate 
 %       model for a broad range of designs and climates. Biosyst. Eng. 110, 363–377 (2011).
@@ -11,14 +11,6 @@ function setGlOdes(gl)
 %       validation of a tomato yield model. Biosyst. Eng. 110, 378–395 (2011).
 % These are also available as Chapters 8 and 9, respecitvely, of
 %   [3] Vanthoor, B. A model based greenhouse design method. (Wageningen University, 2011).
-% Other sources are:
-%   [4] De Zwart, H. F. Analyzing energy-saving options in greenhouse cultivation 
-%       using a simulation model. (Landbouwuniversiteit Wageningen, 1996).
-% The model is described and evaluated in:
-%   [5] Katzin, D., van Mourik, S., Kempkes, F., & Van Henten, E. J. (2020). 
-%       GreenLight - An open source model for greenhouses with supplemental 
-%       lighting: Evaluation of heat requirements under LED and HPS lamps. 
-%       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
 %
 % Inputs:
 %   gl    - a DynamicModel object to be used as a GreenLight model.
@@ -102,21 +94,19 @@ function setGlOdes(gl)
       setOde(gl, 'tCovE', (1./a.capCovE).*(a.rGlobSunCovE+a.hCovInCovE-a.hCovEOut-a.rCovESky));
 
     % Lamp temperature [°C s^{-1}]
-    % Equation A1 [5]
     setOde(gl, 'tLamp', 1/p.capLamp*(a.qLampIn-a.hLampAir-a.rLampSky-a.rLampCovIn ...
         -a.rLampThScr-a.rLampPipe-a.rLampAir - a.rLampBlScr ...
         -a.rParLampFlr-a.rNirLampFlr-a.rFirLampFlr ...
         -a.rParLampCan-a.rNirLampCan-a.rFirLampCan-a.hLampCool));
     
     % Interlight temperature [°C s^{-1}]
-    % Equation A1 [5]
     setOde(gl, 'tIntLamp', 1/p.capIntLamp*(a.qIntLampIn-a.hIntLampAir- ...
         -a.rParIntLampCan-a.rNirIntLampCan-a.rFirIntLampCan));
 
     %% Vapor balance
     
     % Vapor pressure of greenhouse air [Pa s^{-1}] = [kg m^{-1} s^{-3}]
-    % Equation 10 [1], Equation A40 [5]
+    % Equation 10 [1]
     setOde(gl, 'vpAir', (1./a.capVpAir).*(a.mvCanAir+a.mvPadAir+a.mvFogAir+a.mvBlowAir ...
         -a.mvAirThScr-a.mvAirTop-a.mvAirOut-a.mvAirOutPad-a.mvAirMech-a.mvAirBlScr));
     
@@ -175,7 +165,6 @@ function setGlOdes(gl)
         setOde(gl, 'tGroPipe', ifElse('(d.tGroPipe == 0) || (d.groPipeSwitchOff>0)', ...
             a.tGroPipeOff, a.tGroPipeOn));
     else
-         % Equation A1 [5]
          setOde(gl, 'tGroPipe', 1/p.capGroPipe*(a.hBoilGroPipe-a.rGroPipeCan-a.hGroPipeAir));
     end
     
@@ -194,7 +183,7 @@ function setGlOdes(gl)
     setOde(gl, 'cStem', a.mcBufStem - a.mcStemAir);
     
     % Carbohydrates in fruit [mg{CH2O} m^{-2} s^{-1}]
-    % Equation 2 [2], Equation A44 [5]
+    % Equation 2 [2]
     setOde(gl, 'cFruit', a.mcBufFruit - a.mcFruitAir - a.mcFruitHar);
     
     % Crop development stage [°C day s^{-1}]

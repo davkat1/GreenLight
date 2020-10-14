@@ -6,12 +6,8 @@ A model for simulating the indoor climate and energy use of greenhouses with sup
 ## Maintainers
 * David Katzin, `david.katzin@wur.nl`, `david.katzin1@gmail.com`
 
-## Cite as
-
-David Katzin, Simon van Mourik, Frank Kempkes, and Eldert J. Van Henten. 2020. “GreenLight - An Open Source Model for Greenhouses with Supplemental Lighting: Evaluation of Heat Requirements under LED and HPS Lamps.” Biosystems Engineering 194: 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010.
-
 ## Compatability
-The code in this repository has been tested for compatibility with MATLAB 2015b and onwards. The [DyMoMa](https://github.com/davkat1/DyMoMa/) package is required in order to use this model. The current version uses [DyMoMa v1.0.0](https://github.com/davkat1/DyMoMa/releases/tag/v1.0.0).
+The code in this repository has been tested for compatibility with MATLAB 2015b and onwards. The DyMoMa package is required.
 
 ## In this repository
 
@@ -59,6 +55,6 @@ The code in this repository has been tested for compatibility with MATLAB 2015b 
 		
 ## Using the model
 
-Make sure you have all files in this repository, as well as those from the DyMoMa package, on your MATLAB path. `runScenarios\exampleSimulation` shows how you may use a dataset of weather data (in this case, the Reference Year for Dutch Greenhouses), to run the model with default settings. The plot made here is of the lamp temperatures, but you may plot whatver model component you wish.
+Make sure you have all files in this repository, as well as those from the MyMoMa package, on your MATLAB path. `runScenarios\exampleSimulation` shows how you may use a dataset of weather data (in this case, the Reference Year for Dutch Greenhouses), to run the model with default settings. The plot made here is of the lamp temperatures, but you may plot whatver model component you wish.
 
 The other scenarios in `runScenarios` cannot be run without the data from the Bleiswijk trial, which is not included in this repository. However these examples can be used to run the model with other datasets. You can see in these examples how to compare the model simulations to the measured values, including measured climate variables and energy use.

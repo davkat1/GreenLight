@@ -35,13 +35,13 @@ function setGlControlRules(gl)
     u.roof = min(a.ventCold, max(a.ventHeat,a.ventRh));
     
     % Lighting from the top lights [W m^{-2}]
-    u.lamp = a.lampOn;
+    setDef(u.lamp, 'a.lampOn');
     
     % Lighting from the interlights [W m^{-2}]
     u.intLamp = a.lampOn;
 
     % Thermal screen [0 is open, 1 is closed]
-    u.thScr = max(a.thScrCold,min(a.ventThScr,a.thScrHeat));
+    u.thScr = min(a.thScrCold, min(a.thScrHeat, a.thScrRh));
 
     % set initial values
     u.boil.val = 0;

@@ -11,15 +11,6 @@ function setParamsBleiswijk2010(gl)
 %       & Marcelis, L. F. M. (2012). Growth of Tomatoes under Hybrid LED 
 %       and HPS Lighting. Acta Horticulturae, 1(952), 335–342. 
 %       Retrieved from http://edepot.wur.nl/216929
-%   [3] Nelson, J. A., & Bugbee, B. (2015). Analysis of Environmental Effects 
-%       on Leaf Temperature under Sunlight, High Pressure Sodium and Light 
-%       Emitting Diodes. PLOS ONE, 10(10), e0138930. 
-%       https://doi.org/10.1371/journal.pone.0138930
-% 	[4] Frank Kempkes, personal communication
-%   [5] Katzin, D., van Mourik, S., Kempkes, F., & Van Henten, E. J. (2020). 
-%       GreenLight - An open source model for greenhouses with supplemental 
-%       lighting: Evaluation of heat requirements under LED and HPS lamps. 
-%       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -34,15 +25,15 @@ function setParamsBleiswijk2010(gl)
     
     setParam(gl, 'aRoof', 52.2);                % Maximum roof ventilation area 																- 						52.2 [4]
     setParam(gl, 'hVent', 0.87);                % Vertical dimension of single ventilation opening 												m 						0.87 [4]
-    setParam(gl, 'cLeakage', 0.3e-4); 			% Leakage coefficient 																			- 						1e-4 [5] 
-    setParam(gl, 'cDgh', 0.35);                 % Ventilation discharge coefficient 															-                       0.35 [5]
-    setParam(gl, 'cWgh', 0.02);                 % Ventilation global wind pressure coefficient 													-                       0.02 [5]
+    setParam(gl, 'cLeakage', 0.3e-4); 			% Leakage coefficient 																			- 						0.3e-4 (estimated)
+    setParam(gl, 'cDgh', 0.35);                 % Ventilation discharge coefficient 															-                               0.75 [1]
+    setParam(gl, 'cWgh', 0.02);                 % Ventilation global wind pressure coefficient 													-                               0.09 [1]
     
     setParam(gl, 'tauRfNir', 0.57); 			% NIR transmission coefficient of the roof 														- 						0.57 [4]
     setParam(gl, 'tauRfPar', 0.57);  			% PAR transmission coefficient of the roof 														- 						0.57 [4]
-    setParam(gl, 'tauThScrPar', 0.75); 			% PAR transmission coefficient of thermal screen 												- 						0.75 [5]
-    setParam(gl, 'kBlScr',5e-4);                % Blackout screen flux coefficient 																m^{3} m^{-2} K^{-2/3} s^{-1}    5e-4 [5]
-    setParam(gl, 'kThScr',5e-4);                % Thermal screen flux coefficient 																m^{3} m^{-2} K^{-2/3} s^{-1}    5e-4 [5]
+    setParam(gl, 'tauThScrPar', 0.75); 			% PAR transmission coefficient of thermal screen 												- 						0.75 (estimated)
+    setParam(gl, 'kBlScr',5e-4);                % Blackout screen flux coefficient 																m^{3} m^{-2} K^{-2/3} s^{-1}    
+    setParam(gl, 'kThScr',5e-4);                % Thermal screen flux coefficient 																m^{3} m^{-2} K^{-2/3} s^{-1}    5e-5 [1]
     setParam(gl, 'phiPipeI', (51e-3)-(2.25e-3));% Internal diameter of pipes 																	m 						(51-2.25)e-3 [1,4]
     setParam(gl, 'lPipe', 1.3375); 				% Length of heating pipes per gh floor area 													m m^{-2} 				1.3375 [4],  using 1.25 but correcting for extra pipes on the side wall
     setParam(gl, 'pBoil', 44*gl.p.aFlr.val);    % Capacity of the heating system                                                                W                       44*p.aFlr (Assumed to be 88 W m^{-2} for the entire heating system [1])
@@ -54,10 +45,10 @@ function setParamsBleiswijk2010(gl)
     setParam(gl, 'phiGroPipeI', (35e-3)-(1.2e-3));% Internal diameter of grow pipes 															m                       (35-1.2)e-3 [1,4]
     setParam(gl, 'pBoilGro', 44*gl.p.aFlr.val); % Capacity of the grow pipe heating system                                                      W                       44*p.aFlr (Assumed to be 88 W m^{-2} for the entire heating system [1])
     
-    setParam(gl, 'cLeakTop', 0.9);               % Fraction of leakage ventilation going from the top                                            [-]                    0.9 [5]
+    setParam(gl, 'cLeakTop', 0.9);               % Fraction of leakage ventilation going from the top                                            [-]                     
     
     
-    setParam(gl, 'cHecIn', 3.5);                % Convective heat exchange between cover and outdoor air 										W m^{-2} K^{-1}         3.5 [5]
+    setParam(gl, 'cHecIn', 3.5);                % Convective heat exchange between cover and outdoor air 										W m^{-2} K^{-1}                 1.86 [1]
     
     % Reset other parameters that may depend on parameters changed above
     setDepParams(gl);    

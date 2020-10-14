@@ -60,6 +60,9 @@ hps.x.cLeaf.val = 0.7*6240*10;
 hps.x.cStem.val = 0.25*6240*10;
 hps.x.cFruit.val = 0.05*6240*10;
 
+%% test
+setParam(hps, 'cHecIn', 5);
+
 %% Solve
 solveFromFile(hps, 'ode15s');
 hps = changeRes(hps,300); % set resolution of trajectories at 5 minutes

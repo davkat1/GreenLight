@@ -4,22 +4,15 @@ function gl = createGreenLightModel(weather, startTime, controls, indoor)
 % of toplights, interlights, grow pipes, and a blackout screen.
 %
 % Literature used:
-%%   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J. & de Visser, P. H. B. 
+%   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J. & de Visser, P. H. B. 
 %       A methodology for model-based greenhouse design: Part 1, a greenhouse climate 
-%       model for a broad range of designs and climates. Biosyst. Eng. 110, 363–377 (2011).
+%       model for a broad range of designs and climates. Biosyst. Eng. 110, 363-377 (2011).
 %   [2] Vanthoor, B., de Visser, P. H. B., Stanghellini, C. & van Henten, E. J. 
 %       A methodology for model-based greenhouse design: Part 2, description and 
-%       validation of a tomato yield model. Biosyst. Eng. 110, 378–395 (2011).
-% These are also available as Chapters 8 and 9, respecitvely, of
+%       validation of a tomato yield model. Biosyst. Eng. 110, 378-395 (2011).
+% 	In particular note the electronic appendices of these two publications.
+% These are also available in
 %   [3] Vanthoor, B. A model based greenhouse design method. (Wageningen University, 2011).
-% Other sources are:
-%   [4] De Zwart, H. F. Analyzing energy-saving options in greenhouse cultivation 
-%       using a simulation model. (Landbouwuniversiteit Wageningen, 1996).
-% The model is described and evaluated in:
-%   [5] Katzin, D., van Mourik, S., Kempkes, F., & Van Henten, E. J. (2020). 
-%       GreenLight - An open source model for greenhouses with supplemental 
-%       lighting: Evaluation of heat requirements under LED and HPS lamps. 
-%       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
 %
 % Function inputs:
 %   weather         A matrix with 8 columns, in the following format:
@@ -31,6 +24,7 @@ function gl = createGreenLightModel(weather, startTime, controls, indoor)
 %       weather(:,6)    wind        [m s^{-1}] outdoor wind speed
 %       weather(:,7)    sky temperature [°C]
 %       weather(:,8)    temperature of external soil layer [°C]
+%       weather(:,9)    daily radiation sum [MJ m^{-2} day^{-1}]
 %
 %   startTime       date and time of starting point (datetime)
 %

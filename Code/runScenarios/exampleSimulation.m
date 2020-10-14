@@ -6,7 +6,7 @@
 
 tic;
 
-seasonLength = 1; % season length in days 
+seasonLength = 10; % season length in days 
 firstDay = 1; % days since beginning of data (01-01-2000)
 
 [weather, startTime] = loadSelYearHiRes(firstDay, seasonLength);
@@ -27,21 +27,26 @@ setLedParams(led); % Set up LED lamps
 ledNoCool = DynamicModel(led);
 setParam(ledNoCool, 'etaLampCool', 0); % LED with no cooling
 
+%% test
+hps.x.gasUsed = DynamicElement('x.gasUsed',0);
+setOde(hps, 'gasUsed', hps.a.hBoilPipe+hps.a.hBoilGroPipe);
+    
+
 %% Run simulation
 solveFromFile(hps, 'ode15s');
-solveFromFile(led, 'ode15s');
-solveFromFile(ledNoCool, 'ode15s');
+% solveFromFile(led, 'ode15s');
+% solveFromFile(ledNoCool, 'ode15s');
 
-hps = changeRes(hps,300); % set data to a fixed step size (5 minutes)
-led = changeRes(led,300);
-ledNoCool = changeRes(ledNoCool,300);
+% hps = changeRes(hps,300); % set data to a fixed step size (5 minutes)
+% led = changeRes(led,300);
+% ledNoCool = changeRes(ledNoCool,300);
 
 %% Plot
-plot(hps.x.tAir);
-hold on
-plot(hps.x.tLamp);
-plot(led.x.tLamp);
-plot(ledNoCool.x.tLamp);
-title('Temperature (°C)');
-legend('Air', 'HPS', 'LED', 'LED no cooling');
+% plot(hps.x.tAir);
+% hold on
+% plot(hps.x.tLamp);
+% plot(led.x.tLamp);
+% plot(ledNoCool.x.tLamp);
+% title('Temperature (°C)');
+% legend('Air', 'HPS', 'LED', 'LED no cooling');
 toc;

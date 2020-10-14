@@ -42,6 +42,9 @@ led.x.cLeaf.val = 0.7*6240*10;
 led.x.cStem.val = 0.25*6240*10;
 led.x.cFruit.val = 0.05*6240*10;
 
+%% test
+setParam(led, 'cHecIn', 5);
+
 %% Solve
 solveFromFile(led, 'ode15s');
 

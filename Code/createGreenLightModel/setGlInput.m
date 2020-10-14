@@ -12,6 +12,7 @@ function setGlInput(gl, weatherInput)
 %       weatherInput(:,6)    wind        [m s^{-1}] outdoor wind speed
 %       weatherInput(:,7)    sky temperature [°C]
 %       weatherInput(:,8)    Temperature of external soil layer [°C]
+%       weatherInput(:,9)    daily radiation sum [MJ m^{-2} day^{-1}]
 %
 % The inputs are then converted and copied to the following fields:
 %   d.iGlob                  radiation from the sun [W m^{-2}]
@@ -22,6 +23,7 @@ function setGlInput(gl, weatherInput)
 %   d.tSky                   Sky temperature [°C]
 %   d.tSoOut                 Temperature of external soil layer [°C]
 %   d.isDay                  Indicates if it's day [1] or night [0], with a transition in between 
+%   d.dayRadSum              daily radiation sum [MJ m^{-2} day^{-1}]
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -47,6 +49,9 @@ function setGlInput(gl, weatherInput)
     
     % Temperature of external soil layer [°C]
     d.tSoOut = DynamicElement('d.tSoOut');
+    
+    % Daily radiation sum from the sun [MJ m^{-2} day^{-1}]
+    d.dayRadSum = DynamicElement('d.dayRadSum');
 
     
     time = weatherInput(:,1);
@@ -59,18 +64,22 @@ function setGlInput(gl, weatherInput)
     d.wind.val = [time weatherInput(:,6)];
     d.tSky.val = [time weatherInput(:,7)];
     d.tSoOut.val = [time weatherInput(:,8)];
+    d.dayRadSum.val = [time weatherInput(:,9)];
     
     d.isDay = DynamicElement('d.isDay'); % 1 during day, 0 during night
     
-    isDay = weatherInput(:,2)>10; % 1 during day, 0 during night
+    isDay = 1*(weatherInput(:,2)>0); % 1 during day, 0 during night
+    
+    d.isDaySmooth = DynamicElement('d.isDaySmooth');
+    isDaySmooth = isDay;
     
     % add a transition period to isDay
     % this is important for control purposes, and cannot be added as an
     % auxiliary state because we need to know in advance that night will
-    % start soon (default 1 hour ahead) to start decresing isDau
+    % start soon (default 1 hour ahead) to start decresing isDay
     transSize = 12; % length of transition period between night and day
                     % should be even. Default is 12*5min = 1 hour
-    trans = linspace(0,1,12);
+    trans = linspace(0,1,transSize);
     sunset = false; % indicates if we are during sunset
     for k=transSize:length(isDay)-transSize
         if isDay(k) == 0
@@ -84,7 +93,27 @@ function setGlInput(gl, weatherInput)
         end
     end
     
+    % add a transition period to isDaySmooth
+    % this is important for control purposes, and cannot be added as an
+    % auxiliary state because we need to know in advance that night will
+    % start soon (default 1 hour ahead) to start decresing isDay
+    
+    trans = 1./(1+exp(-10*(trans-0.5)));
+    sunset = false; % indicates if we are during sunset
+    for k=transSize:length(isDaySmooth)-transSize
+        if isDaySmooth(k) == 0
+            sunset = false;
+        end
+        if isDaySmooth(k)==0 && isDaySmooth(k+1)==1
+            isDaySmooth(k-transSize/2:k+transSize/2-1)=trans;
+        elseif isDaySmooth(k)==1 && isDaySmooth(k+1)==0 && ~sunset
+            isDaySmooth(k-transSize/2:k+transSize/2-1)=1-trans;
+            sunset = true;
+        end
+    end
+    
     d.isDay.val = [time isDay];
+    d.isDaySmooth.val = [time isDaySmooth];
 	
 	gl.d = d;
 end
