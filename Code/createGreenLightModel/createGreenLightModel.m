@@ -1,4 +1,4 @@
-function gl = createGreenLightModel(weather, startTime, controls, indoor)
+function gl = createGreenLightModel(lampType, weather, startTime, controls, indoor)
 %CREATEGREENLIGHTMODEL Create a DynamicModel object based on the GreenLight model
 % The GreenLight model is based on the model by Vanthoor et al, with the addition
 % of toplights, interlights, grow pipes, and a blackout screen.
@@ -13,8 +13,16 @@ function gl = createGreenLightModel(weather, startTime, controls, indoor)
 % 	In particular note the electronic appendices of these two publications.
 % These are also available in
 %   [3] Vanthoor, B. A model based greenhouse design method. (Wageningen University, 2011).
+% Additionaly:
+%   [4] Katzin, D., van Mourik, S., Kempkes, F., & 
+%       van Henten, E. J. (2020). GreenLight – An open source model for 
+%       greenhouses with supplemental lighting: Evaluation of heat requirements 
+%       under LED and HPS lamps. Biosystems Engineering, 194, 61–81. 
+%       https://doi.org/10.1016/j.biosystemseng.2020.03.010
 %
 % Function inputs:
+%   lampType        Type of lamps in the greenhouse. Choose between 
+%                   'hps', 'led', or 'none' (default is none)
 %   weather         A matrix with 8 columns, in the following format:
 %       weather(:,1)    timestamps of the input [s] in regular intervals
 %       weather(:,2)    radiation     [W m^{-2}]  outdoor global irradiation 
@@ -49,16 +57,30 @@ function gl = createGreenLightModel(weather, startTime, controls, indoor)
 % david.katzin@wur.nl
 % david.katzin1@gmail.com
 
+    if ~exist('lampType','var') || isempty(lampType)
+        lampType = 'none';
+    end
     if ~exist('indoor','var')
         indoor = [];
     end
+    if strcmpi(lampType, 'hps')
+        lampType = 'hps';
+    elseif strcmpi(lampType, 'led')
+        lampType = 'led';
+    else
+        lampType = 'none';
+    end
 
     gl = DynamicModel();
+    setTime(gl, datestr(startTime), 0);
     setGlParams(gl); % define parameters and nominal values based on the Vanthoor model
     setGlInput(gl, weather);  % define and set inputs
     setGlTime(gl, startTime); % define time phase
     setGlControls(gl); % define controls
     setGlStates(gl); % define states 
+    
+    % set parameters according to lamp type
+    setDefaultLampParams(gl, lampType); % hps, led, or none
     
     if exist('controls','var') && ~isempty(controls)
         ruleBased = false; % controls are given as inputs

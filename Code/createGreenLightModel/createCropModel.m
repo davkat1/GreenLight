@@ -1,5 +1,5 @@
-function gl = createCropModel(weather, startTime)
-%CREATEGREENLIGHTMODEL Create a DynamicModel object based on the GreenLight model
+function gl = createCropModel(indoor, startTime)
+%CREATEGREENLIGHTMODEL Create a DynamicModel object based on the crop componenet of the GreenLight model
 % The GreenLight model is based on the model by Vanthoor et al, with the addition
 % of toplights, interlights, grow pipes, and a blackout screen.
 %
@@ -14,27 +14,11 @@ function gl = createCropModel(weather, startTime)
 % These are also available in
 %   [3] Vanthoor, B. A model based greenhouse design method. (Wageningen University, 2011).
 %
-% weather is [time' rad' temp' co2'] where rad is W/m2 outside, temp is
-% tCan, co2 is ppm
+% indoor is indoor climate, soretd as 
+%   [time rad temp co2] 
+%   where rad is W/m2 outside, temp is tCan, co2 is ppm
 %
 %   startTime       date and time of starting point (datetime)
-%
-%   controls        (optional) A matrix with 8 columns, in the following format:
-%       controls(:,1)     timestamps of the input [s] in regular intervals of 300, starting with 0
-%       controls(:,2)     Energy screen closure 			0-1 (1 is fully closed)
-%       controls(:,3)     Black out screen closure			0-1 (1 is fully closed)
-%       controls(:,4)     Average ventilation aperture		0-1 (1 is fully open)
-%       controls(:,5)     Pipe rail temperature 			°C
-%       controls(:,6)     Grow pipes temperature 			°C
-%       controls(:,7)     Toplights on/off                  0/1 (1 is on)
-%       controls(:,8)     Interlight on/off                 0/1 (1 is on)
-%       controls(:,9)     CO2 injection                     0/1 (1 is on)
-%
-%   indoor          (optional) A 3 column matrix with:
-%       indoor(:,1)     timestamps of the input [s] in regular intervals of 300, starting with 0
-%       indoor(:,2)     temperature       [°C]             indoor air temperature
-%       indoor(:,3)     vapor pressure    [Pa]             indoor vapor concentration
-%       indoor(:,4)     co2 concentration [mg m^{-3}]      indoor co2 concentration
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -46,40 +30,29 @@ function gl = createCropModel(weather, startTime)
 
     gl = DynamicModel();
     setGlParams(gl); % define parameters and nominal values based on the Vanthoor model
-    setInput(gl, weather);  % define and set inputs
+    setInput(gl, indoor);  % define and set inputs
     setGlTime(gl, startTime); % define time phase
     setStates(gl); % define states 
         
     setAux(gl); % define auxiliary states
     
     setOdes(gl); % define odes - must be done after the aux states and control rules are set
-    setInit(gl, weather); % set initial values for the states
+    setInit(gl, indoor); % set initial values for the states
     
-%     gl.u.ctrl = DynamicElement('u.ctrl');
 end
 
-function setInput(gl, weatherInput)
-%SETGLINPUT Set inputs for a GreenLight model instance
+function setInput(gl, indoor)
+%SETGLINPUT Set inputs for a GreenLight crop model
 %
 % Function inputs:
 % 	gl 					 A DynamicModel object representing the GreenLight model
-% weather is [time' rad' temp' co2'] where rad is W/m2 outside, temp is
+% indoor is [time rad temp co2] where rad is W/m2 outside, temp is
 % tCan, co2 is ppm
 %
 % The inputs are then converted and copied to the following fields:
-%   d.iGlob                  radiation from the sun [W m^{-2}]
-%   d.tOut                   Outdoor air temperature [°C]
-%   d.vpOut                  Outdoor vapor pressure [Pa]
-%   d.co2Out                 Outdoor CO2 concentration [mg m^{-3}]
-%   d.wind                   Outdoor wind speed [m s^{-1}]
-%   d.tSky                   Sky temperature [°C]
-%   d.tSoOut                 Temperature of external soil layer [°C]
-%   d.isDay                  Indicates if it's day [1] or night [0], with a transition in between 
-%   d.dayRadSum              daily radiation sum [MJ m^{-2} day^{-1}]
-
-% David Katzin, Wageningen University
-% david.katzin@wur.nl
-% david.katzin1@gmail.com
+%   d.iGlob                  Radiation from the sun [W m^{-2}]
+%   d.tCan                   Canopy temperature [°C]
+%   d.co2InPpm               CO2 concentration [ppm]
 
     % Global radiation [W m^{-2}]
     d.iGlob = DynamicElement('d.iGlob');
@@ -90,20 +63,15 @@ function setInput(gl, weatherInput)
     % co2 concentration [mg m^{-3}]
     d.co2InPpm = DynamicElement('d.co2InPpm');
         
-    time = weatherInput(:,1);
-    d.iGlob.val = [time weatherInput(:,2)];
-    d.tCan.val = [time weatherInput(:,3)];
-    d.co2InPpm.val = [time weatherInput(:,4)];
+    time = indoor(:,1);
+    d.iGlob.val = [time indoor(:,2)];
+    d.tCan.val = [time indoor(:,3)];
+    d.co2InPpm.val = [time indoor(:,4)];
 	gl.d = d;
-%     gl.u.ctrl.val = gl.d.iGlob.val;
 end
 
 function setStates(gl)
-%SETGLSTATES Set states for the GreenLight greenhouse model
-
-% David Katzin, Wageningen University
-% david.katzin@wur.nl
-% david.katzin1@gmail.com
+%SETGLSTATES Set states for the GreenLight crop model
 
     x.tCan24 = DynamicElement('x.tCan24');
     
@@ -130,7 +98,7 @@ function setStates(gl)
 end
 
 function setAux(gl)
-%SETGLAUX Set auxiliary states for a GreenLight greenhouse model
+%SETGLAUX Set auxiliary states for a GreenLight crop model
 %
 % Based on the electronic appendices of:
 %   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J. & de Visser, P. H. B. 
@@ -323,8 +291,7 @@ function de = smoothHar(processVar, cutOff, smooth, maxRate)
 end
 
 function setOdes(gl)
-%SETGLODES Define ODEs for the GreenLight greenhouse model, with the addition of lamps and growpipes
-% Should be used after the states, aux states, and control rules have been set.
+%SETGLODES Define ODEs for the GreenLight crop model
 %
 % Based on the electronic appendices (the case of a Dutch greenhouse) of:
 %   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J. & de Visser, P. H. B. 
@@ -348,9 +315,7 @@ function setOdes(gl)
     a = gl.a;
     u = gl.u;
     d = gl.d;
-    
-    %% Energy balance 
-    
+        
     %% Carbon balance
     
     
@@ -387,19 +352,15 @@ function setOdes(gl)
 end
 
 function setInit(gl, indoor)
-%SETGLINIT Set the initial values for the GreenLight model.
+%SETGLINIT Set the initial values for the GreenLight crop model.
 %
 % Typical usage:
 %   setGlInit(gl, indoor)
 % Inputs:
 %   gl - a DynamicModel element, with its parameters already set by using
 %       setGlParams(m)
-%   indoor          (optional) A 3 column matrix with:
-%       indoor(:,1)     timestamps of the input [s] in regular intervals of 300, starting with 0
-%       indoor(:,2)     temperature       [°C]             indoor air temperature
-%       indoor(:,3)     vapor pressure    [Pa]             indoor vapor concentration
-%       indoor(:,4)     co2 concentration [mg m^{-3}]      indoor vapor concentration%
-%
+%   indoor is [time rad temp co2] where rad is W/m2 outside, temp is
+%   tCan, co2 is ppm
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl

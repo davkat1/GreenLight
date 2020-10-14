@@ -12,7 +12,7 @@ function setGlInput(gl, weatherInput)
 %       weatherInput(:,6)    wind        [m s^{-1}] outdoor wind speed
 %       weatherInput(:,7)    sky temperature [°C]
 %       weatherInput(:,8)    Temperature of external soil layer [°C]
-%       weatherInput(:,9)    daily radiation sum [MJ m^{-2} day^{-1}]
+%       weatherInput(:,9)    daily radiation sum [MJ m^{-2} day^{-1}] (optional)
 %
 % The inputs are then converted and copied to the following fields:
 %   d.iGlob                  radiation from the sun [W m^{-2}]
@@ -29,6 +29,14 @@ function setGlInput(gl, weatherInput)
 % david.katzin@wur.nl
 % david.katzin1@gmail.com
 
+    if size(weatherInput, 2) == 8
+        % add daily radiation sum
+        weatherInput = [weatherInput (dayLightSum(...
+            ... % convert seconds from start of sim to datenum
+            datenum(gl.t.label)+weatherInput(:,1)/86400,...
+            weatherInput(:,2)))'];
+    end
+        
     % Global radiation [W m^{-2}]
     d.iGlob = DynamicElement('d.iGlob');
     

@@ -17,36 +17,28 @@ secsInYear = seconds(startTime-datetime(year(startTime),1,1,0,0,0));
 weather(:,8) = soilTempNl(secsInYear+weather(:,1)); % add soil temperature
 
 % Create an instance of GreenLight with the default Vanthoor parameters
-hps = createGreenLightModel(weather, startTime);
+hps = createGreenLightModel('hps', weather, startTime);
 
-led = DynamicModel(hps); % make a copy of hps
+led = createGreenLightModel('led', weather, startTime);
 
-setHpsParams(hps); % Set up HPS lamps
-setLedParams(led); % Set up LED lamps
-
-ledNoCool = DynamicModel(led);
-setParam(ledNoCool, 'etaLampCool', 0); % LED with no cooling
-
-%% test
-hps.x.gasUsed = DynamicElement('x.gasUsed',0);
-setOde(hps, 'gasUsed', hps.a.hBoilPipe+hps.a.hBoilGroPipe);
-    
+ledCool = DynamicModel(led);
+setParam(ledCool, 'etaLampCool', 0.4); % LED with cooling
 
 %% Run simulation
 solveFromFile(hps, 'ode15s');
-% solveFromFile(led, 'ode15s');
-% solveFromFile(ledNoCool, 'ode15s');
+solveFromFile(led, 'ode15s');
+solveFromFile(ledCool, 'ode15s');
 
-% hps = changeRes(hps,300); % set data to a fixed step size (5 minutes)
-% led = changeRes(led,300);
-% ledNoCool = changeRes(ledNoCool,300);
+hps = changeRes(hps,300); % set data to a fixed step size (5 minutes)
+led = changeRes(led,300);
+ledCool = changeRes(ledCool,300);
 
 %% Plot
-% plot(hps.x.tAir);
-% hold on
-% plot(hps.x.tLamp);
-% plot(led.x.tLamp);
-% plot(ledNoCool.x.tLamp);
-% title('Temperature (°C)');
-% legend('Air', 'HPS', 'LED', 'LED no cooling');
+plot(hps.x.tAir);
+hold on
+plot(hps.x.tLamp);
+plot(led.x.tLamp);
+plot(ledCool.x.tLamp);
+title('Temperature (°C)');
+legend('Air', 'HPS', 'LED', 'LED cooling');
 toc;

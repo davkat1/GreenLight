@@ -22,24 +22,13 @@ function setGlParams(gl)
 %   [6] Dueck, T., Elings, A., Kempkes, F., Knies, P., Garcia, N., Heij, G., 
 % 		Janse, J., Kaarsemaker, R., Korsten, P., Maaswinkel, R., et al. (2004). 
 % 		Energie in kengetallen : op zoek naar een nieuwe balans.
-% Lamp parameters are based on:
-%   [7] De Zwart, H.F., Baeza, E., Van Breugel, B., Mohammadkhani, V., 
-%       and Janssen, H. (2017). De uitstralingmonitor. 52.
 % Several other parameters are based on:
-%   [8] Dueck, T., De Gelder, A., Janse, J., Kempkes, F., Baar, P.H., and 
+%   [7] Dueck, T., De Gelder, A., Janse, J., Kempkes, F., Baar, P.H., and 
 %       Valstar, W. (2014). Het nieuwe belichten onder diffuus glas (Wageningen).
-%   [9] Dueck, T. A., Janse, J., Eveleens, B. A., Kempkes, F. L. K., & Marcelis, L. F. M. (2012). 
-%       Growth of Tomatoes under Hybrid LED and HPS Lighting. Acta Horticulturae, 1(952), 335–342. 
-%   [10] Nelson, J. A., & Bugbee, B. (2014). Economic Analysis of Greenhouse Lighting: 
-%       Light Emitting Diodes vs. High Intensity Discharge Fixtures. PLoS ONE, 9(6), e99010. 
-%   [11] Dueck, T., Janse, J., Schapendonk, A. H. C. M., Kempkes, F., 
-%       Eveleens, B., Scheffers, K., … Marcelis, L. F. M. (2010). 
-%       Lichtbenuttig van tomaat onder LED en SON-T belichting. Wageningen.
-% 	[12] Heuvelink, E. (1996) Tomato growth and yield: quantitative analysis and synthesis.
-% 		 (Wageningen University)
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
+% david.katzin1@gmail.com
 
 
 	%% Table 1 [1]
@@ -343,15 +332,9 @@ function setGlParams(gl)
     addParam(gl, 'thScrRhPband', 2);            % P-band for thermal screen opening due to excess relative humidity 							[%] 									2
     addParam(gl, 'thScrDeadZone', 4);           % Zone between heating setpoint and point where screen opens
     
-    addParam(gl, 'lampsOn', 2);                 % time of day (in morning) to switch on lamps 													[hours since midnight] 					2
-    addParam(gl, 'lampsOff', 18);              	% time of day (in evening) to switch off lamps 													[hours since midnight] 					18
+    addParam(gl, 'lampsOn', 0);                 % time of day (in morning) to switch on lamps 													[hours since midnight] 					0
+    addParam(gl, 'lampsOff', 0);              	% time of day (in evening) to switch off lamps 													[hours since midnight] 					0
     addParam(gl, 'lampsOffSun', 200);       	% lamps are switched off if global radiation is above this value 								[W m^{-2}]   							200
-    addParam(gl, 'lampsOnYear', 260);           % day of year (in autumn) when lamps go on                                                      [days since beginning of year] 			260
-    addParam(gl, 'lampsOffYear', 120);          % day of year (in spring) when lamps go off                                                     [days since beginning of year] 			120
-    % should have: lampsOn < lampsOff, lampsOnYear > lampsOffYear 
-    % (the idea being that at 23:59 the lamps are off
-    % and that on 31 December the lamps are on)
-    
     addParam(gl, 'lampRadSumLimit', 10);        % Predicted daily radiation sum from the sun where lamps are not used that day                  [MJ m^{-2} day^{-1}]                    10
     
     %% Grow pipe parameters
@@ -360,7 +343,7 @@ function setGlParams(gl)
     % There are no grow pipes so these parameters are not important, but
     % they cannot be 0 because the ODE for the grow pipe still exists
     addParam(gl, 'lGroPipe', 1.655); 			% Length of grow pipes per gh floor area                                                    	m m^{-2}                                1.25 
-    addParam(gl, 'phiGroPipeE', 35e-3); 		% External diameter of grow pipes 																m                                       28e-3 [8]
+    addParam(gl, 'phiGroPipeE', 35e-3); 		% External diameter of grow pipes 																m                                       28e-3 [7]
     addParam(gl, 'phiGroPipeI', (35e-3)-(1.2e-3));% Internal diameter of grow pipes 															m                                       24e-3 
        
     addParam(gl, 'aGroPipe', pi*gl.p.lGroPipe*gl.p.phiGroPipeE); % Surface area of pipes for floor area                                                   m^{2}{pipe} m^{-2}{floor}

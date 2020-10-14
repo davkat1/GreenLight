@@ -1,15 +1,18 @@
 function energyCompare(gl1, gl2)
-% ENERGYCOMPARE  ---TO DO---
-% Prints out the total value (trapz) of the following:
-%   Radiation from the sun
-%   Heat from the boiler
-%   Energy converted to latent heat by transpiration
-%   Losses to the soil
-%   Losses due to ventilation
-%   Losses to the outside through convection
-%   Losses to the sky through long wave radiation
-%   Heat from lamps
-%   Heat extracted by lamp cooling
+% ENERGYCOMPARE Compare the energy balances of two GreenLight simulations
+% The function prints out the differnece (gl1-gl2) of the sum of incoming
+% and outgoing energy fluxes:
+%   Incoming fluxes
+%       sunIn:  Radiation from the sun
+%       heatIn: Heat from the boiler (pipe-rail and grow-pipes)
+%       lampIn: Energy from lamps (top-lights and inter-lights)
+%   Outgoing fluxes
+%       transpOut:  Net conversion of sensible to latent heat (transpiration-condensation)
+%       soilOut:    Convection to soil
+%       ventOut:    Ventilation to the outside
+%       convOut:    Convection through the cover
+%       firOut:     Thermal radiation towards the sky
+%       lampCool:   Lamp cooling
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -30,7 +33,7 @@ function energyCompare(gl1, gl2)
     balance = sunIn+heatIn-transp-soilOut-ventOut-firOut+lampIn-convOut-lampCool;
     
     fprintf(['Incoming energy:\nSunIn: %f\nheatIn: %f\nlampIn: %f\ntotal: %f' ...
-        '\n--------\nOutgoing energy:\ntranspiration: %f\nsoilOut: %f\n' ...
+        '\n--------\nOutgoing energy:\ntranspOut: %f\nsoilOut: %f\n' ...
         'ventOut: %f\nconvOut: %f\nfirOut: %f\nlampCool: %f\ntotal: %f\n------\ntotal balance: %f\n'], ...
         sunIn,heatIn,lampIn,sunIn+heatIn+lampIn,...
         transp,soilOut,ventOut,convOut,firOut,lampCool,...

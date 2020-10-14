@@ -1,5 +1,11 @@
 function setParamsBleiswijk2010(gl)
 %SETPARAMSBLEISWIJK2010 Modify parameters for a GreenLight model to fit a trial in Bleiswijk, 2010 
+% Used in: 
+%   Katzin, D., van Mourik, S., Kempkes, F., & 
+%       van Henten, E. J. (2020). GreenLight – An open source model for 
+%       greenhouses with supplemental lighting: Evaluation of heat requirements 
+%       under LED and HPS lamps. Biosystems Engineering, 194, 61–81. 
+%       https://doi.org/10.1016/j.biosystemseng.2020.03.010
 % Inputs:
 %   gl   - a DynamicModel object to be used as a GreenLight model
 %

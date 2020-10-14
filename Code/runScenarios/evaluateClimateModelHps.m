@@ -2,6 +2,12 @@
 % Runs the model with parameter values representing an HPS compartment in
 % Bleiswijk, The Netherlands in 2010. Data is loaded from this trial and
 % compared to the simulated data
+% Used in: 
+%   Katzin, D., van Mourik, S., Kempkes, F., & 
+%       van Henten, E. J. (2020). GreenLight – An open source model for 
+%       greenhouses with supplemental lighting: Evaluation of heat requirements 
+%       under LED and HPS lamps. Biosystems Engineering, 194, 61–81. 
+%       https://doi.org/10.1016/j.biosystemseng.2020.03.010
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -33,17 +39,14 @@ secsInYear = seconds(startTime-datetime(year(startTime),1,1,0,0,0));
 outdoor(:,7) = skyTempRdam(outdoor(:,3), datenum(startTime)+outdoor(:,1)/86400); % add sky temperature
 outdoor(:,8) = soilTempNl(secsInYear+outdoor(:,1)); % add soil temperature
 
-hps = createGreenLightModel(outdoor, startTime, controls, indoor);
+hps = createGreenLightModel('none', outdoor, startTime, controls, indoor);
 setParamsBleiswijk2010(hps);
-feval(['set' upper(simType(1)) simType(2:end) 'Params'], hps); % set lamp params
+setBleiswijk2010HpsParams(hps); % set lamp params
 
 % Set initial values for crop
 hps.x.cLeaf.val = 0.7*6240*10;
 hps.x.cStem.val = 0.25*6240*10;
 hps.x.cFruit.val = 0.05*6240*10;
-
-%% test
-setParam(hps, 'cHecIn', 5);
 
 %% Solve
 solveFromFile(hps, 'ode15s');

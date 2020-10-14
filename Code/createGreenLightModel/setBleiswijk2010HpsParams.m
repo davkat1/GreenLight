@@ -1,5 +1,11 @@
-function setHpsParams(gl)
-%SETHPSPARAMS Modify parameters for a greenhouse crop model based on Vanthoor (2011), according to a dataset with HPS toplighting 
+function setBleiswijk2010HpsParams(gl)
+%SETBLEIWSWIJK2010HPSPARAMS Modify parameters for a greenhouse crop model based on Vanthoor (2011), according to a dataset with HPS toplighting 
+% Used in: 
+%   Katzin, D., van Mourik, S., Kempkes, F., & 
+%       van Henten, E. J. (2020). GreenLight – An open source model for 
+%       greenhouses with supplemental lighting: Evaluation of heat requirements 
+%       under LED and HPS lamps. Biosystems Engineering, 194, 61–81. 
+%       https://doi.org/10.1016/j.biosystemseng.2020.03.010
 % Inputs:
 %   gl   - a DynamicModel object to be used as a GreenLight model
 %
