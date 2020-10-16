@@ -18,7 +18,7 @@
 simType = 'led';
 
 seasonLength = 112; % season length in days (data length is 112 days)
-firstDay = 1; % 46 or 78 or 80.2 days since beginning of data        
+firstDay = 1; % days since beginning of data        
 
 [outdoor, indoor, controls, startTime, filtInd] = loadGreenhouseData(firstDay, seasonLength, simType);
 
@@ -51,11 +51,19 @@ led.x.cFruit.val = 0.05*6240*10;
 %% Solve
 solveFromFile(led, 'ode15s');
 
-led = changeRes(led,300); % set resolution of trajectories at 5 minutes
+mesInterval = v.tAir.val(2,1)-v.tAir.val(1,1); % the interval (seconds) of the measurement data
+led = changeRes(led,mesInterval); % set resolution of trajectories equal to that of the measurement data
 
 %% Get RRMSEs between simulation and measurements
-rrmseTair = sqrt(mean((led.x.tAir.val(:,2)-v.tAir.val(:,2)).^2))./mean(v.tAir.val(:,2));
-rrmseVpair = sqrt(mean((led.x.vpAir.val(:,2)-v.vpAir.val(:,2)).^2))./mean(v.vpAir.val(:,2));
-rrmseCo2air  = sqrt(mean((led.x.co2Air.val(:,2)-v.co2Air.val(:,2)).^2))./mean(v.co2Air.val(:,2));
+% Check that the measured data and the simulations have the same size. 
+% If one of them is bigger, some data points of the longer dataset will be
+% discarded
+mesLength = length(v.tAir.val(:,1)); % the length (array size) of the measurement data
+simLength = length(led.x.tAir.val(:,1)); % the length (array size) of the simulated data
+compareLength = min(mesLength, simLength);
+
+rrmseTair = sqrt(mean((led.x.tAir.val(1:compareLength,2)-v.tAir.val(:,2)).^2))./mean(v.tAir.val(1:compareLength,2));
+rrmseVpair = sqrt(mean((led.x.vpAir.val(1:compareLength,2)-v.vpAir.val(1:compareLength,2)).^2))./mean(v.vpAir.val(1:compareLength,2));
+rrmseCo2air  = sqrt(mean((led.x.co2Air.val(1:compareLength,2)-v.co2Air.val(1:compareLength,2)).^2))./mean(v.co2Air.val(:,2));
 
 save ledClimate

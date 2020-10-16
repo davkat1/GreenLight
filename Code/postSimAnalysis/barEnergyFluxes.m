@@ -33,11 +33,23 @@ led = gl;
 % figure;
 offset = 0.15;
 
-hpsWin = cutTime(hps, datenum(hps.t.label)+116-1/24,86400);
-ledWin = cutTime(led, datenum(led.t.label)+116-1/24,86400);
+% Choose dates for the winter and summer days. Dates are represented by
+% "days since Sept 27 (the beginning of the growing season)". 
+% 116 - January 21; 292 - July 15 (used in Paper).
+% Other examples:
+% 65 - December 1
+% 96 - January 1
+% 156 - March 1
+% 248 - June 1
+% 340 - September 1
+winterDay = 116;
+summerDay = 292;
 
-hpsSum = cutTime(hps, datenum(hps.t.label)+292-1/24,86400);
-ledSum = cutTime(led, datenum(led.t.label)+292-1/24,86400);
+hpsWin = cutTime(hps, datenum(hps.t.label)+winterDay-1/24,86400);
+ledWin = cutTime(led, datenum(led.t.label)+winterDay-1/24,86400);
+
+hpsSum = cutTime(hps, datenum(hps.t.label)+summerDay-1/24,86400);
+ledSum = cutTime(led, datenum(led.t.label)+summerDay-1/24,86400);
 
 subplot(2,1,1)
 plotBars(hpsWin,ledWin,offset,1)
