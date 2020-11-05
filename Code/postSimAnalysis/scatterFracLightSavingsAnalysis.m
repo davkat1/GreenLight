@@ -3,8 +3,10 @@
 % a function of the fraction of energy going to light in the HPS
 % greenhouse, including all scenarios simulated.
 % Used to create Figure 7 in: 
-%   Katzin, Marcelis, Van Mourik, "Energy savings in greenhouses by
-%   transition from HPS to LED lighting" (submitted)
+%   Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%   Energy savings in greenhouses by transition from high-pressure sodium 
+%   to LED lighting. Applied Energy, 281, 116019. 
+%   https://doi.org/10.1016/j.apenergy.2020.116019
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl

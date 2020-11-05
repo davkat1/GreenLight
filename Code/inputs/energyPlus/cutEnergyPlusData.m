@@ -35,6 +35,12 @@ function season = cutEnergyPlusData(firstDay, seasonLength, path)
 % Output:
 %   season          A matrix with the same format of hiresWeather above,
 %                   cut so that it start and ends in the requested time
+%
+% Used to generate the data in: 
+%   Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%   Energy savings in greenhouses by transition from high-pressure sodium 
+%   to LED lighting. Applied Energy, 281, 116019. 
+%   https://doi.org/10.1016/j.apenergy.2020.116019
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl

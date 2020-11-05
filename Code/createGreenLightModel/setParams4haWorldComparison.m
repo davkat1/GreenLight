@@ -1,8 +1,10 @@
 function setParams4haWorldComparison(gl)
 %SETPARAMS4HAWORLDCOMPARISON Set parameters for GreenLight model of a modern 4 ha greenhouse with settings used to compare greenhouses around the world
 % Used to generate the data in: 
-%   Katzin, Marcelis, Van Mourik, "Energy savings in greenhouses by
-%   transition from HPS to LED lighting" (submitted)
+%   Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%   Energy savings in greenhouses by transition from high-pressure sodium 
+%   to LED lighting. Applied Energy, 281, 116019. 
+%   https://doi.org/10.1016/j.apenergy.2020.116019
 %
 % References:
 %   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J., & de Visser, P. H. B. (2011). 

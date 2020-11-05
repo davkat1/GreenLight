@@ -1,8 +1,10 @@
 % BARENERGYFLUXES Create a bar graph of the energy fluxes in a simulated greenhouse
 % Creates a bar graph for the full year, for a day in winter and a day in summer
 % The "winter and summer" figure was used to create Figure 10 in: 
-%   Katzin, Marcelis, Van Mourik, "Energy savings in greenhouses by
-%   transition from HPS to LED lighting" (submitted)
+%   Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%   Energy savings in greenhouses by transition from high-pressure sodium 
+%   to LED lighting. Applied Energy, 281, 116019. 
+%   https://doi.org/10.1016/j.apenergy.2020.116019
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl

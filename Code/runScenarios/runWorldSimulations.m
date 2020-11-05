@@ -1,8 +1,10 @@
 % RUNWORLDSIMULATIONS Simulate an HPS and LED greenhouse in different
 % climate scenarios around the world
 % Used to generate the data in: 
-%   Katzin, Marcelis, Van Mourik, "Energy savings in greenhouses by
-%   transition from HPS to LED lighting" (submitted)
+%   Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%   Energy savings in greenhouses by transition from high-pressure sodium 
+%   to LED lighting. Applied Energy, 281, 116019. 
+%   https://doi.org/10.1016/j.apenergy.2020.116019
 % Note that the simulations in this file take a long time. You can split
 % them across multiple machines by commenting out sections and only running
 % some sections on each machine
@@ -42,8 +44,8 @@ for k=1:length(locations)
     season = cutEnergyPlusData(firstDay, seasonLength, ...
         [dataFolder locations{k} 'EnergyPlus.mat']);
     
-    paramNames = "heatCorrection";
-    paramVals = 1;
+    paramNames = "heatCorrection"; % parameters to modify from the default
+    paramVals = 1; % corresponding changed parameter value
     
     runGreenLight('led', season, [outputFolder locations{k} '_led_' fileLabel],...
         paramNames, paramVals);
@@ -52,8 +54,8 @@ end
 %% more light hours
 locations = {'cal', 'ams', 'che'};
 fileLabel = 'moreLightHours';
-paramNames = ["lampsOffSun" "lampRadSumLimit"];
-paramVals = [600 14];  
+paramNames = ["lampsOffSun" "lampRadSumLimit"]; % list of parameters to modify from the default
+paramVals = [600 14];  % corresponding changed parameter values
 for k=1:length(locations)
     % load climate data and cut it to requested season size
     season = cutEnergyPlusData(firstDay, seasonLength, ...
@@ -68,8 +70,8 @@ end
 %% Colder
 locations = {'cal', 'ams', 'che'};
 fileLabel = 'colder';
-paramNames = ["tSpNight" "tSpDay"];
-paramVals = [16.5 17.5];
+paramNames = ["tSpNight" "tSpDay"]; % list of parameters to modify from the default
+paramVals = [16.5 17.5]; % corresponding changed parameter values
 for k=1:length(locations)
     % load climate data and cut it to requested season size
     season = cutEnergyPlusData(firstDay, seasonLength, ...
@@ -84,8 +86,8 @@ end
 %% Warmer
 locations = {'cal', 'ams', 'che'};
 fileLabel = 'warmer';
-paramNames = ["tSpNight" "tSpDay"];
-paramVals = [20.5 21.5];
+paramNames = ["tSpNight" "tSpDay"]; % list of parameters to modify from the default
+paramVals = [20.5 21.5]; % corresponding changed parameter values
 for k=1:length(locations)
     % load climate data and cut it to requested season size
     season = cutEnergyPlusData(firstDay, seasonLength, ...
@@ -100,8 +102,8 @@ end
 % Low insulation
 locations = {'cal', 'ams', 'che'};
 fileLabel = 'lowInsulation';
-paramNames = ["cLeakage" "hRf"];
-paramVals = [2e-4 2e-3];
+paramNames = ["cLeakage" "hRf"]; % list of parameters to modify from the default
+paramVals = [2e-4 2e-3]; % corresponding changed parameter values
 for k=1:length(locations)
     % load climate data and cut it to requested season size
     season = cutEnergyPlusData(firstDay, seasonLength, ...
@@ -116,8 +118,8 @@ end
 %% High insulation
 locations = {'cal', 'ams', 'che'};
 fileLabel = 'highInsulation';
-paramNames = ["cLeakage" "hRf"];
-paramVals = [0.5e-4 8e-3];
+paramNames = ["cLeakage" "hRf"]; % list of parameters to modify from the default
+paramVals = [0.5e-4 8e-3]; % corresponding changed parameter values
 
 for k=1:length(locations)
     % load climate data and cut it to requested season size
