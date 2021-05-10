@@ -18,7 +18,7 @@
 simType = 'led';
 
 seasonLength = 112; % season length in days (data length is 112 days)
-firstDay = 1; % days since beginning of data        
+firstDay = 1; % days since beginning of data
 
 [outdoor, indoor, controls, startTime, filtInd] = loadGreenhouseData(firstDay, seasonLength, simType);
 

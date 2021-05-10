@@ -1,88 +1,86 @@
 function setGlStates(gl)
 %SETGLSTATES Set states for the GreenLight greenhouse model
+% See setGlOdes for equations and references
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
 % david.katzin1@gmail.com
 
     % CO2 concentration in main compartment [mg m^{-3}]
-    x.co2Air = DynamicElement('x.co2Air');
+    addState(gl, 'co2Air');
     
     % CO2 concentration in top compartment [mg m^{-3}]
-    x.co2Top = DynamicElement('x.co2Top');
+    addState(gl, 'co2Top');
     
     % Air temperature in main compartment [°C]
-    x.tAir = DynamicElement('x.tAir');
+    addState(gl, 'tAir');
     
     % Air temperature in top compartment [°C]
-    x.tTop = DynamicElement('x.tTop');
+    addState(gl, 'tTop');
     
     % Canopy temperature [°C]
-    x.tCan = DynamicElement('x.tCan');
+    addState(gl, 'tCan');
     
     % Indoor cover temperature [°C]
-    x.tCovIn = DynamicElement('x.tCovIn');
+    addState(gl, 'tCovIn');
      
     % Thermal screen temperature [°C]
-    x.tThScr = DynamicElement('x.tThScr');
+    addState(gl, 'tThScr');
     
     % Floor temperature [°C]
-    x.tFlr = DynamicElement('x.tFlr');
+    addState(gl, 'tFlr');
     
     % Pipe temperature [°C]
-    x.tPipe = DynamicElement('x.tPipe');
+    addState(gl, 'tPipe');
     
     % Outdoor cover temperature [°C]
-    x.tCovE = DynamicElement('x.tCovE');
+    addState(gl, 'tCovE');
     
     % Soil layers temperature [°C]
-    x.tSo1 = DynamicElement('x.tSo1');
-    x.tSo2 = DynamicElement('x.tSo2');
-    x.tSo3 = DynamicElement('x.tSo3');
-    x.tSo4 = DynamicElement('x.tSo4');
-    x.tSo5 = DynamicElement('x.tSo5');
+    addState(gl, 'tSo1');
+    addState(gl, 'tSo2');
+    addState(gl, 'tSo3');
+    addState(gl, 'tSo4');
+    addState(gl, 'tSo5');
     
     % Vapor pressure in main compartment [Pa]
-    x.vpAir = DynamicElement('x.vpAir');
+    addState(gl, 'vpAir');
    
     % Vapor pressure in top compartment [Pa]
-    x.vpTop = DynamicElement('x.vpTop');
+    addState(gl, 'vpTop');
     
     % Average canopy temperature in last 24 hours [°C]
-    x.tCan24 = DynamicElement('x.tCan24');
+    addState(gl, 'tCan24');
     
     % Time since beginning simulation [s]
-    x.time = DynamicElement('x.time');
+    addState(gl, 'time');
     
     % Lamp temperature [°C]
-    x.tLamp = DynamicElement('x.tLamp');
+    addState(gl, 'tLamp');
     
     % Growpipes temperature [°C]
-    x.tGroPipe = DynamicElement('x.tGroPipe');
+    addState(gl, 'tGroPipe');
     
     % Interlights temperature [°C]
-    x.tIntLamp = DynamicElement('x.tIntLamp');
+    addState(gl, 'tIntLamp');
     
     % Blackout screen temperature [°C]
-    x.tBlScr = DynamicElement('x.tBlScr');
-    
+    addState(gl, 'tBlScr');
+        
     %% Crop model
     
     % Carbohydrates in buffer [mg{CH2O} m^{-2}]
-    x.cBuf = DynamicElement('x.cBuf');
+    addState(gl, 'cBuf');
     
     % Carbohydrates in leaves [mg{CH2O} m^{-2}]
-    x.cLeaf = DynamicElement('x.cLeaf');
+    addState(gl, 'cLeaf');
     
     % Carbohydrates in stem [mg{CH2O} m^{-2}]
-    x.cStem = DynamicElement('x.cStem');
+    addState(gl, 'cStem');
     
     % Carbohydrates in fruit [mg{CH2O} m^{-2}]
-    x.cFruit = DynamicElement('x.cFruit');
+    addState(gl, 'cFruit');
     
     % Crop development stage [°C day]
-    x.tCanSum = DynamicElement('x.tCanSum');
-	
-	gl.x = x;
+    addState(gl, 'tCanSum');
 end
-

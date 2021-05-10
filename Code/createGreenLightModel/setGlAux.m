@@ -1,5 +1,5 @@
 function setGlAux(gl)
-%SETGLAUX Set auxiliary states for a GreenLight greenhouse model
+%SETGLAUX Set auxiliary states for the GreenLight greenhouse model
 %
 % Based on the electronic appendices of:
 %   [1] Vanthoor, B., Stanghellini, C., van Henten, E. J. & de Visser, P. H. B. 
@@ -18,7 +18,20 @@ function setGlAux(gl)
 %       GreenLight - An open source model for greenhouses with supplemental 
 %       lighting: Evaluation of heat requirements under LED and HPS lamps. 
 %       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
-%
+% Additional components are taken from:
+%   [6] Righini, I., Vanthoor, B., Verheul, M. J., Naseer, M., Maessen, H., 
+%       Persson, T., & Stanghellini, C. (2020). A greenhouse climate-yield 
+%       model focussing on additional light, heat harvesting and its validation. 
+%       Biosystems Engineering, (194), 1–15. https://doi.org/10.1016/j.biosystemseng.2020.03.009
+% The model is further described in:
+%   [7] Katzin, D. (2021). Energy saving by LED lighting in greenhouses: 
+%       a process-based modelling approach (PhD thesis, Wageningen University).
+%       https://doi.org/10.18174/544434
+% Some control decisions are described in:
+%   [8] Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%       Energy savings in greenhouses by transition from high-pressure sodium 
+%       to LED lighting. Applied Energy, 281, 116019. 
+%       https://doi.org/10.1016/j.apenergy.2020.116019
 % Inputs:
 %   gl    - a DynamicModel object to be used as a GreenLight model.
 
@@ -190,19 +203,19 @@ function setGlAux(gl)
     addAux(gl, 'rhoBlScrPar', u.blScr*p.rhoBlScrPar);
     
     % PAR transmission coefficient of the old cover and blackout screen [-]
-    % Equation A9 [5]
+	% Equation A9 [5]
     addAux(gl, 'tauCovBlScrPar', tau12(gl.a.tauCovParOld, gl.a.tauBlScrPar, ...
         gl.a.rhoCovParOldUp, gl.a.rhoCovParOldDn, ...
         gl.a.rhoBlScrPar, gl.a.rhoBlScrPar));
     
     % PAR up reflection coefficient of the old cover and blackout screen [-]
-    % Equation A10 [5]
+	% Equation A10 [5]
     addAux(gl, 'rhoCovBlScrParUp', rhoUp(gl.a.tauCovParOld, gl.a.tauBlScrPar, ...
         gl.a.rhoCovParOldUp, gl.a.rhoCovParOldDn, ...
         gl.a.rhoBlScrPar, gl.a.rhoBlScrPar));
     
     % PAR down reflection coefficient of the old cover and blackout screen [-]
-    % Equation A11 [5]
+	% Equation A11 [5]
     addAux(gl, 'rhoCovBlScrParDn', rhoDn(gl.a.tauCovParOld, gl.a.tauBlScrPar, ...
         gl.a.rhoCovParOldUp, gl.a.rhoCovParOldDn, ...
         gl.a.rhoBlScrPar, gl.a.rhoBlScrPar));
@@ -230,13 +243,13 @@ function setGlAux(gl)
     
     % all layers
     % PAR transmission coefficient of the cover [-]
-    % Equation A12 [5]
+	 % Equation A12 [5]
     addAux(gl, 'tauCovPar', tau12(gl.a.tauCovBlScrPar, p.tauLampPar, ...
         gl.a.rhoCovBlScrParUp, gl.a.rhoCovBlScrParDn, ...
         p.rhoLampPar, p.rhoLampPar));
     
     % PAR reflection coefficient of the cover [-]
-    % Equation A13 [5]
+	% Equation A13 [5]
     addAux(gl, 'rhoCovPar', rhoUp(gl.a.tauCovBlScrPar, p.tauLampPar, ...
         gl.a.rhoCovBlScrParUp, gl.a.rhoCovBlScrParDn, ...
         p.rhoLampPar, p.rhoLampPar));
@@ -319,22 +332,30 @@ function setGlAux(gl)
     % Equation A15 [5]
     addAux(gl, 'rParGhLamp', p.etaLampPar*gl.a.qLampIn);
     
+    % PAR outside the canopy from the interlights [W m^{-2}] 
+    % Equation 7.7, 7.14 [7]
+    addAux(gl, 'rParGhIntLamp', p.etaIntLampPar*gl.a.qIntLampIn);
+    
     % Global radiation above the canopy from the sun [W m^{-2}]
     % (PAR+NIR, where UV is counted together with NIR)
+    % Equation 7.24 [7]
     addAux(gl, 'rCanSun', (1-p.etaGlobAir).*d.iGlob.*...
         (p.etaGlobPar*gl.a.tauCovPar+p.etaGlobNir*gl.a.tauCovNir));
                                     % perhaps tauHatCovNir should be used here?
     
     % Global radiation above the canopy from the lamps [W m^{-2}]
     % (PAR+NIR, where UV is counted together with NIR)
+    % Equation 7.25 [7]
     addAux(gl, 'rCanLamp', (p.etaLampPar+p.etaLampNir)*gl.a.qLampIn);    
     
-    % Global radiation to the canopy from the interlight lamps [W m^{-2}]
+    % Global radiation outside the canopy from the interlight lamps [W m^{-2}]
     % (PAR+NIR, where UV is counted together with NIR)
+    % Equation 7.26 [7]
     addAux(gl, 'rCanIntLamp', (p.etaIntLampPar+p.etaIntLampNir)*gl.a.qIntLampIn);    
     
-    % Global radiation above the canopy [W m^{-2}]
+    % Global radiation above and outside the canopy [W m^{-2}]
     % (PAR+NIR, where UV is counted together with NIR)
+    % Equation 7.23 [7]
     addAux(gl, 'rCan', gl.a.rCanSun+gl.a.rCanLamp+gl.a.rCanIntLamp);    
     
     % PAR from the sun directly absorbed by the canopy [W m^{-2}]
@@ -344,6 +365,26 @@ function setGlAux(gl)
     % PAR from the lamps directly absorbed by the canopy [W m^{-2}]
     % Equation A17 [5]
     addAux(gl, 'rParLampCanDown', gl.a.rParGhLamp.*(1-p.rhoCanPar).*(1-exp(-p.k1Par*gl.a.lai)));
+    
+    % Fraction of PAR from the interlights reaching the canopy [-]
+    % Equation 7.13 [7]
+    addAux(gl, 'fIntLampCanPar', 1-p.fIntLampDown*exp(-p.k1IntPar*p.vIntLampPos*gl.a.lai) + ...
+        (p.fIntLampDown-1)*exp(-p.k1IntPar*(1-p.vIntLampPos)*gl.a.lai));
+        % Fraction going up and absorbed is (1-p.fIntLampDown)*(1-exp(-p.k1IntPar*(1-p.vIntLampPos)*gl.a.lai))
+        % Fraction going down and absorbed is p.fIntLampDown*(1-exp(-p.k1IntPar*p.vIntLampPos*gl.a.lai))
+        % This is their sum
+        % e.g., if p.vIntLampPos==1, the lamp is above the canopy
+        %   fraction going up and abosrbed is 0
+        %   fraction going down and absroebd is p.fIntLampDown*(1-exp(-p.k1IntPar*gl.a.lai))
+    
+    % Fraction of NIR from the interlights reaching the canopy [-]
+    % Analogous to Equation 7.13 [7]
+    addAux(gl, 'fIntLampCanNir', 1-p.fIntLampDown*exp(-p.kIntNir*p.vIntLampPos*gl.a.lai) + ...
+        (p.fIntLampDown-1)*exp(-p.kIntNir*(1-p.vIntLampPos)*gl.a.lai));
+    
+    % PAR from the interlights directly absorbed by the canopy [W m^{-2}]
+    % Equation 7.16 [7]
+    addAux(gl, 'rParIntLampCanDown', gl.a.rParGhIntLamp.*gl.a.fIntLampCanPar.*(1-p.rhoCanPar));
     
     % PAR from the sun absorbed by the canopy after reflection from the floor [W m^{-2}]
     % Equation 28 [1]
@@ -355,6 +396,16 @@ function setGlAux(gl)
     addAux(gl, 'rParLampFlrCanUp', gl.a.rParGhLamp.*exp(-p.k1Par*gl.a.lai)*p.rhoFlrPar* ...
         (1-p.rhoCanPar).*(1-exp(-p.k2Par*gl.a.lai)));
     
+    % PAR from the interlights absorbed by the canopy after reflection from the floor [W m^{-2}]
+    % Equation 7.18 [7]
+    addAux(gl, 'rParIntLampFlrCanUp', gl.a.rParGhIntLamp.*p.fIntLampDown.*...
+        exp(-p.k1IntPar*p.vIntLampPos.*gl.a.lai).*p.rhoFlrPar* ...
+        (1-p.rhoCanPar).*(1-exp(-p.k2IntPar*gl.a.lai)));
+        % if p.vIntLampPos==1, the lamp is above the canopy, light loses
+        % exp(-k*LAI) on its way to the floor.
+        % if p.vIntLampPos==0, the lamp is below the canopy, no light is
+        % lost on the way to the floor
+    
     % Total PAR from the sun absorbed by the canopy [W m^{-2}]
     % Equation 25 [1]
     addAux(gl, 'rParSunCan', gl.a.rParSunCanDown + gl.a.rParSunFlrCanUp);
@@ -362,6 +413,10 @@ function setGlAux(gl)
     % Total PAR from the lamps absorbed by the canopy [W m^{-2}]
     % Equation A19 [5]
     addAux(gl, 'rParLampCan', gl.a.rParLampCanDown + gl.a.rParLampFlrCanUp);
+        
+    % Total PAR from the interlights absorbed by the canopy [W m^{-2}]
+    % Equation A19 [5], Equation 7.19 [7]
+    addAux(gl, 'rParIntLampCan', gl.a.rParIntLampCanDown + gl.a.rParIntLampFlrCanUp);
     
     % Virtual NIR transmission for the cover-canopy-floor lumped model [-]
     % Equation 29 [1]
@@ -406,7 +461,11 @@ function setGlAux(gl)
     % NIR from the lamps absorbed by the canopy [W m^{-2}]
     % Equation A20 [5]
     addAux(gl, 'rNirLampCan', p.etaLampNir.*gl.a.qLampIn.*(1-p.rhoCanNir).*(1-exp(-p.kNir*gl.a.lai)));
-        
+            
+    % NIR from the interlights absorbed by the canopy [W m^{-2}]
+    % Equation 7.20 [7]
+    addAux(gl, 'rNirIntLampCan', p.etaIntLampNir.*gl.a.qIntLampIn.*gl.a.fIntLampCanNir.*(1-p.rhoCanNir));
+
     % NIR from the sun absorbed by the floor [W m^{-2}]
     % Equation 33 [1]
     addAux(gl, 'rNirSunFlr', (1-p.etaGlobAir).*gl.a.aFlrNir.*p.etaGlobNir.*d.iGlob);
@@ -414,6 +473,16 @@ function setGlAux(gl)
     % NIR from the lamps absorbed by the floor [W m^{-2}]
     % Equation A22 [5]
     addAux(gl, 'rNirLampFlr', (1-p.rhoFlrNir).*exp(-p.kNir*gl.a.lai).*p.etaLampNir.*gl.a.qLampIn);
+    
+    % NIR from the interlights absorbed by the floor [W m^{-2}]
+    % Equation 7.21 [7]
+    addAux(gl, 'rNirIntLampFlr', p.fIntLampDown.*(1-p.rhoFlrNir).*...
+        exp(-p.kIntNir*gl.a.lai.*p.vIntLampPos).*...
+        p.etaIntLampNir.*gl.a.qIntLampIn);
+        % if p.vIntLampPos==1, the lamp is above the canopy, light loses
+        % exp(-k*LAI) on its way to the floor.
+        % if p.vIntLampPos==0, the lamp is below the canopy, no light is
+        % lost on the way to the floor
     
     % PAR from the sun absorbed by the floor [W m^{-2}]
     % Equation 34 [1]
@@ -423,11 +492,21 @@ function setGlAux(gl)
     % Equation A21 [5]
     addAux(gl, 'rParLampFlr', (1-p.rhoFlrPar).*exp(-p.k1Par*gl.a.lai).*gl.a.rParGhLamp);
     
+    % PAR from the interlights absorbed by the floor [W m^{-2}]
+    % Equation 7.17 [7]
+    addAux(gl, 'rParIntLampFlr', gl.a.rParGhIntLamp.*p.fIntLampDown.*(1-p.rhoFlrPar).*...
+        exp(-p.k1IntPar*gl.a.lai.*p.vIntLampPos));
+    
 	% PAR and NIR from the lamps absorbed by the greenhouse air [W m^{-2}]
     % Equation A23 [5]
 	addAux(gl, 'rLampAir', (p.etaLampPar+p.etaLampNir)*gl.a.qLampIn - gl.a.rParLampCan - ...
 		gl.a.rNirLampCan - gl.a.rParLampFlr - gl.a.rNirLampFlr);
 	
+    % PAR and NIR from the interlights absorbed by the greenhouse air [W m^{-2}]
+    % Equation 7.22 [7]
+	addAux(gl, 'rIntLampAir', (p.etaIntLampPar+p.etaIntLampNir)*gl.a.qIntLampIn - gl.a.rParIntLampCan - ...
+		gl.a.rNirIntLampCan - gl.a.rParIntLampFlr - gl.a.rNirIntLampFlr);
+    
     % Global radiation from the sun absorbed by the greenhouse air [W m^{-2}]
     % Equation 35 [1]
     addAux(gl, 'rGlobSunAir', p.etaGlobAir*d.iGlob.*...
@@ -436,14 +515,6 @@ function setGlAux(gl)
     % Global radiation from the sun absorbed by the cover [W m^{-2}]
     % Equation 36 [1]
     addAux(gl, 'rGlobSunCovE', (gl.a.aCovPar*p.etaGlobPar+gl.a.aCovNir*p.etaGlobNir).*d.iGlob);
-    
-    % PAR from the interlights to the canopy lamps [W m^{-2}] 
-    % Equation A24 [5]
-    addAux(gl, 'rParIntLampCan', p.etaIntLampPar*gl.a.qIntLampIn);
-    
-    % NIR from the interlight absorbed by the canopy [W m^{-2}]
-    % Equation A25 [5]
-    addAux(gl, 'rNirIntLampCan', p.etaIntLampNir.*gl.a.qLampIn);
     
     %% FIR heat fluxes - Section 5.2 [1]
 	
@@ -459,38 +530,39 @@ function setGlAux(gl)
     addAux(gl, 'aCan', 1-exp(-p.kFir*gl.a.lai));
 	
 	% FIR between greenhouse objects [W m^{-2}]
-	% Table 3 [1]
-    % Table A1 [5]
+	% Table 7.4 [7]. Based on Table 3 [1] and Table A1 [5]
 	
 	% FIR between canopy and cover [W m^{-2}]
     addAux(gl, 'rCanCovIn', fir(gl.a.aCan, p.epsCan, gl.a.epsCovFir, ...
-        p.tauLampFir*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU, x.tCan, x.tCovIn));
+        p.tauLampFir*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU,...
+        x.tCan, x.tCovIn));
 	
 	% FIR between canopy and sky [W m^{-2}]
     addAux(gl, 'rCanSky', fir(gl.a.aCan, p.epsCan, p.epsSky, ...
-        p.tauLampFir*gl.a.tauCovFir.*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU, x.tCan, d.tSky));
+        p.tauLampFir*gl.a.tauCovFir.*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU,...
+        x.tCan, d.tSky));
 	
 	% FIR between canopy and thermal screen [W m^{-2}]
     addAux(gl, 'rCanThScr', fir(gl.a.aCan, p.epsCan, p.epsThScrFir, ...
         p.tauLampFir*u.thScr.*gl.a.tauBlScrFirU, x.tCan, x.tThScr));
     
 	% FIR between canopy and floor [W m^{-2}]
-	addAux(gl, 'rCanFlr', fir(gl.a.aCan, p.epsCan, p.epsFlr, p.fCanFlr, ...
-        x.tCan, x.tFlr));
+	addAux(gl, 'rCanFlr', fir(gl.a.aCan, p.epsCan, p.epsFlr, ...
+        p.fCanFlr, x.tCan, x.tFlr));
 	
 	% FIR between pipes and cover [W m^{-2}]
     addAux(gl, 'rPipeCovIn', fir(p.aPipe, p.epsPipe, gl.a.epsCovFir, ...
-        p.tauLampFir*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU*0.49.*...
+        p.tauIntLampFir*p.tauLampFir*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU*0.49.*...
         exp(-p.kFir*gl.a.lai), x.tPipe, x.tCovIn));
 		
 	% FIR between pipes and sky [W m^{-2}]
     addAux(gl, 'rPipeSky', fir(p.aPipe, p.epsPipe, p.epsSky, ...
-        p.tauLampFir*gl.a.tauCovFir.*gl.a.tauThScrFirU.*...
+        p.tauIntLampFir*p.tauLampFir*gl.a.tauCovFir.*gl.a.tauThScrFirU.*...
         gl.a.tauBlScrFirU*0.49.*exp(-p.kFir*gl.a.lai), x.tPipe, d.tSky));
 		
 	% FIR between pipes and thermal screen [W m^{-2}]
     addAux(gl, 'rPipeThScr', fir(p.aPipe, p.epsPipe, p.epsThScrFir, ...
-        p.tauLampFir*u.thScr.*gl.a.tauBlScrFirU*0.49.*...
+        p.tauIntLampFir*p.tauLampFir*u.thScr.*gl.a.tauBlScrFirU*0.49.*...
         exp(-p.kFir*gl.a.lai), x.tPipe, x.tThScr));
 		
 	% FIR between pipes and floor [W m^{-2}]
@@ -502,17 +574,17 @@ function setGlAux(gl)
 		
 	% FIR between floor and cover [W m^{-2}]
     addAux(gl, 'rFlrCovIn', fir(1, p.epsFlr, gl.a.epsCovFir, ...
-        p.tauLampFir*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU*...
+        p.tauIntLampFir*p.tauLampFir*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU*...
         (1-0.49*pi*p.lPipe*p.phiPipeE).*exp(-p.kFir*gl.a.lai), x.tFlr, x.tCovIn));
     
 	% FIR between floor and sky [W m^{-2}]
 	addAux(gl, 'rFlrSky', fir(1, p.epsFlr, p.epsSky, ...
-        p.tauLampFir*gl.a.tauCovFir.*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU*...
+        p.tauIntLampFir*p.tauLampFir*gl.a.tauCovFir.*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU*...
         (1-0.49*pi*p.lPipe*p.phiPipeE).*exp(-p.kFir*gl.a.lai), x.tFlr, d.tSky));
     
 	% FIR between floor and thermal screen [W m^{-2}]
 	addAux(gl, 'rFlrThScr', fir(1, p.epsFlr, p.epsThScrFir, ...
-        p.tauLampFir*u.thScr.*gl.a.tauBlScrFirU*(1-0.49*pi*p.lPipe*p.phiPipeE).*...
+        p.tauIntLampFir*p.tauLampFir*u.thScr.*gl.a.tauBlScrFirU*(1-0.49*pi*p.lPipe*p.phiPipeE).*...
         exp(-p.kFir*gl.a.lai), x.tFlr, x.tThScr));
     
 	% FIR between thermal screen and cover [W m^{-2}]
@@ -528,11 +600,11 @@ function setGlAux(gl)
     
     % FIR between lamps and floor [W m^{-2}]
     addAux(gl, 'rFirLampFlr', fir(p.aLamp, p.epsLampBottom, p.epsFlr, ...
-        (1-0.49*pi*p.lPipe*p.phiPipeE).*exp(-p.kFir*gl.a.lai), x.tLamp, x.tFlr));
+        p.tauIntLampFir.*(1-0.49*pi*p.lPipe*p.phiPipeE).*exp(-p.kFir*gl.a.lai), x.tLamp, x.tFlr));
     
     % FIR between lamps and pipe [W m^{-2}]
     addAux(gl, 'rLampPipe', fir(p.aLamp, p.epsLampBottom, p.epsPipe, ...
-        0.49*pi*p.lPipe*p.phiPipeE.*exp(-p.kFir*gl.a.lai), x.tLamp, x.tPipe));
+        p.tauIntLampFir.*0.49*pi*p.lPipe*p.phiPipeE.*exp(-p.kFir*gl.a.lai), x.tLamp, x.tPipe));
     
     % FIR between lamps and canopy [W m^{-2}]
     addAux(gl, 'rFirLampCan', fir(p.aLamp, p.epsLampBottom, p.epsCan, ...
@@ -551,21 +623,16 @@ function setGlAux(gl)
         gl.a.tauCovFir.*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU, x.tLamp, d.tSky));
     
     % FIR between grow pipes and canopy [W m^{-2}]
-    addAux(gl, 'rGroPipeCan', fir(p.aGroPipe, p.epsGroPipe, p.epsCan, ...
-        1, x.tGroPipe, x.tCan));
-    
-    % FIR between interlights and canopy [W m^{-2}]
-    addAux(gl, 'rFirIntLampCan', fir(p.aIntLamp, p.epsIntLamp, p.epsCan, ...
-        1, x.tIntLamp, x.tCan));
+    addAux(gl, 'rGroPipeCan', fir(p.aGroPipe, p.epsGroPipe, p.epsCan, 1, x.tGroPipe, x.tCan));
     
     % FIR between blackout screen and floor [W m^{-2}]	
     addAux(gl, 'rFlrBlScr', fir(1, p.epsFlr, p.epsBlScrFir, ...
-        p.tauLampFir*u.blScr*(1-0.49*pi*p.lPipe*p.phiPipeE).*...
+        p.tauIntLampFir*p.tauLampFir*u.blScr*(1-0.49*pi*p.lPipe*p.phiPipeE).*...
         exp(-p.kFir*gl.a.lai), x.tFlr, x.tBlScr));
     
     % FIR between blackout screen and pipe [W m^{-2}]
     addAux(gl, 'rPipeBlScr', fir(p.aPipe, p.epsPipe, p.epsBlScrFir, ...
-        p.tauLampFir*u.blScr*0.49.*exp(-p.kFir*gl.a.lai), x.tPipe, x.tBlScr));
+        p.tauIntLampFir*p.tauLampFir*u.blScr*0.49.*exp(-p.kFir*gl.a.lai), x.tPipe, x.tBlScr));
     
     % FIR between blackout screen and canopy [W m^{-2}]
     addAux(gl, 'rCanBlScr', fir(gl.a.aCan, p.epsCan, p.epsBlScrFir, ...
@@ -576,16 +643,65 @@ function setGlAux(gl)
         p.epsThScrFir, u.thScr, x.tBlScr, x.tThScr)); 
     
     % FIR between blackout screen and cover [W m^{-2}]
-    addAux(gl, 'rBlScrCovIn', fir(1, p.epsBlScrFir, gl.a.epsCovFir, ...
-        u.blScr.*gl.a.tauThScrFirU, x.tBlScr, x.tCovIn));
+    addAux(gl, 'rBlScrCovIn', fir(u.blScr, p.epsBlScrFir, gl.a.epsCovFir, ...
+        gl.a.tauThScrFirU, x.tBlScr, x.tCovIn));
     
     % FIR between blackout screen and sky [W m^{-2}]
-    addAux(gl, 'rBlScrSky', fir(1, p.epsBlScrFir, p.epsSky, ...
-        gl.a.tauCovFir.*u.blScr.*gl.a.tauThScrFirU, x.tBlScr, d.tSky));
-
+    addAux(gl, 'rBlScrSky', fir(u.blScr, p.epsBlScrFir, p.epsSky, ...
+        gl.a.tauCovFir.*gl.a.tauThScrFirU, x.tBlScr, d.tSky));
+    
     % FIR between blackout screen and lamps [W m^{-2}]
     addAux(gl, 'rLampBlScr', fir(p.aLamp, p.epsLampTop, p.epsBlScrFir, ...
         u.blScr, x.tLamp, x.tBlScr));
+    
+    % Fraction of radiation going up from the interlight to the canopy [-]
+    % Equation 7.29 [7]
+    addAux(gl, 'fIntLampCanUp', 1-exp(-p.kIntFir*(1-p.vIntLampPos).*gl.a.lai));
+    
+    % Fraction of radiation going down from the interlight to the canopy [-]
+    % Equation 7.30 [7]
+    addAux(gl, 'fIntLampCanDown', 1-exp(-p.kIntFir*p.vIntLampPos.*gl.a.lai));
+    
+    % FIR between interlights and floor [W m^{-2}]
+    addAux(gl, 'rFirIntLampFlr', fir(p.aIntLamp, p.epsIntLamp, p.epsFlr, ...
+        (1-0.49*pi*p.lPipe*p.phiPipeE).*(1-gl.a.fIntLampCanDown),...
+        x.tIntLamp, x.tFlr));
+    
+    % FIR between interlights and pipe [W m^{-2}]
+    addAux(gl, 'rIntLampPipe', fir(p.aIntLamp, p.epsIntLamp, p.epsPipe, ...
+        0.49*pi*p.lPipe*p.phiPipeE.*(1-gl.a.fIntLampCanDown),...
+        x.tIntLamp, x.tPipe));
+    
+    % FIR between interlights and canopy [W m^{-2}]
+    addAux(gl, 'rFirIntLampCan', fir(p.aIntLamp, p.epsIntLamp, p.epsCan, ...
+        gl.a.fIntLampCanDown+gl.a.fIntLampCanUp, x.tIntLamp, x.tCan));
+    
+    % FIR between interlights and toplights [W m^{-2}]
+    addAux(gl, 'rIntLampLamp', fir(p.aIntLamp, p.epsIntLamp, p.epsLampBottom, ...
+        (1-gl.a.fIntLampCanUp).*p.aLamp, x.tIntLamp, x.tLamp));
+        
+    % FIR between interlights and blackout screen [W m^{-2}]
+    addAux(gl, 'rIntLampBlScr', fir(p.aIntLamp, p.epsIntLamp, p.epsBlScrFir, ...
+        u.blScr.*p.tauLampFir.*(1-gl.a.fIntLampCanUp), x.tIntLamp, x.tBlScr));
+        % if p.vIntLampPos==0, the lamp is above the canopy, no light is
+        % lost on its way up
+        % if p.vIntLampPos==1, the lamp is below the canopy, the light
+        % loses exp(-k*LAI) on its way up
+    
+    % FIR between interlights and thermal screen [W m^{-2}]
+    addAux(gl, 'rIntLampThScr', fir(p.aIntLamp, p.epsIntLamp, p.epsThScrFir, ...
+        u.thScr.*gl.a.tauBlScrFirU.*p.tauLampFir.*(1-gl.a.fIntLampCanUp),...
+        x.tIntLamp, x.tThScr));
+    
+    % FIR between interlights and cover [W m^{-2}]
+    addAux(gl, 'rIntLampCovIn', fir(p.aIntLamp, p.epsIntLamp, gl.a.epsCovFir, ...
+        gl.a.tauThScrFirU.*gl.a.tauBlScrFirU.*p.tauLampFir.*(1-gl.a.fIntLampCanUp),...
+        x.tIntLamp, x.tCovIn));
+    
+    % FIR between interlights and sky [W m^{-2}]
+    addAux(gl, 'rIntLampSky', fir(p.aIntLamp, p.epsIntLamp, p.epsSky, ...
+        gl.a.tauCovFir.*gl.a.tauThScrFirU.*gl.a.tauBlScrFirU.*p.tauLampFir.*(1-gl.a.fIntLampCanUp),...
+        x.tIntLamp, d.tSky));
 
 	%% Natural ventilation - Section 9.7 [1]
     
@@ -655,60 +771,202 @@ function setGlAux(gl)
         p.etaInsScr*(max(u.thScr,u.blScr).*gl.a.fVentSide2+(1-max(u.thScr,u.blScr)).*gl.a.fVentRoofSide2.*gl.a.etaSide)...
         +(1-p.cLeakTop)*gl.a.fLeakage));
     
-    %% Control rules 
-
-    % hours since midnight [h]
+    %% Control rules  
+	
+    % Hours since midnight [h]
     addAux(gl, 'timeOfDay', 24*(x.time-floor(x.time))); 
     
-    % control for the lamps [0/1]
-    addAux(gl, 'lampOn', gl.d.iGlob < gl.p.lampsOffSun & ... % lamps are off if sun is bright
-        gl.a.timeOfDay>gl.p.lampsOn & gl.a.timeOfDay<gl.p.lampsOff & ... % lamps are on between p.lampsOn to p.lampsOff
-        (gl.d.dayRadSum < gl.p.lampRadSumLimit)); % the predicted daily radiation sum is less than the limit 
-       
-    % 1 if lamps on, 0 if lamps off, with a smooth interpolation between
-    addAux(gl, 'smoothLamp', min(max(0,min(gl.a.timeOfDay-p.lampsOn+1,1)),...
-        max(0,min(1,p.lampsOff-gl.a.timeOfDay+1))).*...
-        (gl.d.dayRadSum < p.lampRadSumLimit)); % smoothLamp is off if daily radiation sum is big
+    % Day of year [d]
+    addAux(gl, 'dayOfYear', mod(x.time, 365.2425));
     
+    % Control of the lamp according to the time of day [0/1]
+    % if p.lampsOn < p.lampsOff, lamps are on from p.lampsOn to p.lampsOff each day
+    % if p.lampsOn > p.lampsOff, lamps are on from p.lampsOn until p.lampsOff the next day
+    % if p.lampsOn == p.lampsOff, lamps are always off
+    % for continuous light, set p.lampsOn = -1, p.lampsOff = 25
+    addAux(gl, 'lampTimeOfDay', ((p.lampsOn<=p.lampsOff).* ...
+        (p.lampsOn < gl.a.timeOfDay & gl.a.timeOfDay < p.lampsOff) + ... 
+        (1-(p.lampsOn<=p.lampsOff)).*(p.lampsOn<gl.a.timeOfDay | gl.a.timeOfDay<p.lampsOff))...
+        .*1); % multiply by 1 to convert from logical to double
+        
+    % Control of the lamp according to the day of year [0/1]
+    % if p.dayLampStart < p.dayLampStop, lamps are on from p.dayLampStart to p.dayLampStop
+    % if p.dayLampStart > p.dayLampStop, lamps are on from p.lampsOn until p.lampsOff the next year
+    % if p.dayLampStart == p.dayLampStop, lamps are always off
+    % for no influence of day of year, set p.dayLampStart = -1, p.dayLampStop > 366
+    addAux(gl, 'lampDayOfYear', ((p.dayLampStart<=p.dayLampStop).* ...
+        (p.dayLampStart < gl.a.dayOfYear & gl.a.dayOfYear < p.dayLampStop) + ... 
+        (1-(p.dayLampStart<=p.dayLampStop)).*(p.dayLampStart<gl.a.dayOfYear | gl.a.dayOfYear<p.dayLampStop))...
+        .*1); % multiply by 1 to convert from logical to double
+    
+    % Control for the lamps disregarding temperature and humidity constraints
+    % Chapter 4 Section 2.3.2, Chapter 5 Section 2.4 [7]
+    % Section 2.3.2 [8]
+    % This variable is used to decide if the greenhouse is in the light period
+    % ("day inside"), needed to set the climate setpoints. 
+    % However, the lamps may be switched off if it is too hot or too humid
+    % in the greenhouse. In this case, the greenhouse is still considered
+    % to be in the light period
+    addAux(gl, 'lampNoCons', 1.*(gl.d.iGlob < gl.p.lampsOffSun).* ... % lamps are off if sun is not too bright
+        (gl.d.dayRadSum < gl.p.lampRadSumLimit).* ... % and the predicted daily radiation sum is less than the predefined limit 
+        gl.a.lampTimeOfDay.* ... % and the time of day is within the lighting period
+        gl.a.lampDayOfYear); % and the day of year is within the lighting season
+        
+    %% Smoothing of control of the lamps
+    % To allow smooth transition between day and night setpoints
+    
+    % Linear version of lamp switching on: 
+    % 1 at lampOn, 0 one hour before lampOn, with linear transition
+    % Note: this current function doesn't do a linear interpolation if
+    % lampOn == 0
+    addAux(gl, 'linearLampSwitchOn', max(0,min(1,gl.a.timeOfDay-p.lampsOn+1)));
+    
+    % Linear version of lamp switching on: 
+    % 1 at lampOff, 0 one hour after lampOff, with linear transition
+    % Note: this current function doesn't do a linear interpolation if
+    % lampOff == 24
+    addAux(gl, 'linearLampSwitchOff', max(0,min(1,p.lampsOff-gl.a.timeOfDay+1)));
+    
+    % Combination of linear transitions above
+    % if p.lampsOn < p.lampsOff, take the minimum of the above
+    % if p.lampsOn > p.lampsOn, take the maximum
+    % if p.lampsOn == p.lampsOff, set at 0
+    addAux(gl, 'linearLampBothSwitches', ...
+        (p.lampsOn~=p.lampsOff).*((p.lampsOn<p.lampsOff).*min(gl.a.linearLampSwitchOn,gl.a.linearLampSwitchOff) ...
+        + (1-(p.lampsOn<p.lampsOff)).*max(gl.a.linearLampSwitchOn,gl.a.linearLampSwitchOff)));
+    
+    % Smooth (linear) approximation of the lamp control
+    % To allow smooth transition between light period and dark period setpoints
+    % 1 when lamps are on, 0 when lamps are off, with a linear
+    % interpolation in between
+    % Does not take into account the lamp switching off due to 
+    % instantaenous sun radiation, excess heat or humidity
+    addAux(gl, 'smoothLamp', gl.a.linearLampBothSwitches.* ... % linear transition between lamp on and off
+        (gl.d.dayRadSum < gl.p.lampRadSumLimit).* ... % lamps off if the predicted daily radiation sum is more than the predefined limit 
+        gl.a.lampDayOfYear); % lamps off if day of year is not within the lighting season
+
+    % Indicates whether daytime climate settings should be used, i.e., if
+    % the sun is out or the lamps are on
     % 1 if day, 0 if night. If lamps are on it is considered day
     addAux(gl, 'isDayInside', max(gl.a.smoothLamp,d.isDay));
     
+    % Decision on whether mechanical cooling and dehumidification is allowed to work
+    % (0 - not allowed, 1 - allowed)
+    % By default there is no mechanical cooling and dehumidification
+    addAux(gl, 'mechAllowed', '0');
+            
+    % Decision on whether heating from buffer is allowed to run
+    % (0 - not allowed, 1 - allowed)
+    % By default there is no heating from the buffer
+    addAux(gl, 'hotBufAllowed', '0');
+        % Only runs if the hot buffer is not empty 
+        
     % Heating set point [°C]
+    % Chapter 5, Section 2.4, point 6 [7]
+    % Chapter 4, Section 2.3.2, point 3 and Section 2.3.3 [7]
+    % Section 2.3.2, point 3 and Section 2.3.3 [8]
     addAux(gl, 'heatSetPoint', gl.a.isDayInside*p.tSpDay + (1-gl.a.isDayInside)*p.tSpNight ...
-        + p.heatCorrection*gl.a.lampOn); % correction for LEDs when lamps are on
+        + p.heatCorrection*gl.a.lampNoCons); % correction for LEDs when lamps are on
     
-    % Ventilation due to excess heating set point [°C]
+    % Ventilation setpoint due to excess heating set point [°C]
+    % Chapter 5, Section 2.4, point 8 [7]
+    % Chapter 4, Section 2.3.2, point 4 [7]
+    % Section 2.3.2, point 4 [8]
     addAux(gl, 'heatMax', gl.a.heatSetPoint + p.heatDeadZone);    
     
     % CO2 set point [ppm]
+    % Chapter 5, Section 2.4, point 5 [7]
+    % Chapter 4, Section 2.3.2, point 2 [7]
+    % Section 2.3.2, point 2 [8]
     addAux(gl, 'co2SetPoint', gl.a.isDayInside*p.co2SpDay);
     
     % CO2 concentration in main compartment [ppm]
     addAux(gl, 'co2InPpm', co2dens2ppm(x.tAir,1e-6*x.co2Air)); 
     
     % Ventilation due to excess heat [0-1, 0 means vents are closed]
-    addAux(gl, 'ventHeat', proportionalControl(x.tAir, gl.a.heatMax, p.ventHeatPband, 0, 1));
+    addAux(gl, 'ventHeat', proportionalControl(x.tAir, ...
+        gl.a.heatMax, p.ventHeatPband, 0, 1));
     
     % Relative humidity [%]
     addAux(gl, 'rhIn', 100*x.vpAir./satVp(x.tAir));
     
     % Ventilation due to excess humidity [0-1, 0 means vents are closed]
-    addAux(gl, 'ventRh', proportionalControl(gl.a.rhIn, p.rhMax, p.ventRhPband, 0, 1));
+    % Chapter 5, Section 2.4, point 7 [7]
+    % Chapter 4, Section 2.3.2, point 4 [7]
+    % Section 2.3.2, point 4 [8]
+    addAux(gl, 'ventRh', proportionalControl(gl.a.rhIn, ...
+        p.rhMax+gl.a.mechAllowed.*p.mechDehumidPband, ...
+        p.ventRhPband, 0, 1));
+        % the setpoint of when to start ventilating depends on the mechanical dehumidification:
+        % if it is on (a.mechAllowed == 1), start ventilating only when 
+        % mechanical dehumidification is at full capacity. 
+        % If it is off (a.mechAllowed == 0)
+        % start at the normal setpoint
     
-    % Ventilation closure due to too cold temperatures [0-1, 0 means vents are closed]
+    % Ventilation closure due to too cold temperatures 
+    % [0-1, 0 means vents are closed because it's too cold inside to ventilate,
+    % better to raise the RH by heating]
+    % Chapter 5, Section 2.4, point 7 [7]
+    % Chapter 4, Section 2.3.2, point 4 [7]
+    % Section 2.3.2, point 4 [8]
     addAux(gl, 'ventCold', proportionalControl(x.tAir, gl.a.heatSetPoint-p.tVentOff, p.ventColdPband, 1, 0));
-	
+        
     % Setpoint for closing the thermal screen [°C]
+    % Chapter 5, Section 2.4, point 4 [7]
+    % Chapter 4, Section 2.3.2, point 5 [7]
+    % Section 2.3.2, point 5 [8]
     addAux(gl, 'thScrSp', gl.d.isDay.*p.thScrSpDay+(1-gl.d.isDay).*p.thScrSpNight);
     
     % Closure of the thermal screen based on outdoor temperature [0-1, 0 is fully open]
+    % Chapter 5, Section 2.4, point 4 [7]
+    % Chapter 4, Section 2.3.2, point 5 [7]
+    % Section 2.3.2, point 5 [8]
     addAux(gl, 'thScrCold', proportionalControl(d.tOut, gl.a.thScrSp, p.thScrPband, 0, 1));
     
     % Opening of thermal screen closure due to too high temperatures 
-    addAux(gl, 'thScrHeat', proportionalControl(x.tAir, gl.a.heatSetPoint+p.thScrDeadZone, -p.thScrPband, 1, 0));
+    % Chapter 5, Section 2.4, point 4 [7]
+    % Chapter 4, Section 2.3.2, point 5 [7]
+    % Section 2.3.2, point 5 [8]
+    addAux(gl, 'thScrHeat', proportionalControl(x.tAir, ...
+        gl.a.heatSetPoint+p.thScrDeadZone, ...
+        -p.thScrPband, 1, 0));
     
     % Opening of thermal screen due to high humidity [0-1, 0 is fully open]
-    addAux(gl, 'thScrRh', proportionalControl(gl.a.rhIn, p.rhMax+p.thScrRh, p.thScrRhPband, 1, 0));
+    % Chapter 5, Section 2.4, point 4 [7]
+    % Chapter 4, Section 2.3.2, point 5 [7]
+    % Section 2.3.2, point 5 [8]
+    addAux(gl, 'thScrRh', max(proportionalControl(gl.a.rhIn, ...
+        p.rhMax+p.thScrRh, p.thScrRhPband, 1, 0), ...
+        1-gl.a.ventCold));
+        % if 1-a.ventCold == 0 (it's too cold inside to ventilate)
+        % don't force to open the screen (even if RH says it should be 0)
+        % Better to reduce RH by increasing temperature
+    
+    % Control for the top lights: 
+    % 1 if lamps are on, 0 if lamps are off
+    addAux(gl, 'lampOn', gl.a.lampNoCons.* ... % Lamps should be on
+        proportionalControl(gl.x.tAir, gl.a.heatMax+gl.p.lampExtraHeat, -0.5, 0, 1).* ... % Switch lamp off if too hot inside
+        ...                                            % Humidity: only switch off if blackout screen is used 
+        (gl.d.isDaySmooth + (1-gl.d.isDaySmooth).* ... % Blackout sceen is only used at night 
+            max(proportionalControl(gl.a.rhIn, gl.p.rhMax+gl.p.blScrExtraRh, -0.5, 0, 1),... % Switch lamp off if too humid inside
+                        1-gl.a.ventCold))); % Unless ventCold == 0
+                        % if ventCold is 0 it's too cold inside to ventilate, 
+                        % better to raise the RH by heating. 
+                        % So don't open the blackout screen and 
+                        % don't stop illuminating in this case. 
+        
+    % Control for the interlights: 
+    % 1 if interlights are on, 0 if interlights are off
+    addAux(gl, 'intLampOn', gl.a.lampNoCons.* ... % Lamps should be on
+        proportionalControl(gl.x.tAir, gl.a.heatMax+gl.p.lampExtraHeat, -0.5, 0, 1).* ... % Switch lamp off if too hot inside
+        ... % Humidity: only switch off if blackout screen is used 
+        (gl.d.isDaySmooth + (1-gl.d.isDaySmooth).* ... % Blackout sceen is only used at night 
+            max(proportionalControl(gl.a.rhIn, gl.p.rhMax+gl.p.blScrExtraRh, -0.5, 0, 1),... % Switch lamp off if too humid inside
+                        1-gl.a.ventCold))); 
+                        % if ventCold is 0 it's too cold inside to ventilate, 
+                        % better to raise the RH by heating. 
+                        % So don't open the blackout screen and 
+                        % don't stop illuminating in this case. 
     
     %% Convection and conduction - Section 5.3 [1]
     
@@ -731,14 +989,14 @@ function setGlAux(gl)
         ((1-u.thScr)./gl.a.rhoAirMean).*sqrt(0.5*gl.a.rhoAirMean.*(1-u.thScr).*p.g.*abs(gl.a.rhoAir-gl.a.rhoTop)));
     
     % Air flux through the blackout screen [m s^{-1}]
-    % Equation A37 [5]
+	% Equation A37 [5]
     addAux(gl, 'fBlScr', u.blScr*p.kBlScr.*(abs((x.tAir-x.tTop)).^0.66) + ... 
         ((1-u.blScr)./gl.a.rhoAirMean).*sqrt(0.5*gl.a.rhoAirMean.*(1-u.blScr).*p.g.*abs(gl.a.rhoAir-gl.a.rhoTop)));
     
     % Air flux through the screens [m s^{-1}]
-    % Equation A38 [5]
+	% Equation A38 [5]
     addAux(gl, 'fScr', min(gl.a.fThScr,gl.a.fBlScr));
-        
+    
 	%% Convective and conductive heat fluxes [W m^{-2}]
 	% Table 4 [1]
     
@@ -758,7 +1016,7 @@ function setGlAux(gl)
         x.tAir,x.tThScr));
     
 	% Between air in main compartment and blackout screen [W m^{-2}]
-    % Equations A28, A32 [5]
+	% Equations A28, A32 [5]
     addAux(gl, 'hAirBlScr', sensible(1.7.*u.blScr.*nthroot(abs(x.tAir-x.tBlScr),3),...
         x.tAir,x.tBlScr));
 		
@@ -882,7 +1140,6 @@ function setGlAux(gl)
     addAux(gl, 'mvFogAir', DynamicElement('0', 0));
     addAux(gl, 'mvBlowAir', DynamicElement('0', 0));
     addAux(gl, 'mvAirOutPad', DynamicElement('0', 0));
-    addAux(gl, 'mvAirMech', DynamicElement('0', 0));
     
     
     % Condensation from main compartment on thermal screen [kg m^{-2} s^{-1}]
@@ -891,7 +1148,7 @@ function setGlAux(gl)
         x.vpAir, satVp(x.tThScr)));
     
     % Condensation from main compartment on blackout screen [kg m^{-2} s^{-1}]
-    % Equation A39 [5]
+    % Equatio A39 [5], Equation 7.39 [7]
     addAux(gl, 'mvAirBlScr', cond(1.7*u.blScr.*nthroot(abs(x.tAir-x.tBlScr),3), ...
         x.vpAir, satVp(x.tBlScr)));
     
@@ -1039,14 +1296,14 @@ function setGlAux(gl)
     addAux(gl, 'mcOrgAir', gl.a.mcLeafAir+gl.a.mcStemAir+gl.a.mcFruitAir);
     
     %% Leaf pruning and fruit harvest
-	% A new smoothing function has been applied here to avoid stiffness
+    % A new smoothing function has been applied here to avoid stiffness
     % Leaf pruning [mg{CH2O} m^{-2] s^{-1}]
-    % Equation B.5
-    addAux(gl, 'mcLeafHar', smoothHar(x.cLeaf, p.cLeafMax, 1e4, 10e4));
-
-    % Fruit harvest [mg{CH2O} m^{-2] s^{-1}]
-    % Equation A45 [5]
-    addAux(gl, 'mcFruitHar', smoothHar(x.cFruit, p.cFruitMax, 1e4, 10e4));
+    % Equation B.5 [2]
+    addAux(gl, 'mcLeafHar', smoothHar(x.cLeaf, p.cLeafMax, 1e4, 5e4));
+    
+    % Fruit harvest [mg{CH2O} m^{-2} s^{-1}]
+	% Equation A45 [5], Equation 7.45 [7]
+    addAux(gl, 'mcFruitHar', smoothHar(x.cFruit, p.cFruitMax, 1e4, 5e4));
     
 	%% CO2 Fluxes - Section 7 [1]
 	
@@ -1089,30 +1346,23 @@ function setGlAux(gl)
     addAux(gl, 'hPasAir', DynamicElement('0',0));
     addAux(gl, 'hBlowAir', DynamicElement('0',0));
     addAux(gl, 'hAirPadOut', DynamicElement('0',0));
-    addAux(gl, 'hMechAir', DynamicElement('0',0));
     addAux(gl, 'hAirOutPad', DynamicElement('0',0));
     addAux(gl, 'lAirFog', DynamicElement('0',0));
     addAux(gl, 'hIndPipe', DynamicElement('0',0));
     addAux(gl, 'hGeoPipe', DynamicElement('0',0));
     
     %% Lamp cooling
-    % Equation A34 [5]
+	% Equation A34 [5], Equation 7.34 [7]
     addAux(gl, 'hLampCool', p.etaLampCool*gl.a.qLampIn);
     
-    
-end
-
-function sat = satVp(temp)
-% saturated vapor pressure (Pa) at temperature temp (°C)
-% Calculation based on 
-%   http://www.conservationphysics.org/atmcalc/atmoclc2.pdf
-
-    % parameters used in the conversion
-    p = [610.78 238.3 17.2694 -6140.4 273 28.916];
-        % default value is [610.78 238.3 17.2694 -6140.4 273 28.916]
-    
-    sat = p(1)*exp(p(3)*temp./(temp+p(2))); 
-        % Saturation vapor pressure of air in given temperature [Pa]
+    %% Heat harvesting, mechanical cooling and dehumidification
+    % By default there is no mechanical cooling or heat harvesting
+    % see addHeatHarvesting.m for mechanical cooling and heat harvesting
+    addAux(gl, 'hecMechAir', '0');
+    addAux(gl, 'hAirMech', '0');
+    addAux(gl, 'mvAirMech', '0');
+    addAux(gl, 'lAirMech', '0');
+    addAux(gl, 'hBufHotPipe', '0');
 end
 
 function de = tau12(tau1, tau2, ~, rho1Dn, rho2Up, ~)
@@ -1149,13 +1399,6 @@ function de = sensible(hec, t1, t2)
 % Equation 39 [1]
 
     de = abs(hec).*(t1-t2);
-end
-
-function de = cond(hec, vp1, vp2)
-% Vapor flux from the air to an object [kg m^{-2} s^{-1}]
-% Equation 42 [1]
-    
-    de = max(0, 6.4e-9*hec.*(vp1-vp2));
 end
 
 function de = airMv(f12, vp1, vp2, t1, t2)

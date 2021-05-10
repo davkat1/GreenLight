@@ -25,6 +25,17 @@ function setGlParams(gl)
 % Several other parameters are based on:
 %   [7] Dueck, T., De Gelder, A., Janse, J., Kempkes, F., Baar, P.H., and 
 %       Valstar, W. (2014). Het nieuwe belichten onder diffuus glas (Wageningen).
+%   [8] Katzin, D., van Mourik, S., Kempkes, F., & Van Henten, E. J. (2020). 
+%       GreenLight - An open source model for greenhouses with supplemental 
+%       lighting: Evaluation of heat requirements under LED and HPS lamps. 
+%       Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010
+%   [9] Katzin, D. (2021). Energy saving by LED lighting in greenhouses: 
+%       a process-based modelling approach (PhD thesis, Wageningen University).
+%       https://doi.org/10.18174/544434
+%   [10] Katzin, D., Marcelis, L. F. M., & van Mourik, S. (2021). 
+%        Energy savings in greenhouses by transition from high-pressure sodium 
+%        to LED lighting. Applied Energy, 281, 116019. 
+%        https://doi.org/10.1016/j.apenergy.2020.116019
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -77,11 +88,10 @@ function setGlParams(gl)
 	addParam(gl, 'hSo5', 0.64); 				% Thickness of soil layer 5 																	m 						0.64 [1]
 	addParam(gl, 'k1Par', 0.7); 				% PAR extinction coefficient of the canopy 														- 						0.7 [1]
 	addParam(gl, 'k2Par', 0.7); 				% PAR extinction coefficient of the canopy for light reflected from the floor 					- 						0.7 [1]
-	addParam(gl, 'kNir', 0.27); 				% NIR extinction coefficient of the canopy 														- 						0.27 [1]
+    addParam(gl, 'kNir', 0.27); 				% NIR extinction coefficient of the canopy 														- 						0.27 [1]
 	addParam(gl, 'kFir', 0.94); 				% FIR extinction coefficient of the canopy 														- 						0.94 [1]
 	addParam(gl, 'mAir', 28.96); 				% Molar mass of air 																			kg kmol^{-1} 			28.96 [1]
-	
-    addParam(gl, 'hSoOut', 1.28);               % Thickness of the external soil layer                                                          m                       1.28 (assumed)
+	addParam(gl, 'hSoOut', 1.28);               % Thickness of the external soil layer                                                          m                       1.28 (assumed)
     
 	%% pg. 42 [1]
 	% parameter 					            description 																					unit 					nominal value (source)
@@ -91,7 +101,6 @@ function setGlParams(gl)
 	addParam(gl, 'rB', 275); 					% Boundary layer resistance of the canopy for transpiration 									s m^{-1} 				275 [1]
 	addParam(gl, 'rSMin', 82); 					% Minimum canopy resistance for transpiration 													s m^{-1} 				82 [1]
 	addParam(gl, 'sRs', -1); 					% Slope of smoothed stomatal resistance model 													m W^{-2} 				-1 [1]
-	addParam(gl, 'sMV12', -0.1); 				% Slope of smoothed condensation model 															Pa^{-1} 				-0.1 [1]
 	
 	%% Table 2 [1]
 	% Location specific parameters - The Netherlands
@@ -188,7 +197,7 @@ function setGlParams(gl)
 	addParam(gl, 'tauBlScrFir', 0.7); 			% FIR transmission coefficient of blackout screen 												- 						
 	addParam(gl, 'cPBlScr', 1.8e3); 			% Specific heat capacity of blackout screen 													J kg^{-1} K^{-1} 		
     addParam(gl, 'hBlScr', 0.35e-3); 			% Thickness of blackout screen 																	m 						
-    addParam(gl, 'kBlScr', 0.04e-3); 			% Blackout screen flux coefficient 																m^{3} m^{-2} K^{-2/3} s^{-1} 
+    addParam(gl, 'kBlScr', 0.05e-3); 			% Blackout screen flux coefficient 																m^{3} m^{-2} K^{-2/3} s^{-1} 
 	
     
 	%% Floor [1]
@@ -326,16 +335,36 @@ function setGlParams(gl)
     addParam(gl, 'co2Band', -100);              % P-band for co2 supply                                 										[ppm]    								-100   
     addParam(gl, 'heatDeadZone', 5);       		% zone between heating setpoint and ventilation setpoint 										[°C]     								5 [4]
     addParam(gl, 'ventHeatPband', 4);     		% P-band for ventilation due to excess heat 													[°C] 									4
-    addParam(gl, 'ventColdPband', -1);     		% P-band for ventilation due to low indoor temperature 													[°C] 									4
+    addParam(gl, 'ventColdPband', -1);     		% P-band for ventilation due to low indoor temperature 											[°C] 									4
     addParam(gl, 'ventRhPband', 5);         	% P-band for ventilation due to relative humidity 												[%] 									5
-    addParam(gl, 'thScrRh', -2);                % Relative humidity where thermal screen is forced to open, with respect to rhMax										[%] 									80
+    addParam(gl, 'thScrRh', -2);                % Relative humidity where thermal screen is forced to open, with respect to rhMax				[%] 									80
     addParam(gl, 'thScrRhPband', 2);            % P-band for thermal screen opening due to excess relative humidity 							[%] 									2
     addParam(gl, 'thScrDeadZone', 4);           % Zone between heating setpoint and point where screen opens
     
-    addParam(gl, 'lampsOn', 0);                 % time of day (in morning) to switch on lamps 													[hours since midnight] 					0
-    addParam(gl, 'lampsOff', 0);              	% time of day (in evening) to switch off lamps 													[hours since midnight] 					0
-    addParam(gl, 'lampsOffSun', 200);       	% lamps are switched off if global radiation is above this value 								[W m^{-2}]   							200
-    addParam(gl, 'lampRadSumLimit', 10);        % Predicted daily radiation sum from the sun where lamps are not used that day                  [MJ m^{-2} day^{-1}]                    10
+    addParam(gl, 'lampsOn', 0);                 % time of day to switch on lamps                                                                [hours since midnight] 					0 (no lamps)
+    addParam(gl, 'lampsOff', 0);              	% time of day to switch off lamps                                                               [hours since midnight] 					0 (no lamps)
+    % if p.lampsOn < p.lampsOff, lamps are on from p.lampsOn to p.lampsOff each day
+    % if p.lampsOn > p.lampsOff, lamps are on from p.lampsOn until p.lampsOff the next day
+    % if p.lampsOn == p.lampsOff, lamps are always off
+    % for continuous light, set p.lampsOn = -1, p.lampsOff = 25
+    
+    addParam(gl, 'dayLampStart', -1);           % Day of year when lamps start                                                                  [day of year]                           -1 (no influence of doy)
+    addParam(gl, 'dayLampStop', 400);           % Day of year when lamps stop                                                                   [day of year]                           400 (no influence of doy)
+    % if p.dayLampStart < p.dayLampStop, lamps are on from p.dayLampStart to p.dayLampStop
+    % if p.dayLampStart > p.dayLampStop, lamps are on from p.lampsOn until p.lampsOff the next year
+    % if p.dayLampStart == p.dayLampStop, lamps are always off
+    % for no influence of day of year, set p.dayLampStart = -1, p.dayLampStop > 366
+    
+    addParam(gl, 'lampsOffSun', 400);       	% lamps are switched off if global radiation is above this value 								[W m^{-2}]   							400 [10]
+    addParam(gl, 'lampRadSumLimit', 10);        % Predicted daily radiation sum from the sun where lamps are not used that day                  [MJ m^{-2} day^{-1}]                    10 [10]   
+    addParam(gl, 'lampExtraHeat', 2);           % Control for lamps due to too much heat - switched off if indoor temperature is above setpoint+heatDeadZone+lampExtraHeat [°C]         2 [Chapter 5 Section 2.4 [9]]
+    addParam(gl, 'blScrExtraRh', 100);          % Control for blackout screen due to humidity - screens open if relative humidity exceeds rhMax+blScrExtraRh [%]                        100 (no blackout screen), 3 (with blackout screen) [Chapter 5 Section 2.4 [9]]
+    addParam(gl, 'useBlScr', 0);                % Determines whether a blackout screen is used (1 if used, 0 otherwise)                         [-]                                     0 (no blackout screen), 1 (with blackout screen)
+    
+    addParam(gl, 'mechCoolPband', 1);           % P-band for mechanical cooling                                                                 [°C]                                    1 [Chapter 5 Section 2.4 [9]]
+    addParam(gl, 'mechDehumidPband', 2);        % P-band for mechanical dehumidification                                                        [%]                                     2 [Chapter 5 Section 2.4 [9]]
+    addParam(gl, 'heatBufPband', -1);           % P-band for heating from the buffer                                                            [°C]                                    -1 [Chapter 5 Section 2.4 [9]]
+    addParam(gl, 'mechCoolDeadZone', 2);        % zone between heating setpoint and mechanical cooling setpoint                                 [°C]                                    2 [Chapter 5 Section 2.4 [9]]
     
     %% Grow pipe parameters
     addParam(gl, 'epsGroPipe', 0);              % Emissivity of grow pipes                                                                  	[-]                                     0 (no grow pipes)
@@ -355,35 +384,45 @@ function setGlParams(gl)
         gl.p.cPSteel+gl.p.phiGroPipeI^2*gl.p.rhoWater*gl.p.cPWater));
     
 	%% Lamp parameters - no lamps
-    addParam(gl, 'thetaLampMax', 0);             	% Maximum intensity of lamps																	[W m^{-2}]
+    addParam(gl, 'thetaLampMax', 0);            % Maximum intensity of lamps																	[W m^{-2}]
 	addParam(gl, 'heatCorrection', 0);   		% correction for temperature setpoint when lamps are on 										[C]   									 0
-    addParam(gl, 'etaLampPar', 0);  			% fraction of lamp input converted to PAR 														[-]
-    addParam(gl, 'etaLampNir', 0);				% fraction of lamp input converted to NIR 														[-]
-	addParam(gl, 'tauLampPar', 1);				% transmissivity of lamp layer to PAR															[-]
-	addParam(gl, 'rhoLampPar', 0);				% reflectivity of lamp layer to PAR 															[-]
-	addParam(gl, 'tauLampNir', 1);				% transmissivity of lamp layer to NIR 															[-]
-	addParam(gl, 'rhoLampNir', 0);				% reflectivity of lamp later to NIR 															[-]
-	addParam(gl, 'tauLampFir', 1);				% transmissivity of lamp later to FIR 															[-]
-	addParam(gl, 'aLamp', 0);					% lamp area 																					[m^{2}{lamp} m^{-2}{floor}]
-	addParam(gl, 'epsLampTop', 0); 				% emissivity of top side of lamp 																[-]
-	addParam(gl, 'epsLampBottom', 0);			% emissivity of bottom side of lamp 															[-]
-	addParam(gl, 'capLamp', 350);				% heat capacity of lamp 																		[J K^{-1} m^{-2}]
-    addParam(gl, 'cHecLampAir', 0);				% heat exchange coefficient of lamp                                                             [W m^{-2} K^{-1}]
-    addParam(gl, 'etaLampCool', 0);                % fraction of lamp input removed by cooling
-    addParam(gl, 'zetaLampPar', 0);          % J to umol conversion of PAR output of lamp                                                    [J{PAR} umol{PAR}^{-1}                  
+    addParam(gl, 'etaLampPar', 0);  			% fraction of lamp input converted to PAR 														[-]                                      0
+    addParam(gl, 'etaLampNir', 0);				% fraction of lamp input converted to NIR 														[-]                                      0
+	addParam(gl, 'tauLampPar', 1);				% transmissivity of lamp layer to PAR															[-]                                      1
+	addParam(gl, 'rhoLampPar', 0);				% reflectivity of lamp layer to PAR 															[-]                                      0
+	addParam(gl, 'tauLampNir', 1);				% transmissivity of lamp layer to NIR 															[-]                                      1
+	addParam(gl, 'rhoLampNir', 0);				% reflectivity of lamp later to NIR 															[-]                                      0
+	addParam(gl, 'tauLampFir', 1);				% transmissivity of lamp later to FIR 															[-]                                      1
+	addParam(gl, 'aLamp', 0);					% lamp area 																					[m^{2}{lamp} m^{-2}{floor}]              0
+	addParam(gl, 'epsLampTop', 0); 				% emissivity of top side of lamp 																[-]                                      0
+	addParam(gl, 'epsLampBottom', 0);			% emissivity of bottom side of lamp 															[-]                                      0
+	addParam(gl, 'capLamp', 350);				% heat capacity of lamp 																		[J K^{-1} m^{-2}]                        350
+    addParam(gl, 'cHecLampAir', 0);				% heat exchange coefficient of lamp                                                             [W m^{-2} K^{-1}]                        0
+    addParam(gl, 'etaLampCool', 0);             % fraction of lamp input removed by cooling                                                     [-]                                      0
+    addParam(gl, 'zetaLampPar', 0);             % J to umol conversion of PAR output of lamp                                                    [J{PAR} umol{PAR}^{-1}]                  0                  
     
     % Interlight parameters - no lamps
-    addParam(gl, 'capIntLamp', gl.p.capGroPipe.val);              % heat capacity of lamp 														[J K^{-1} m^{-2}]                       
-    addParam(gl, 'etaIntLampPar', 0);           % fraction of lamp input converted to PAR 														[-]                                     
-    addParam(gl, 'etaIntLampNir', 0);           % fraction of lamp input converted to NIR 														[-]                                     
-    addParam(gl, 'aIntLamp', 0);                % interlight lamp area 																			[m^{2}{lamp} m^{-2}{floor}]             
-    addParam(gl, 'epsIntLamp', 0);              % emissivity of interlight [-]                                                                  assumed that lamps act the same as heating pipes
-    addParam(gl, 'thetaIntLampMax', 0);           	% Maximum intensity of lamps																	[W m^{-2}]    
-	addParam(gl, 'zetaIntLampPar', 0);       % conversion from Joules to umol photons within the PAR output of the interlight
-    addParam(gl, 'cHecIntLampAir', 0);			% heat exchange coefficient of interlights                                                      [W m^{-2} K^{-1}]
-
+    addParam(gl, 'vIntLampPos', 0.5);           % Vertical position of the interlights within the canopy [0-1, 0 is above canopy and 1 is below][-]                                      0.5 [Chapter 7 Section 4.12 [9]]
+    addParam(gl, 'fIntLampDown', 0.5);          % Fraction of interlight light output (PAR and NIR) that goes downwards                         [-]                                      0.5 [Chapter 7 Section 4.12 [9]]
+    addParam(gl, 'capIntLamp', 10);             % heat capacity of lamp                                                                         [J K^{-1} m^{-2}]                        10 [Assumed to be the same as top LEDs [8]]            
+    addParam(gl, 'etaIntLampPar', 0);           % fraction of lamp input converted to PAR 														[-]                                      0
+    addParam(gl, 'etaIntLampNir', 0);           % fraction of lamp input converted to NIR 														[-]                                      0                                     
+    addParam(gl, 'aIntLamp', 0);                % interlight lamp area 																			[m^{2}{lamp} m^{-2}{floor}]              0        
+    addParam(gl, 'epsIntLamp', 0);              % emissivity of interlight                                                                      [-]                                      0.88 Assumed that lamps act the same as heating pipes [8]
+    addParam(gl, 'thetaIntLampMax', 0);         % Maximum intensity of lamps																	[W m^{-2}]                               0
+	addParam(gl, 'zetaIntLampPar', 0);          % conversion from Joules to umol photons within the PAR output of the interlight                [J{PAR} umol{PAR}^{-1}]                  0
+    addParam(gl, 'cHecIntLampAir', 0);			% heat exchange coefficient of interlights                                                      [W m^{-2} K^{-1}]                        0
+    addParam(gl, 'tauIntLampFir', 1);			% transmissivity of FIR through the interlights                                                 [-]                                      1
+    addParam(gl, 'k1IntPar', 1.4); 				% PAR extinction coefficient of the canopy for light coming from the interlights                [-]                                      1.4 [Chapter 7 Section 4.12 [9]]
+    addParam(gl, 'k2IntPar', 1.4); 				% PAR extinction coefficient of the canopy for light coming from the interlights through the floor [-]                                   1.4 [Chapter 7 Section 4.12 [9]]
+    addParam(gl, 'kIntNir', 0.54); 				% NIR extinction coefficient of the canopy for light coming from the interlights                [-]                                      0.54 [Chapter 7 Section 4.12 [9]]
+    addParam(gl, 'kIntFir', 1.88); 				% FIR extinction coefficient of the canopy for light coming from the interlights                [-]                                      1.88 [Chapter 7 Section 4.12 [9]]
+	
+    
     %% Other parameters
-    addParam(gl, 'cLeakTop', 0.5);               % Fraction of leakage ventilation going from the top                                            [-]                                     0.5 [1]
-    addParam(gl, 'minWind', 0.25);              % wind speed where the effect of wind on leakage begins                                         [ m s^{-1}]                             0.25 [1]
+    addParam(gl, 'cLeakTop', 0.5);              % Fraction of leakage ventilation going from the top                                            [-]                                      0.5 [1]
+    addParam(gl, 'minWind', 0.25);              % wind speed where the effect of wind on leakage begins                                         [m s^{-1}]                               0.25 [1]
+    
 end
+
 

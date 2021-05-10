@@ -16,15 +16,14 @@ function setGlControlRules(gl)
     d = gl.d;
     u = gl.u;
 	
+    % Controls that are excluded by default
     setDef(u.shScr, '0'); % shading screen is always open (doesn't exist)
     setDef(u.shScrPer, '0'); % permanent shading screen is always open (doesn't exist)
     setDef(u.side, '0'); % side ventilation is always closed (doesn't exist)
-    setDef(u.blScr, '0'); % blackout screen is always open (doesn't exist)
-
     
     % Heating from boiler [0 is no heating, 1 is full heating]
     u.boil = proportionalControl(x.tAir, a.heatSetPoint, p.tHeatBand, 0, 1);
-    
+        
     % Heating to grow pipes [0 is no heating, 1 is full heating]
     u.boilGro = proportionalControl(x.tAir, a.heatSetPoint, p.tHeatBand, 0, 1);
 
@@ -38,11 +37,17 @@ function setGlControlRules(gl)
     setDef(u.lamp, 'a.lampOn');
     
     % Lighting from the interlights [W m^{-2}]
-    u.intLamp = a.lampOn;
+    setDef(u.intLamp, 'a.intLampOn');
 
     % Thermal screen [0 is open, 1 is closed]
     u.thScr = min(a.thScrCold, min(a.thScrHeat, a.thScrRh));
 
+    % Blackout screen: 1 if screen is closed, 0 if open
+    % Screen is closed at night when lamp is on, the constraints for the
+    % lamps in lampOn and intLampOn ensure that screen opens if there is
+    % excess heat or humidity
+    u.blScr = p.useBlScr.*(1-gl.d.isDaySmooth).*max(gl.a.lampOn, gl.a.intLampOn);
+    
     % set initial values
     u.boil.val = 0;
     u.boilGro.val = 0;
@@ -55,6 +60,6 @@ function setGlControlRules(gl)
     u.lamp.val = 0;
     u.intLamp.val = 0;
     u.blScr.val = 0;
-	
+    
 	gl.u = u;
 end

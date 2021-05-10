@@ -39,7 +39,7 @@ temp = [];
 cc = lines(100);
 blue = cc(1,:);
 red = cc(2,:);
-    
+
 for k=1:288:length(hps.d.iGlob.val(:,2))
     m = min(k+287, length(hps.d.iGlob.val(:,2)));
     hpsLight(day) = 1e-6*300*sum(hps.a.qLampIn.val(k:m,2));
@@ -47,7 +47,7 @@ for k=1:288:length(hps.d.iGlob.val(:,2))
     hpsHeat(day) = 1e-6*300*sum(hps.a.hBoilPipe.val(k:m,2));
     ledHeat(day) = 1e-6*300*sum(led.a.hBoilPipe.val(k:m,2));
     sun(day) = 1e-6*300*sum(hps.d.iGlob.val(k:m,2));
-    temp(day) = mean(hps.d.tOut.val(k:m,2));
+    temp(day) = mean(hps.d.tOut.val(k:m,2));    
     day = day+1;
 end
 

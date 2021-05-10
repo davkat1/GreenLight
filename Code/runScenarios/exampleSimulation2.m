@@ -7,10 +7,10 @@
 % Set directories for loading data and saving output
 currentFile = mfilename('fullpath');
 currentFolder = fileparts(currentFile);
-dataFolder = strrep(currentFolder, '\GreenLight\Code\runScenarios', ...
-    '\GreenLight\Code\inputs\energyPlus\data\');
-outputFolder = strrep(currentFolder, '\GreenLight\Code\runScenarios', ...
-    '\GreenLight\Output\');
+dataFolder = strrep(currentFolder, '\Code\runScenarios', ...
+    '\Code\inputs\energyPlus\data\');
+outputFolder = strrep(currentFolder, '\Code\runScenarios', ...
+    '\Output\');
 
 %% Weather input settings
 weatherInput = 'bei'; % Choose name of location, see folder inputs\energyPlus\data\

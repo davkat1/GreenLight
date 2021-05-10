@@ -46,7 +46,7 @@ function u = setGlControls(gl)
     % Closure of blackout screen [-]
     % 0 is open (folded screen), 1 is closed (spread out screen)
     u.blScr = DynamicElement('u.blScr');
-	
+    
 	gl.u = u;
 end
 
