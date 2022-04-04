@@ -14,7 +14,7 @@ David Katzin, Simon van Mourik, Frank Kempkes, and Eldert J. Van Henten. 2020. â
 The code in this repository has been tested for compatibility with MATLAB 2015b and onwards. The [DyMoMa](https://github.com/davkat1/DyMoMa/) package is required in order to use this model. The current version uses [DyMoMa v1.0.1](https://github.com/davkat1/DyMoMa/releases/tag/v1.0.1).
 
 ## User's guide
-A user's guide for GreenLight and DyMomMa is available in Chapter 7 (pages 235-280) of [David Katzin's PhD thesis](https://doi.org/10.18174/544434).
+A user's guide for GreenLight and DyMomMa is available in Chapter 7 (pages 235-280) of [David Katzin's PhD thesis](https://doi.org/10.18174/544434). Also see some examples and explanations in this readme, below.
 
 ## Use of the model in published studies
 
