@@ -13,8 +13,15 @@ David Katzin, Simon van Mourik, Frank Kempkes, and Eldert J. Van Henten. 2020. â
 ## Compatability
 The code in this repository has been tested for compatibility with MATLAB 2015b and onwards. The [DyMoMa](https://github.com/davkat1/DyMoMa/) package is required in order to use this model. The current version uses [DyMoMa v1.0.1](https://github.com/davkat1/DyMoMa/releases/tag/v1.0.1).
 
+## User's guide
+A user's guide for GreenLight and DyMomMa is available in Chapter 7 (pages 235-280) of [David Katzin's PhD thesis](https://doi.org/10.18174/544434).
 
 ## Use of the model in published studies
+
+### Code and data used for Chapter 5 of [Katzin, 2021](https://doi.org/10.18174/544434)
+Simulations for this study were performed by running "Code/runScenarios/heatByLightScript.m". The version of the code used was the one in [commit 78a2e8b of GreenLight](https://github.com/davkat1/GreenLight/commit/78a2e8b1dff91a127787eeb69b35d29c5b37e896) and [commit 33edf69 of DyMoMa](https://github.com/davkat1/DyMoMa/commit/33edf691ace81daf71cbf89ff75824d53abc2308). The resulting output is available on the associated dataset on the [4TU.ResearchData database](https://doi.org/10.4121/14575965.v1).
+
+The figures using in the chapter were generated using the output files available on the [4TU.ResearchData database](https://doi.org/10.4121/14575965.v1) by running the scripts in "Code/postSimAnalysis/katzinThesisFigures/Chapter 5".
 
 ### Code and data used for [Katzin, Marcelis, Van Mourik](https://doi.org/10.1016/j.apenergy.2020.116019) (2021, Applied Energy)
 The simulations described in this study were executed by running the file `Code\runScenarios\runWorldSimulations.m`. The version of the code used was the one in [commit 2d1f510 of GreenLight](https://github.com/davkat1/GreenLight/commit/2d1f510827b4e6460dac21c248617844304af194) and [commit 172a76e of DyMoMa](https://github.com/davkat1/DyMoMa/commit/172a76e22da1cdd6ed6a90e0e2632b8e83958859). The resulting output is available on the associated dataset on the [4TU.ResearchData database](https://doi.org/10.4121/13096403).
