@@ -375,8 +375,8 @@ function setGlParams(gl)
     addParam(gl, 'phiGroPipeE', 35e-3); 		% External diameter of grow pipes 																m                                       28e-3 [7]
     addParam(gl, 'phiGroPipeI', (35e-3)-(1.2e-3));% Internal diameter of grow pipes 															m                                       24e-3 
        
-    addParam(gl, 'aGroPipe', pi*gl.p.lGroPipe*gl.p.phiGroPipeE); % Surface area of pipes for floor area                                                   m^{2}{pipe} m^{-2}{floor}
-    addParam(gl, 'pBoilGro', 0);                % Capacity of the grow pipe heating system                                                      W                                       88*p.aFlr (Assumed to be same as pipe rail, but actually based on [5] pBoil+pBoilGro should be 88) 
+    addParam(gl, 'aGroPipe', pi*gl.p.lGroPipe*gl.p.phiGroPipeE); % Surface area of pipes for floor area                                         m^{2}{pipe} m^{-2}{floor}
+    addParam(gl, 'pBoilGro', 0);                % Capacity of the grow pipe heating system                                                      W                                       0 (no grow pipes) 
     
     % Heat capacity of grow pipes [J K^{-1} m^{-2}]
     % Equation 21 [1]

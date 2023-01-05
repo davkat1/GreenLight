@@ -40,7 +40,7 @@ function gl = createGreenLightModel(lampType, weather, startTime, controls, indo
 %       controls(:,1)     timestamps of the input [s] in regular intervals of 300, starting with 0
 %       controls(:,2)     Energy screen closure 			0-1 (1 is fully closed)
 %       controls(:,3)     Black out screen closure			0-1 (1 is fully closed)
-%       controls(:,4)     Average ventilation aperture		0-1 (1 is fully open)
+%       controls(:,4)     Average roof ventilation aperture	(average between lee side and wind side)	0-1 (1 is fully open)
 %       controls(:,5)     Pipe rail temperature 			°C
 %       controls(:,6)     Grow pipes temperature 			°C
 %       controls(:,7)     Toplights on/off                  0/1 (1 is on)
