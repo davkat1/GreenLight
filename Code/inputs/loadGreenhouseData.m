@@ -17,7 +17,7 @@ function [outdoor, indoor, controls, startTime, filtInd] = loadGreenhouseData(fi
 %       temperature model. MSc thesis, Farm Technology Group, Wageningen University.
 %
 % Usage:
-%   [outdoor, indoor, contorls, startTime] = loadToplightData2010(firstDay, seasonLength, type)
+%   [outdoor, indoor, contorls, startTime] = loadGreenhouseData(firstDay, seasonLength, type)
 %
 % Needs the files '..\toplight2010\data608.mat',
 % '..\toplight2010\data609.mat', '..\greenQ\greenQ_correctedLamps.mat

@@ -16,8 +16,11 @@ function [lampIn, boilIn, hhIn, parSun, parLamps, yield, efficiency] = energyYie
 %
 % For more information, see 
 %   [1] Katzin, D. (2021). Energy saving by LED lighting in greenhouses: 
-%       a process-based modelling approach (Phd Thesis, Wageningen University). 
+%       a process-based modelling approach (PhD Thesis, Wageningen University). 
 %       https://doi.org/10.18174/544434
+%   [2] Katzin, Marcelis, Van Henten, Van Mourik (2023). Heating
+%       greenhouses by light: A novel concept for intensive greenhouse
+%       production (Biosystems Engineering).
 
 % David Katzin, Wageningen University, April 2021
 % david.katzin@wur.nl
@@ -50,8 +53,8 @@ function [lampIn, boilIn, hhIn, parSun, parLamps, yield, efficiency] = energyYie
     boilIn = 1e-6*trapz(gl.a.hBoilPipe+gl.a.hBoilGroPipe);
 
     % Energy consumption of the heat harvesting system [MJ m^{-2}]
-    % See Equation 5.1 [1]
-    hhIn = 1e-6*trapz(gl.p.pHeatPump*gl.u.heatPump+gl.p.etaMech*gl.p.pMech.*gl.u.mech);
+    % See Equation 1 [2]
+    hhIn = 1e-6*trapz(gl.p.pHeatPump*gl.u.heatPump+(1+gl.p.etaMech)*gl.p.pMech.*gl.u.mech);
     
     % PAR light from the sun reaching above the canopy [mol m^{-2}]
     parSun = 1e-6*trapz(gl.p.parJtoUmolSun*gl.a.rParGhSun);
