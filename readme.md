@@ -18,6 +18,35 @@ A user's guide for GreenLight and DyMomMa is available in Chapter 7 (pages 235-2
 
 ## Use of the model in published studies
 
+### Code used for [Katzin, Marcelis, Van Henten, Van Mourik](https://doi.org/10.1016/j.biosystemseng.2023.04.003) (2023, Biosystems engineering)
+Simulations for this study were performed by running "Code/runScenarios/heatByLightScript.m". The version of the code used was the one in [commit 78a2e8b of GreenLight](https://github.com/davkat1/GreenLight/commit/78a2e8b1dff91a127787eeb69b35d29c5b37e896) and [commit 33edf69 of DyMoMa](https://github.com/davkat1/DyMoMa/commit/33edf691ace81daf71cbf89ff75824d53abc2308). The resulting output is available on the associated dataset on the [4TU.ResearchData database](https://doi.org/10.4121/14575965.v1).
+
+The following files were used for each figure:
+- **Fig. 01:** Outline of the greenhouse system considered in this study.
+	- Textual image generated using Microsoft Visio software
+- **Fig. 02:** Control of heating, ventilation and thermal screen in the reference setting.
+	- Control of heating, ventilation and thermal screens in the standard setting.
+- **Fig. 03:** Daily solar radiation sum and heating demand in the scenario without lamps and with heat storage. 
+	- `Code\postSimAnalysis\katzin2023figures\fig03DailySolarRadiationAndHeatingDemand.m`
+- **Fig. 04:** Number of cold hours and lowest indoor temperature realised in the tested greenhouse scenarios.
+	- `Code\postSimAnalysis\katzin2023figures\fig04HeatByLightColdHours.m`
+- **Fig. 05:** Energy use, PAR, and yield in the scenarios studied.
+	- `Code\postSimAnalysis\katzin2023figures\fig05HeatByLightScenarioSummary.m`
+- **Fig. 06:** Daily light integral of PAR light above the crop.
+	- `Code\postSimAnalysis\katzin2023figures\fig06DailyLightIntegral.m`
+- **Fig. 07:** Hourly average indoor temperature, thermal screens use and cooling, and outdoor weather.
+	- `Code\postSimAnalysis\katzin2023figures\fig07HeatByLightFourDaysNoLamps.m`
+- **Fig. 08:** Hourly average indoor temperature, energy inputs, and energy content of the heat buffers.
+	- `Code\postSimAnalysis\katzin2023figures\fig08HeatByLightFourDaysLampIntensityBufferSize.m`
+- **Fig. 09:** Hourly averages of indoor temperature, lamp input, and energy content of the heat buffers.
+	- `Code\postSimAnalysis\katzin2023figures\fig09HeatByLightFourDaysHybrid.m`
+- **Fig. 10:** Daily heating and lighting input of the scenarios studied.
+	- `Code\postSimAnalysis\katzin2023figures\fig10DailyHeatingLighting.m`
+- **Fig. 11:** Incoming and outgoing energy flows in the scenarios studied.
+	- `Code\postSimAnalysis\katzin2023figures\fig11IncomingOutgoingEnergy.m`
+- **Fig. 12:** Running costs and carbon footprint, scaled per m2 floor area and per kg harvested product,
+	`Code\postSimAnalysis\katzin2023figures\fig12HeatByCostsAndFootprint.m`
+
 ### Code and data used for Chapter 5 of [Katzin, 2021](https://doi.org/10.18174/544434)
 Simulations for this study were performed by running "Code/runScenarios/heatByLightScript.m". The version of the code used was the one in [commit 78a2e8b of GreenLight](https://github.com/davkat1/GreenLight/commit/78a2e8b1dff91a127787eeb69b35d29c5b37e896) and [commit 33edf69 of DyMoMa](https://github.com/davkat1/DyMoMa/commit/33edf691ace81daf71cbf89ff75824d53abc2308). The resulting output is available on the associated dataset on the [4TU.ResearchData database](https://doi.org/10.4121/14575965.v1).
 
