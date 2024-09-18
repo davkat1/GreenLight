@@ -8,6 +8,13 @@
 %       greenhouses with supplemental lighting: Evaluation of heat requirements 
 %       under LED and HPS lamps. Biosystems Engineering, 194, 61–81. 
 %       https://doi.org/10.1016/j.biosystemseng.2020.03.010
+%
+% In order to run this file, the following data files are needed: 
+%   'inputs\Recorded greenhouse data from 2010 Bleiswijk trial\dataLED.mat'
+%   'inputs\Recorded greenhouse data from 2010 Bleiswijk trial\dataHPS.mat'
+% These files can be accessed through https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865
+% see inputs\Recorded greenhouse data from 2010 Bleiswijk trial\Readme.txt
+% for more information
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl

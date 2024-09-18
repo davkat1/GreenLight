@@ -1,13 +1,22 @@
 % evaluateEnergyUseHps Evaluate the GreenLight energy use model under HPS
 % Runs the model with parameter values representing an HPS compartment in
 % Bleiswijk, The Netherlands in 2010. Data is loaded from this trial and
-% the heating
+% the simulated heating data is compared with the calculated heating data 
+% of the trial.
+%
 % Used in: 
 %   Katzin, D., van Mourik, S., Kempkes, F., & 
 %       van Henten, E. J. (2020). GreenLight – An open source model for 
 %       greenhouses with supplemental lighting: Evaluation of heat requirements 
 %       under LED and HPS lamps. Biosystems Engineering, 194, 61–81. 
 %       https://doi.org/10.1016/j.biosystemseng.2020.03.010
+%
+% In order to run this file, the following data files are needed: 
+%   'inputs\Recorded greenhouse data from 2010 Bleiswijk trial\dataLED.mat'
+%   'inputs\Recorded greenhouse data from 2010 Bleiswijk trial\dataHPS.mat'
+% These files can be accessed through https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865
+% see inputs\Recorded greenhouse data from 2010 Bleiswijk trial\Readme.txt
+% for more information
 
 % David Katzin, Wageningen University
 % david.katzin@wur.nl
@@ -86,9 +95,9 @@ hps.d.uGroPipe = DynamicElement('d.uGroPipe', ...
     [hps.d.tPipe.val(:,1), groPipeEnergy(controls(:,6)-indoor(:,2))]);
 
 %% Plot
-plot(cumsum(hps.a.hBoilPipe+hps.a.hBoilGroPipe)); % simulated heat input
+plot(300e-6*cumsum(hps.a.hBoilPipe+hps.a.hBoilGroPipe)); % simulated heat input
 hold on
-plot(cumsum(hps.d.uPipe+hps.d.uGroPipe)); % measured heat input
+plot(300e-6*cumsum(hps.d.uPipe+hps.d.uGroPipe)); % measured heat input
 legend('simulated','calculated from data');
 
 %% Calculate relative error ratio
@@ -96,6 +105,7 @@ eMeas = 1e-6*trapz(hps.d.uPipe+hps.d.uGroPipe);
 eSim = 1e-6*trapz(hps.a.hBoilPipe+hps.a.hBoilGroPipe);
 errorRatio = eSim./eMeas;
 
+%%
 toc;
 
 save hpsEnergy

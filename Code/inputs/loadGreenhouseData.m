@@ -3,7 +3,6 @@ function [outdoor, indoor, controls, startTime, filtInd] = loadGreenhouseData(fi
 % The following datasets are avilable:
 %   hps - WUR Glas 2010 with HPS toplights 
 %   led - WUR Glas 2010 with LED toplights 
-%   hybrid - GreenQ 2012 with HPS toplights and LED interlights
 % The data is given in 5-minute intervals.
 %
 % The dataset for hps and led is described in:
@@ -19,9 +18,14 @@ function [outdoor, indoor, controls, startTime, filtInd] = loadGreenhouseData(fi
 % Usage:
 %   [outdoor, indoor, contorls, startTime] = loadGreenhouseData(firstDay, seasonLength, type)
 %
-% Needs the files '..\toplight2010\data608.mat',
-% '..\toplight2010\data609.mat', '..\greenQ\greenQ_correctedLamps.mat
-% which contain a table in the following format: 
+% Needs the files: 
+%   'inputs\Recorded greenhouse data from 2010 Bleiswijk trial\dataLED.mat'
+%   'inputs\Recorded greenhouse data from 2010 Bleiswijk trial\dataHPS.mat'
+% which can be accessed through https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865
+% see inputs\Recorded greenhouse data from 2010 Bleiswijk trial\Readme.txt
+% for more information.
+%
+% The data files contain a table in the following format: 
 % Column    Description                         Unit             
 % 1 		Time 								datenum (days since 0/0/0000)
 % 2 		Radiation 							W m^{-2}
@@ -92,23 +96,17 @@ function [outdoor, indoor, controls, startTime, filtInd] = loadGreenhouseData(fi
     %% load file
     switch type
         case 'hps'
-            load([currentFolder '\toplight2010\data609.mat'], 'data609');
-            inputData = data609;
+            load([currentFolder ...
+                '\Recorded greenhouse data from 2010 Bleiswijk trial\dataHPS.mat'], 'dataHPS');
+            inputData = dataHPS;
             inputData(:,15) = zeros(size(inputData(:,1))); % no interlights
         case 'led'
-            load([currentFolder '\toplight2010\data608.mat'], 'data608');
-            inputData = data608;
+            load([currentFolder ...
+                '\Recorded greenhouse data from 2010 Bleiswijk trial\dataLED.mat'], 'dataLED');
+            inputData = dataLED;
             inputData(:,15) = zeros(size(inputData(:,1))); % no interlights
-        case 'hybrid'
-            load([currentFolder '\greenQ\greenQ_correctedLamps.mat'], 'greenQ_correctedLamps');
-            inputData = greenQ_correctedLamps;
-            
-            % no CO2 injection data, just give zeros
-            inputData(:,23) = zeros(size(inputData(:,1)));
-            % assume that indoor CO2 is same as outdoor
-            inputData(:,24) = CO2_PPM*ones(size(inputData(:,1)));
         otherwise
-            error('Wrong dataset type. Enter ''hps'', ''led'', or ''hybrid''.');
+            error('Wrong dataset type. Enter ''hps'' or ''led''.');
     end
     
     %% Cut out the required season

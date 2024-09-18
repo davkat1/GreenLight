@@ -3,7 +3,7 @@ GreenLight - A model for greenhouses with supplemental lighting
 
 A model for simulating the indoor climate and energy use of greenhouses with supplemental lighting. 
 
-## Maintainers
+## Maintainer
 * David Katzin, `david.katzin@wur.nl`, `david.katzin1@gmail.com`
 
 ## Cite as
@@ -12,6 +12,14 @@ David Katzin, Simon van Mourik, Frank Kempkes, and Eldert J. Van Henten. 2020. �
 
 ## Compatability
 The code in this repository has been tested for compatibility with MATLAB 2015b and onwards. The [DyMoMa](https://github.com/davkat1/DyMoMa/) package is required in order to use this model. The current version uses [DyMoMa v1.0.1](https://github.com/davkat1/DyMoMa/releases/tag/v1.0.1).
+
+## Getting started
+See [Using the model](#Using-the-model), below.
+
+## Related datasets
+- **[Data from: ‘GreenLight - An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps’](https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865)** Data used and simulation results from Katzin et al. (2020), Biosystems Engineering.
+- **[Data from: Energy savings in greenhouses by transition from high-pressure sodium to LED lighting](https://doi.org/10.4121/13096403)** Data used and simulation results from Katzin et al. (2021), Applied Energy.
+- **[Data from: Energy saving by LED lighting in greenhouses: a process-based modelling approach, Chapter 5](https://doi.org/10.4121/14575965)** Data used and simulation results from Katzin et al. (2023), Biosystems Engineering.
 
 ## User's guide
 A user's guide for GreenLight and DyMomMa is available in Chapter 7 (pages 235-280) of [David Katzin's PhD thesis](https://doi.org/10.18174/544434). Also see some examples and explanations in this readme, below.
@@ -101,9 +109,9 @@ Make sure you have all files in this repository, as well as those from the DyMoM
 
 ### Example simulations
 
-`runScenarios\exampleSimulation` shows how you may use a dataset of weather data (in this case, the Reference Year for Dutch Greenhouses), to run the model with default settings. The plot made here is of the lamp temperatures, but you may plot whatver model component you wish.
+`runScenarios\exampleSimulation.m` shows how you may use a dataset of weather data (in this case, the Reference Year for Dutch Greenhouses), to run the model with default settings. The plot made here is of the lamp temperatures, but you may plot whatver model component you wish.
 
-`runScenarios\exampleSimulation2` shows more uses of the model, now run with settings for a modern greenhouse, including plotting the outputs.
+`runScenarios\exampleSimulation2.m` shows more uses of the model, now run with settings for a modern greenhouse, including plotting the outputs.
 
 `runScenarios\exampleCropModel.m` gives a simple example of running only the crop component of the model.
 
@@ -152,7 +160,12 @@ To:
 - Examples of an evaluation of the climate model are given in `Code\runScenarios\evaluateClimateModelHps.m` and `Code\runScenarios\evaluateClimateModelLed.m`.
 - Examples of an evaluation of energy use are given in `Code\runScenarios\evaluateEnergyUseHps.m` and `Code\runScenarios\evaluateEnergyUseLed.m`.
 
-Unfortunately these files cannot be run without the data from the Bleiswijk 2010 trial, which is not included in this repository. However these examples can be used to run the model with other datasets. You can see in these examples how to compare the model simulations to the measured values, including measured climate variables and energy use.
+In order to run these evaluation simulations, the data from the greenhouse trial is needed. This data is available at [Data from: ‘GreenLight - An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps’](https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865). 
+
+#### Instructions:
+1. Download `Processed data.zip` from [Data from: ‘GreenLight - An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps’](https://doi.org/10.4121/78968e1b-eaea-4f37-89f9-2b98ba3ed865).
+2. Unzip the file and place its contents in `Code\inputs\Recorded greenhouse data from 2010 Bleiswijk trial`.
+3. The evaluation scripts can now be run. Be sure that **lines 100 and 105** of `Code\inputs\loadGreenhouseData.m` point to the right location of the datasets.
 
 ## Files in this repository
 
