@@ -1,0 +1,548 @@
+{
+   "Info" : {
+      "About" : "This model is based on the tomato crop model described in Chapter 9 of Vanthoor (2011), with some simplifications as in Katzin (2020) and Katzin (2021). Further description of the model is in Chapter 2 of Vanthoor (2011), also published as Vanthoor et al. (2011b). Details of the simplifications used here are available in Katzin (2020) and Katzin (2021).\r\n\r\nInitial values for the model states were chosen based on earlier GreenLight versions (https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlInit.m)",
+      "Usage" : "This file can either be used for modelling a tomato crop with a greenhouse, or for modelling only a crop with the climate values as an input. For running a crop model only, use this file together with extension_crop_vanthoor_2011_for_standalone.json, see example in main_vanthoor_crop.json. \r\n\r\nTo model the crop together with the Vanthoor greenhouse model, use it with greenhouse_vanthoor_2011_chapter_8.json, see example in main_vanthoor_2011.json. \r\n\r\nInput variables have been set here as constants. In order to run meaningful simulations, input values must be provided, see examples.",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Vanthoor 2011b" : "Vanthoor, B. H. E., De Visser, P. H. B., Stanghellini, C., and Van Henten, E. J. (2011). A Methodology for Model-Based Greenhouse Design: Part 2, Description and Validation of a Tomato Yield Model. Biosystems Engineering 110(4), 378–95. https://doi.org/10.1016/j.biosystemseng.2011.08.005",
+         "Katzin 2020" : "Katzin, D., van Mourik, S., Kempkes, F., & van Henten, E. J. (2020). GreenLight – An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps. Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+      },
+      "Notation" : "hCBufMCBufOrg used by Vanthoor is renamed here hBufOrg",
+      "Authors" : "This file was written by David Katzin (Wageningen University & Research), Pierre-Olivier Schwarz (Université Laval), and Joshi Graf (Wageningen University & Research)",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json"
+   },
+
+   "State variables of the model" : {
+      "about" : "The states of the model, defined by ordinary differential equations (ODEs)",
+      "reference" : "Vanthoor 2011, Section 9.4",
+      "cBuf" : {
+         "unit" : "mg{CH2O} m**-2",
+         "type" : "state",
+         "definition" : "mcAirBuf - mcBufFruit - mcBufLeaf - mcBufStem - mcBufAir",
+         "description" : "Carbohydrates in the buffer",
+         "init" : "20e3",
+         "reference" : "Vanthoor 2011, Equation 9.1"
+      },
+      "cFruit" : {
+         "unit" : "mg{CH2O} m**-2",
+         "type" : "state",
+         "definition" : "mcBufFruit - mcFruitAir - mcFruitHar",
+         "description" : "Carbohydrates in the fruit",
+         "init" : "312",
+         "reference" : "Vanthoor 2011, Equation 9.2; Katzin 2021, Equation 7.43. Initial value based on previous versions of GreenLight, assuming 3.12 plants/m2, with each plant 2 g and  fruit fraction 0f 0.05. see https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlInit.m"
+      },
+      "cLeaf" : {
+         "unit" : "mg{CH2O} m**-2",
+         "type" : "state",
+         "definition" : "mcBufLeaf - mcLeafAir - mcLeafHar",
+         "description" : "Carbohydrates in the leaves",
+         "init" : "4368",
+         "reference" : "Vanthoor 2011, Equation 9.4. Initial value based on previous versions of GreenLight, assuming 3.12 plants/m2, with each plant 2 g and leaf fraction 0f 0.7. see https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlInit.m"
+      },
+      "lai" : {
+         "unit" : "m**2 {leaf} m**-2 {floor}",
+         "type" : "aux",
+         "definition" : "sla * cLeaf",
+         "description" : "Leaf area index",
+         "reference" : "Vanthoor 2011, Equation 9.5"
+      },
+      "cStem" : {
+         "unit" : "mg{CH2O} m**-2",
+         "type" : "state",
+         "definition" : "mcBufStem - mcStemAir",
+         "description" : "Carbohydrates in the stems",
+         "init" : "1560",
+         "reference" : "Vanthoor 2011, Equation 9.6. Initial value based on previous versions of GreenLight, assuming 3.12 plants/m2, with each plant 2 g and stem fraction 0f 0.25. see https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlInit.m"
+      },
+      "tCanSum" : {
+         "unit" : "°C day",
+         "type" : "state",
+         "definition" : "1 / 86400 * tCan",
+         "description" : "Crop temperature sum",
+         "init" : "0",
+         "reference" : "Vanthoor 2011, Equation 9.8. Note that the unit noted there is different than the one used here"
+      },
+      "tCan24" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1 / 86400) * (tCan - tCan24)",
+         "description" : "Average Canopy Temperature in previous 24 Hours",
+         "init" : "20.5",
+         "reference" : "Vanthoor 2011, Equation 9.9, Equation A.2 Section 9.7.1"
+      }
+   },
+   "Model flows" : {
+      "reference" : "Vanthoor 2011, Section 9.5",
+      "Canopy photosynthesis" : {
+         "reference" : "Vanthoor 2011, Section 9.5.1",
+         "Net photosynthesis rate" : {
+            "reference" : "Vanthoor 2011, Section 9.5.1.1",
+            "mcAirCan" : {
+               "unit" : "mg{CO2} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "mCo2/ mCh2o * (mcAirBuf - mcBufAir - mcOrgAir)",
+               "description" : "Net crop assimilation",
+               "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlParams.m\r\n\r\nIt is assumed that for every mol of CH2O, a mol of CO2 is taken from the air, thus the conversion uses molar masses"
+            },
+            "mcAirBuf" : {
+               "unit" : "mg{CH2O} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "mCh2o * hAirBuf * (p - r)",
+               "description" : "Net photosynthesis",
+               "reference" : "Vanthoor 2011, Equation 9.10"
+            },
+            "p" : {
+               "unit" : "umol{co2} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "j * (co2Stom - gamma) / (4 * (co2Stom + 2 * gamma))",
+               "description" : "Photosynthesis rate at canopy level",
+               "reference" : "Vanthoor 2011, Equation 9.12"
+            },
+            "r" : {
+               "unit" : "umol{co2} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "p * gamma / co2Stom",
+               "description" : "Photrespiration",
+               "reference" : "Vanthoor 2011, Equation 9.13"
+            }
+         },
+         "Electron transport rate" : {
+            "reference" : "Vanthoor 2011, Section 9.5.1.2",
+            "j" : {
+               "unit" : "umol{e-} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "(1 / (2 * theta)) * (jPot + alpha * parCan - sqrt((jPot + alpha * parCan)**2 - 4 * theta * jPot * alpha * parCan))",
+               "description" : "Electron transport rate",
+               "reference" : "Vanthoor 2011, Equation 9.14"
+            },
+            "jPot" : {
+               "unit" : "umol{e-} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "j25CanMax * exp(eJ * (tCan + 273.15 - t25k) / (1e-3 * R * (tCan + 273.15) * t25k)) * (1 + exp((S * t25k - H) / (1e-3 * R * t25k))) / (1 + exp((S * (tCan+ 273.15) - H) / (1e-3 * R * (tCan + 273.15))))",
+               "description" : "Potential rate of electron transport",
+               "reference" : "Vanthoor 2011, Equation 9.15. Note that R is 8.314 in Chapter 9 (Table 9.1) and 8314 in Chapter 8 (Table 8.1)"
+            },
+            "j25CanMax" : {
+               "unit" : "umol{e-} m**-2 s**-1",
+               "type" : "aux",
+               "definition" : "lai * j25LeafMax",
+               "description" : "Maximum rate of electron transport rate at 25°C",
+               "reference" : "Vanthoor 2011, Equation 9.16"
+            }
+         },
+         "Absorbed PAR by the canopy" : {
+            "about" : "The PAR absorbed by the canopy in the crop model of Vanthoor (Chapter 9), is analogous to the PAR absorbed by the crop in the greenhouse model of Vanthoor (Chapter 8), except in Chapter 8 (Equation 8.26) it is expressed as W m**-2, and in Chapter 9 (Equation 9.17) it is expressed in µmol m**-2 s**-1. For easier modifications, parCan is considered here an input of the crop model, and is defined in the greenhouse file instead.",
+            "reference" : "Vanthoor 2011, Section 9.5.1.3"
+         },
+         "CO2 relationships in the photosynthetic tissue" : {
+            "reference" : "Vanthoor 2011, Section 9.5.1.4",
+            "co2Stom" : {
+               "unit" : "ppm",
+               "type" : "aux",
+               "definition" : "etaCo2AirStom * co2InPpm",
+               "description" : "CO2 concentration in the stomata",
+               "reference" : "Vanthoor 2011, Equation 9.21. Note that the unit there is equivalent to ppm"
+            },
+            "gamma" : {
+               "unit" : "ppm",
+               "type" : "aux",
+               "definition" : "(j25LeafMax / j25CanMax) * cGamma * tCan + 20 * cGamma * (1 - j25LeafMax / j25CanMax)",
+               "description" : "CO2 compensation point, - Canopy photosynthesis, - Canopy photosynthesis",
+               "reference" : "Vanthoor 2011, Equation 9.23. Note that the unit there is equivalent to ppm"
+            }
+         }
+      },
+      "Carbohydrate flow to plant organs" : {
+         "reference" : "Vanthoor 2011, Section 9.5.2",
+         "mcBufFruit" : {
+            "unit" : "mg{CH2O} m**2 s**-1",
+            "type" : "aux",
+            "definition" : "hBufOrg * hTCan * hTCan24 * hTCanSum * gTCan24 * rgFruit",
+            "description" : "Carbohydrate flow from buffer to fruit",
+            "reference" : "Vanthoor 2011, Equation 9.24"
+         },
+         "mcBufLeaf" : {
+            "unit" : "mg{CH2O} m**2 s**-1",
+            "type" : "aux",
+            "definition" : "hBufOrg * hTCan24 * gTCan24 * rgLeaf",
+            "description" : "Carbohydrate flow from buffer to leaves",
+            "reference" : "Vanthoor 2011, Equation 9.25"
+         },
+         "mcBufStem" : {
+            "unit" : "mg{CH2O} m**2 s**-1",
+            "type" : "aux",
+            "definition" : "hBufOrg * hTCan24 * gTCan24 * rgStem",
+            "description" : "Carbohydrate flow from buffer to stems",
+            "reference" : "Vanthoor 2011, Equation 9.25"
+         },
+         "Temperature effect on structural carbon flow to organs" : {
+            "reference" : "Vanthoor 2011, Section 9.5.2.4",
+            "gTCan24" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "0.047 * tCan24 + 0.06",
+               "description" : "Temperature effect on structural carbon flow to organs",
+               "reference" : "Vanthoor 2011, Equation 9.28"
+            }
+         }
+      },
+      "Growth and maintenance respiration" : {
+         "reference" : "Vanthoor 2011, Section 9.5.4",
+         "mcBufAir" : {
+            "unit" : "mg{CH2O} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "cLeafG * mcBufLeaf + cStemG * mcBufStem + cFruitG * mcBufFruit",
+            "description" : "Growth respiration",
+            "reference" : "Vanthoor 2011, Equations 9.43-9.44"
+         },
+         "mcOrgAir" : {
+            "unit" : "mg{CH2O} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "mcLeafAir + mcStemAir + mcFruitAir",
+            "description" : "Total maintenance respiration",
+            "reference" : "Vanthoor 2011, Equation 9.45"
+         },
+         "mcLeafAir" : {
+            "unit" : "mg{CH2O} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "(1 - exp(-cRgr * rgr)) * q10m**(0.1 * (tCan24 - 25)) * cLeaf * cLeafM",
+            "description" : "Leaf maintenance respiration",
+            "reference" : "Vanthoor 2011, Equation 9.45"
+         },
+         "mcStemAir" : {
+            "unit" : "mg{CH2O} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "(1 - exp(-cRgr * rgr)) * q10m**(0.1 * (tCan24 - 25)) * cStem * cStemM",
+            "description" : "Stem maintenance respiration",
+            "reference" : "Vanthoor 2011, Equation 9.45"
+         },
+         "mcFruitAir" : {
+            "unit" : "mg{CH2O} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "(1 - exp(-cRgr * rgr)) * q10m**(0.1 * (tCan24 - 25)) * cFruit * cFruitM",
+            "description" : "Fruit maintenance respiration",
+            "reference" : "Vanthoor 2011, Equation 9.45"
+         }
+      },
+      "Leaf pruning" : {
+         "reference" : "Vanthoor 2011, Section 9.5.5",
+         "cLeafMax" : {
+            "unit" : "mg{leaf} m**-2",
+            "type" : "const",
+            "definition" : "laiMax / sla",
+            "description" : "Maximum allowed leaf size",
+            "reference" : "Vanthoor 2011, Equation 9.46"
+         }
+      },
+      "Differential representation of conditional model statements" : {
+         "reference" : "Vanthoor 2011, Section 9.7.2 Equations B.1-B.3, Table 9.2",
+         "hAirBuf" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 / (1 + exp(5e-4 * (cBuf - cBufMax)))",
+            "description" : "Inhibition due to full carbohydrates buffer",
+            "reference" : "Vanthoor 2011, Equation 9.11, Section 9.7.2 Equation B.1, Table 9.2"
+         },
+         "hBufOrg" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 / (1 + exp(-5e-3 * (cBuf - cBufMin)))",
+            "description" : "Inhibition due to insufficient carbohydrates in the buffer",
+            "reference" : "Vanthoor 2011, Equation 9.26 and Section 9.7.2 Equation B.1, Table 9.2"
+         },
+         "hTCan" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 / (1 + exp(-0.869 * (tCan - tCanMin))) * 1 / (1 + exp(0.5793 * (tCan - tCanMax)))",
+            "description" : "Inhibition of carbohydrate flow to the fruit",
+            "reference" : "Vanthoor 2011, Section 9.7.2 Equation B.2"
+         },
+         "hTCan24" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 / (1 + exp(-1.1587 * (tCan24 - tCan24Min))) * 1 / (1 + exp(1.3904 * (tCan24 - tCan24Max)))",
+            "description" : "Inhibition of carbohydrate flow to the organs",
+            "reference" : "Vanthoor 2011, Section 9.7.2 Equation B.3"
+         },
+         "hTCanSum" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "0.5*(tCanSum/tEndSum+sqrt((tCanSum/tEndSum)**2+1e-4)) - 0.5*((tCanSum-tEndSum)/tEndSum+sqrt(((tCanSum-tEndSum)/tEndSum)**2 + 1e-4))",
+            "description" : "Inhibition due to development stage",
+            "reference" : "Vanthoor 2011, Equation 9.27 and Section 9.7.2 Equation B.6, Table 9.2"
+         },
+         "mcLeafHar" : {
+            "unit" : "mg{CH2O} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "smoothHar(cLeaf, cLeafMax, 1e4, 1e5)",
+            "description" : "Leaf pruning",
+            "reference" : "Vanthoor 2011, Equation 9.47 and Section 9.7.2 Equation B.5. Note that in these references, the last value should be 5e4. But according to the dataset from Katzin 2021 (doi.org/10.4121/13096403), the value used there for the last argument is 1e5."
+         }
+      }
+   },
+   "Parameters" : {
+      "about" : "Parameters are taken from Vanthoor 2011 (Chapter 9). Parameters that are already included in Vanthoor 2011 (Chapter 8), or that are not used here due to model simplification, are omitted.",
+      "Table 2.2" : {
+         "laiMax" : {
+            "unit" : "m**2{leaf} m**-2{floor}",
+            "type" : "const",
+            "definition" : "3",
+            "description" : "Leaf area index",
+            "reference" : "Vanthoor 2011, Table 2.2 (NL Specific)"
+         }
+      },
+      "Table 9.1" : {
+         "alpha" : {
+            "unit" : "umol{e-} umol**-1{photons}",
+            "type" : "const",
+            "definition" : "0.385",
+            "description" : "conversion factor from photons to electrons including efficiency term",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "theta" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.7",
+            "description" : "degree of curvature of the electron transport rate",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "etaCo2AirStom" : {
+            "unit" : "umol{co2} mol**-1{air}",
+            "type" : "const",
+            "definition" : "0.67",
+            "description" : "conversion from greenhouse air co2 concentration and stomatal co2 concentration",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cGamma" : {
+            "unit" : "umol{co2} mol**-1{air} K**-1",
+            "type" : "const",
+            "definition" : "1.7",
+            "description" : "Effect of canopy temperature on CO2 compensation point",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cFruitM" : {
+            "unit" : "mg mg**-1 s**-1",
+            "type" : "const",
+            "definition" : "1.16e-7",
+            "description" : "Fruit maintenance respiration coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cFruitG" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.27",
+            "description" : "Fruit growth respiration coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cLeafM" : {
+            "unit" : "mg mg**-1 s**-1",
+            "type" : "const",
+            "definition" : "3.47e-7",
+            "description" : "Leaf maintenance respiration coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cLeafG" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.28",
+            "description" : "Leaf growth respiration coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cStemM" : {
+            "unit" : "mg mg**-1 s**-1",
+            "type" : "const",
+            "definition" : "1.47e-7",
+            "description" : "Stem maintenance respiration coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cStemG" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.3",
+            "description" : "Stem growth respiration coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cRgr" : {
+            "unit" : "s**-1",
+            "type" : "const",
+            "definition" : "2.85e6",
+            "description" : "Regression coefficient in maintenance respiration function",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cBufMax" : {
+            "unit" : "mg m**-2",
+            "type" : "const",
+            "definition" : "20e3",
+            "description" : "Maximum capacity of carbohydrate buffer",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "cBufMin" : {
+            "unit" : "mg m**-2",
+            "type" : "const",
+            "definition" : "1e3",
+            "description" : "Minimum capacity of carbohydrate buffer",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "eJ" : {
+            "unit" : "J mol**-1",
+            "type" : "const",
+            "definition" : "37e3",
+            "description" : "Activation energy for Jpot calculation",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "H" : {
+            "unit" : "J mol**-1",
+            "type" : "const",
+            "definition" : "22e4",
+            "description" : "Deactivation energy for Jpot calculation",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "j25LeafMax" : {
+            "unit" : "umol{e-} m**-2{leaf} s**-1",
+            "type" : "const",
+            "definition" : "210",
+            "description" : "Maximal rate of electron transport at 25°C for the leaf",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "mCh2o" : {
+            "unit" : "mg umol**-1",
+            "type" : "const",
+            "definition" : "30e-3",
+            "description" : "Molar mass of CH2O",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "rgFruit" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "const",
+            "definition" : "0.328",
+            "description" : "Potential fruit growth coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "rgLeaf" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "const",
+            "definition" : "0.095",
+            "description" : "Potential leaf growth coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "rgStem" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "const",
+            "definition" : "0.074",
+            "description" : "Potential stem growth coefficient",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "S" : {
+            "unit" : "J mol**-1 K**-1",
+            "type" : "const",
+            "definition" : "710",
+            "description" : "Entropy term for Jpot calculation",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "sla" : {
+            "unit" : "m**2{leaf} mg**-1{leaf}",
+            "type" : "const",
+            "definition" : "2.66e-5",
+            "description" : "Specific leaf area",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "t25k" : {
+            "unit" : "K",
+            "type" : "const",
+            "definition" : "298.15",
+            "description" : "Reference temperature for Jpot calculation",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         },
+         "tEndSum" : {
+            "unit" : "°C day",
+            "type" : "const",
+            "definition" : "1035",
+            "description" : "temperature sum where crop is fully generative",
+            "reference" : "Vanthoor 2011, Table 9.1. Note that the unit there is different than the one used here"
+         },
+         "q10m" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "2",
+            "description" : "Q10 value of temperature effect on maintenance respiration",
+            "reference" : "Vanthoor 2011, Table 9.1"
+         }
+      },
+      "Table 9.2" : {
+         "tCanMin" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "10",
+            "description" : "Inhibition of carbohydrate flow because of low instantaneous temperatures",
+            "reference" : "Vanthoor 2011, Table 9.2"
+         },
+         "tCanMax" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "34",
+            "description" : "Inhibition of carbohydrate flow because of high instantaneous temperatures",
+            "reference" : "Vanthoor 2011, Table 9.2"
+         },
+         "tCan24Min" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "15",
+            "description" : "Inhibition of carbohydrate flow because of low temperatures",
+            "reference" : "Vanthoor 2011, Table 9.2"
+         },
+         "tCan24Max" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "24.5",
+            "description" : "Inhibition of carbohydrate flow because of high temperatures",
+            "reference" : "Vanthoor 2011, Table 9.2"
+         }
+      },
+      "rgr" : {
+         "unit" : "{kg{dw grown} kg**-1{existing dw} s**-1}",
+         "type" : "const",
+         "definition" : "3e-6",
+         "description" : "Relative growth rate",
+         "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlParams.m"
+      },
+      "mCo2" : {
+         "unit" : "mg µmol**-1",
+         "type" : "const",
+         "definition" : "44e-3",
+         "description" : "Molar mass of CO2",
+         "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlParams.m"
+      },
+      "R" : {
+         "unit" : "J kmol**-1 K**-1",
+         "type" : "const",
+         "definition" : "8314",
+         "description" : "Molar gas constant",
+         "reference" : "Vanthoor 2011, Table 8.1. Included here to allow for standalone running"
+      }
+   },
+   "Fruit harvesting" : {
+      "smoothHar(processVar, cutOff, smooth, maxRate)" : {
+         "type" : "function",
+         "definition" : "maxRate / (1 + exp( -(processVar - cutOff) * 2 * log(100) / smooth))",
+         "description" : "Smooth function for harvesting (leaves, fruit, etc); processVar - the variable to be controlled; cutoff - the value at which the processVar should be harvested; smooth - smoothing factor. The rate will go from 0 to maxRate at a range with approximately this width; maxRate - the maximum harvest rate",
+         "reference" : "Katzin 2021, Equation 7.45"
+      },
+      "mcFruitHar" : {
+         "unit" : "mg{CH2O} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "smoothHar(cFruit, cFruitMax, 1e4, 5e4)",
+         "description" : "Fruit harvest rate",
+         "reference" : "Katzin 2021, Equation 7.45"
+      },
+      "cFruitMax" : {
+         "unit" : "mg{fruit} m**-2",
+         "type" : "const",
+         "definition" : "300e3",
+         "description" : "Maximum allowed dry weight of unharvested fruit on the crop in the greenhouse",
+         "reference" : "Katzin 2021, pg. 246"
+      }
+   }
+}

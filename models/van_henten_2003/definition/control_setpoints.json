@@ -1,0 +1,57 @@
+{
+	"info" : {
+      "about" : "Climate control settings for the Van Henten (2003) model, to be used with the file greenhouse_evh2003.json. This file ensures the climate is controlled to achieve constant values, defined by setpoints. Control is done with a smoothed proportional controller, following Katzin (2021a), which also appeared as Chapter 4 in Katzin (2021). Values chosen here for the setpoints are meant to serve here as an example.",
+      "usage" : "Use this file together with greenhouse_evh2003.json, see for example main_evh2003_setpoint_control.json",
+      "references" : {
+         "Van Henten 2003" : "Van Henten (2003). Sensitivity Analysis of an Optimal Control Problem in Greenhouse Climate Management. Biosystems Engineering, 85(3), 355-364. https://doi.org/10.1016/S1537-5110(03)00068-0",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434",
+         "Katzin 2021a" : "Katzin, Marcelis, Van Mourik (2021). Energy Savings in Greenhouses by Transition from High-Pressure Sodium to LED Lighting. Applied Energy 281:116019. https://doi.org/10.1016/j.apenergy.2020.116019"
+      },
+      "author" : "This file was written by David Katzin, Wageningen University and Research. david.katzin@wur.nl",
+      "created" : "May 2025",
+	  "URL" : "https://github.com/davkat1/GreenLight",
+	  "File" : "GreenLight/models/van_henten_2003/definition/control_setpoints.json"
+   },
+	"parameters" : {
+		"heating_setpoint" : {
+			"unit" : "°C",
+			"type" : "const",
+			"description" : "If the indoor temperature is below this point, heating switches on",
+			"definition" : "15",
+			"reference" : "Given here as an example"
+		},
+		"ventilation_setpoint" : {
+			"unit" : "°C",
+			"type" : "const",
+			"description" : "If the indoor temperature is above this point, the windows open",
+			"definition" : "22",
+			"reference" : "Given here as an example"
+		},
+		"co2_setpoint" : {
+			"unit" : "kg m^{-3}",
+			"type" : "const",
+			"description" : "If the indoor CO2 concentration is below this point, CO2 is supplied",
+			"definition" : "2e-3",
+			"reference" : "Given here as an example"
+		}
+	},
+	"aux_states" : {
+		"U_q" : {
+			"definition" : "proportional_control(X_T, heating_setpoint, -2, 0, 150)"
+		},
+		"U_v" : {
+			"definition" : "proportional_control(X_T, ventilation_setpoint, 10, 0, 10)"
+		},
+		"U_c" : {
+			"definition" : "proportional_control(X_c, co2_setpoint, 1e-4, 0, 1e-6)"
+		}
+	},
+	"functions" : {
+		"proportional_control(process_variable, setpoint, p_band, min_val, max_val)" : {
+			"definition" : "min_val+(max_val-min_val)*(1/(1+exp(-2/p_band*log(100)*(process_variable-setpoint-p_band/2))))",
+			"type" : "function",
+			"description" : "Smoothed proportional controller",
+			"reference" : "Based on Katzin 2021a, Eq. 4"
+		}
+	}
+}

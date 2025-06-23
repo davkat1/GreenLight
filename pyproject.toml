@@ -1,0 +1,50 @@
+[project]
+name = "GreenLight"
+dynamic = ["version"]
+authors = [{name="David Katzin", email="david.katzin@wur.nl"}]
+description = "A platform for creating, modifying, and combining dynamic models, with a focus on horticultural greenhouses and crops"
+readme = "README.md"
+requires-python = ">3.9"
+license = "BSD-3-Clause-Clear"
+license-files = ["LICEN[CS]E*"]
+keywords = ["greenlight", "greenhouse", "crop", "modelling"]
+dependencies = [
+    "numpy~=1.26.4",
+    "numexpr~=2.10.1",
+    "scipy~=1.14.1",
+    "pandas~=2.2.3",
+    "matplotlib~=3.10.0",
+    "tkcalendar~=1.6.1"
+]
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "jupyter",
+    "jupytext",
+    "pre-commit",
+    "black",
+    "isort",
+    "setuptools",
+    "twine",
+    "build"
+]
+
+
+[tool.black]
+line-length = 120
+# Exclude everything in the .gitignore, but also:
+extend-exclude = '''
+/(
+    notebooks
+    | docs
+)/
+'''
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+line_length = 120
+skip_glob = ["docs/*", "notebooks/*"]
+[tool.jupytext]
+formats = "ipynb,py:light"
+

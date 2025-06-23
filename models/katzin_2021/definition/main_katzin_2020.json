@@ -1,0 +1,25 @@
+{
+   "About" : "Model structure for the Katzin (2020, also published as Katzin 2021 Chapter 3) greenhouse model simulations, used to compare model outputs with real data recorded in a greenhouse",
+   "Usage" : "This file sets up the model settings shared by all 4 simulations (LED and HPS lamps, climate evaluation and energy evaluation) performed in Katzin (2020). It is not meant to be run on its own, since either pipe temperature data (for climate model evaluation) or heating setpoint data (for energy use model evaluation) should be added to it. See scripts\\katzin_2020\\katzin_2020_run_sims.py to see how this file is used. Note: in 'options', below, the LSODA solver was chosen instead of the default BDF. This is because BDF tends to fail in these simulations, probably due to numerical (stiffness) issues.",
+   "Author" : "David Katzin, Wageningen University & Research",
+   "Date" : "This file was created in May 2025",
+   "References" : {
+      "Katzin 2020" : "Katzin, D., van Mourik, S., Kempkes, F., & van Henten, E. J. (2020). GreenLight – An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps. Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010",
+      "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+   },
+   "URL" : "https://github.com/davkat1/GreenLight",
+   "File" : "GreenLight/models/katzin_2021/definition/main_katzin_2020.json",
+   "processing_order" : [
+      "vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json",
+      "vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json",
+      "extension_greenhouse_katzin_2021_vanthoor_2011.json",
+      "modification_katzin_2020_katzin_2021.json",
+      "../input_data/katzin_2020_formatted/greenhouse_data_Bleiswijk_2010_led.csv",
+      {"options" : {
+          "t_end": "9676800",
+          "solver": "LSODA",
+          "max_step": "300",
+          "output_step": "300"
+      }}
+   ]
+}

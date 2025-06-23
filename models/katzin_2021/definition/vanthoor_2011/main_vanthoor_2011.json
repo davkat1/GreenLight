@@ -1,0 +1,24 @@
+{
+   "info" : {
+      "about" : "Run the Vanthoor (2011) greenhouse and tomato crop model, with some modifications by Katzin (2021), and climate control according to Katzin (2021).",
+      "usage" : "In order to run a meaningful simulation, climate data must be provided. In this example, climate inputs are taken from EnergyPlus, see vanthoor_2011\\readme.txt. Use the name of the generated weather file as the fourth line in processing_order, below. The simulation length is set to 350 days = 60x60x24x120 = 30240000 seconds",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+      },
+      "author" : "This file was written by David Katzin, Wageningen University and Research. david.katzin@wur.nl",
+      "created" : "May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/vanthoor_2011/main_vanthoor_2011.json"
+   },
+   "processing_order" : [
+      "greenhouse_vanthoor_2011_chapter_8.json",
+      "crop_vanthoor_2011_chapter_9_simplified.json",
+      "controls_katzin_2021.json",
+      "..\\..\\input_data\\energyPlus_ams_vanthoor_2011_from_jan_01_010000.csv",
+      {"options" : {
+         "t_start" : "0",
+         "t_end" : "30240000"
+      }}
+   ]
+}

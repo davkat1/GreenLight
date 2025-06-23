@@ -1,0 +1,333 @@
+{
+   "Info" : {
+      "About" : "Greenhouse climate control to be used together with the Vanthoor (2011) model. These controls are based on Katzin (2021).",
+      "Usage" : "Use this file together with greenhouse_vanthoor_2011_chapter_8.json. See example in main_vanthoor_2011.json",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+      },
+      "Authors" : "This file was written by David Katzin, Wageningen University & Research",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/vanthoor_2011/controls_katzin_2021.json"
+   },
+   "Greenhouse climate control" : {
+      "reference" : "Katzin 2021, Chapter 4",
+      "proportionalControl(processVar, setPt, pBand, min_val, max_val)" : {
+         "type" : "function",
+         "definition" : "min_val + (max_val - min_val) * (1 / (1 + exp(-2 / pBand * log(100) * (processVar - setPt - pBand / 2))))",
+         "description" : "Smooth proportional controller steering processVar towards setPt",
+         "reference" : "Katzin 2021, Equation 4.4"
+      },
+      "Heating" : {
+         "tSpDay" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "19.5",
+            "description" : "Heat is on below this point in day",
+            "reference" : "Katzin 2021, pg. 122"
+         },
+         "tSpNight" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "18.5",
+            "description" : "Heat is on below this point in night",
+            "reference" : "Katzin 2021, pg. 122"
+         },
+         "heatSetPoint" : {
+            "unit" : "°C",
+            "type" : "aux",
+            "definition" : "isDay * tSpDay + (1 - isDay) * tSpNight",
+            "description" : "Heating set point",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "tHeatBand" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "-1",
+            "description" : "P-band for heating",
+            "reference" : "Katzin 2021, pg. 121"
+         },
+         "uBoil" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "proportionalControl(tAir, heatSetPoint, tHeatBand, 0, 1)",
+            "description" : "Control valve of the heating from the boiler to the pipe rail system",
+            "reference" : "Katzin 2021, Equation 4.4"
+         },
+         "uBoilGro" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uBoil",
+            "description" : "Control valve of the heating from the boiler to the grow pipes",
+            "reference" : "Assumed to be equal to the control of the pipe rails"
+         }
+      },
+      "Ventilation" : {
+         "Ventilation due to excess heat" : {
+            "heatMax" : {
+               "unit" : "°C",
+               "type" : "aux",
+               "definition" : "heatSetPoint + heatDeadZone",
+               "description" : "Ventilation setpoint due to excess heating set point",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "heatDeadZone" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "5",
+               "description" : "Zone between heating setpoint and ventilation setpoint",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "ventHeatPband" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "4",
+               "description" : "P-band for ventilation due to excess heat",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "ventHeat" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tAir, heatMax, ventHeatPband, 0, 1)",
+               "description" : "Ventilation due to excess heat, 0 means vents are closed",
+               "reference" : "Katzin 2021, Equation 4.4"
+            }
+         },
+         "Ventilation due to excess humidity" : {
+            "rhIn" : {
+               "unit" : "%",
+               "type" : "aux",
+               "definition" : "100 * vpAir / (satVp(tAir))",
+               "description" : "Relative humidity of the indoor air"
+            },
+            "rhMax" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "87",
+               "description" : "Upper bound on relative humidity",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "ventRhPband" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "50",
+               "description" : "P-band for ventilation due to relative humidity",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "ventRh" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(rhIn, rhMax + mechAllowed * mechDehumidPband, ventRhPband, 0, 1)",
+               "description" : "Ventilation due to excess humidity",
+               "reference" : "Katzin 2021, pg. 119; pg. 156-157: The setpoint of when to start ventilating depends on the mechanical dehumidification, if it is on (mechAllowed == 1), start ventilating only when mechanical dehumidification is at full capacity. If it is off (mechAllowed == 0), start at the normal setpoint"
+            }
+         },
+         "Ventilation closure due to cold temperature" : {
+            "tVentOff" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "Distance from heating setpoint where ventilation stops (even if humidity is too high)",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "ventColdPband" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "-1",
+               "description" : "P-band for ventilaiton closure due to too cold temperature",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "ventCold" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tAir, heatSetPoint - tVentOff, ventColdPband, 1, 0)",
+               "description" : "Ventilation closure due to too cold temperatures",
+               "reference" : "Katzin 2021, Equation 4.4"
+            }
+         },
+         "uRoof" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "min(ventCold, max(ventHeat, ventRh))",
+            "description" : "Control of the roof ventilation",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "uSide" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Control of the side ventilation",
+            "reference" : "Assuming no side ventilation"
+         }
+      },
+      "Thermal screen" : {
+         "Control of thermal screen due to cold outdoor temperature" : {
+            "thScrSpDay" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "5",
+               "description" : "Screen is closed at day when outdoor air is below this temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrSpNight" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "10",
+               "description" : "Screen is closed at night when outdoor air is below this temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrSp" : {
+               "unit" : "°C",
+               "type" : "aux",
+               "definition" : "isDay * thScrSpDay + (1 - isDay) * thScrSpNight",
+               "description" : "Setpoint for closing the thermal screen",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrPband" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "-1",
+               "description" : "P-band for thermal screen",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "thScrCold" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tOut, thScrSp, thScrPband, 0, 1)",
+               "description" : "Closure of the thermal screen based on outdoor temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            }
+         },
+         "Control of thermal screen related to high humidity" : {
+            "thScrMaxRh" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "-2",
+               "description" : "Relative humidity where thermal screen is forced to open, with respect to rhMax",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrRhPband" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "10",
+               "description" : "P-band for thermal screen opening due to excess relative humidity",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "thScrRh" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "max(proportionalControl(rhIn, rhMax + thScrMaxRh, thScrRhPband, 1, 0), 1 - ventCold)",
+               "description" : "Opening of thermal screen due to high humidity",
+               "reference" : "Katzin 2021, pg. 119. Note that if ventCold == 0 (it's too cold inside to ventilate), the screen will not open - better to reduce RH by increasing temperature"
+            }
+         },
+         "Control of thermal screen related to high indoor temperature" : {
+            "thScrDeadZone" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "4",
+               "description" : "Zone between heating setpoint and point where screen opens due to too high temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrHeat" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tAir, heatSetPoint + thScrDeadZone, - thScrPband, 1, 0)",
+               "description" : "Opening of thermal screen closure due to too high temperatures",
+               "reference" : "Katzin 2021, pg. 119"
+            }
+         },
+         "uThScr" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "min(thScrCold, min(thScrHeat, thScrRh))",
+            "description" : "Closure of thermal screen, 0 is open (folded screen), 1 is closed (spread out screen)",
+            "reference" : "Katzin 2021, pg. 119"
+         }
+      },
+      "CO2 injection" : {
+         "co2SpDay" : {
+            "unit" : "ppm",
+            "type" : "const",
+            "definition" : "1000",
+            "description" : "CO2 is supplied if CO2 is below this point during day",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "co2SetPoint" : {
+            "unit" : "ppm",
+            "type" : "aux",
+            "definition" : "isDay * co2SpDay",
+            "description" : "CO2 set point",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "co2Band" : {
+            "unit" : "ppm",
+            "type" : "const",
+            "definition" : "-100",
+            "description" : "P-band for CO2 supply",
+            "reference" : "Katzin 2021, pg. 121"
+         },
+         "uExtCo2" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "proportionalControl(co2InPpm, co2SetPoint, co2Band, 0, 1)",
+            "description" : "Control of the external CO2 source",
+            "reference" : "Katzin 2021, Equation 4.4"
+         }
+      },
+      "Mechanical cooling and dehumidification" : {
+         "mechCoolPband" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "1",
+            "description" : "P-band for mechanical cooling",
+            "reference" : "Katzin 2021, pg. 158"
+         },
+         "mechDehumidPband" : {
+            "unit" : "%",
+            "type" : "const",
+            "definition" : "2",
+            "description" : "P-band for mechanical dehumidification",
+            "reference" : "Katzin 2021, pg. 158"
+         },
+         "heatBufPband" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "-1",
+            "description" : "P-band for heating from the buffer",
+            "reference" : "Katzin 2021, pg. 157"
+         },
+         "mechCoolDeadZone" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "2",
+            "description" : "Zone between heating setpoint and mechanical cooling setpoint",
+            "reference" : "Katzin 2021, pg. 156"
+         },
+         "mechAllowed" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "0",
+            "description" : "Decision on whether mechanical cooling and dehumidification is allowed to work",
+            "reference" : "Assuming no mechanical cooling and dehumidification"
+         },
+         "hotBufAllowed" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "0",
+            "description" : "Decision on whether heating from buffer is allowed to run",
+            "reference" : "Assuming no heating from the buffer"
+         }
+      }
+   },
+   "Inputs" : {
+      "about" : "Input variables required for the model that are not included in greenhouse_vanthoor_2011_chapter_8.json. These inputs are used for control decisions.  Here they are given as constants. In order to run meaningful simulations, a file with time series input data should be provided",
+      "isDay" : {
+         "unit" : "-",
+         "type" : "input",
+         "definition" : "0",
+         "description" : "Indicates whether it is day outside. 1 is day, 0 is night."
+      }
+   }
+}

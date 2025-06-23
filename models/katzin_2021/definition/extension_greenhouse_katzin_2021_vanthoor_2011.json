@@ -1,0 +1,1722 @@
+{
+   "Info" : {
+      "About" : "This file extends the model files of the greenhouse climate and tomato crop model of Vanthoor (2011), to include the modifications described in Katzin (2021). This extension adds lamps (toplights and interlights), growpipes (heating pipes at crop level), and blackout screens to the Vanthoor model, and redefines the climate control settings. By default the parameters included here make the toplights chosen as LEDs, no interlights, no growpipes, and no blackout screen",
+      "Usage" : "This file cannot be used on its own, it must be used together with greenhouse_vanthoor_2011_chapter_8.json, and (in order to include a crop in the greenhouse), crop_vanthoor_2011_chapter_9_simplified.json. \r\n\rFor an example on how to run this file with the Vanthoor model and with weather inputs, see main_katzin_2021.json",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Katzin 2020" : "Katzin, D., van Mourik, S., Kempkes, F., & van Henten, E. J. (2020). GreenLight – An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps. Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+      },
+      "Authors" : "This file was written by David Katzin (Wageningen University & Research), Pierre-Olivier Schwarz (Université Laval), and Joshi Graf (Wageningen University & Research)",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/extension_greenhouse_katzin_2021_vanthoor_2011.json"
+   },
+   "State equations - temperature states" : {
+      "reference" : "Katzin 2021, Section 7.4.2",
+      "Temperature states" : {},
+      "tCovIn" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capCovIn) * (hTopCovIn + lTopCovIn + rCanCovIn + rFlrCovIn + rPipeCovIn + rThScrCovIn - hCovInCovE + rBlScrCovIn + rLampCovIn + rIntLampCovIn)",
+         "description" : "Temperature of the internal side of the greenhouse cover",
+         "init" : "16.5",
+         "reference" : "Katzin 2021, Equation 7.1"
+      },
+      "tTop" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capTop) * (hThScrTop + hAirTop - hTopCovIn - hTopOut + hBlScrTop)",
+         "description" : "Temperature of the air in the top compartment of the greenhouse (above the screen)",
+         "init" : "16.5",
+         "reference" : "Katzin 2021, Equation 7.1"
+      },
+      "tBlScr" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capBlScr) * (hAirBlScr + lAirBlScr + rCanBlScr + rFlrBlScr + rPipeBlScr - hBlScrTop - rBlScrCovIn - rBlScrSky - rBlScrThScr + rLampBlScr + rIntLampBlScr)",
+         "description" : "Blackout screen temperature",
+         "init" : "16.5",
+         "reference" : "Katzin 2021, Equation 7.1"
+      },
+      "tThScr" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capThScr) * (hAirThScr + lAirThScr + rCanThScr + rFlrThScr + rPipeThScr - hThScrTop - rThScrCovIn - rThScrSky + rBlScrThScr + rLampThScr + rIntLampThScr)",
+         "description" : "Thermal screen temperature",
+         "init" : "16.5",
+         "reference" : "Vanthoor 2011, Equation 8.5; Katzin 2020, Equation A1 ; Katzin 2021, Equation 7.1 [6]"
+      },
+      "tAir" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capAir) * (hCanAir + hPadAir - hAirMech + hPipeAir + hPasAir + hBlowAir + rGlobSunAir - hAirFlr - hAirThScr - hAirOut - hAirTop - hAirOutPad - lAirFog - hAirBlScr + hLampAir + rLampAir + hGroPipeAir + hIntLampAir + rIntLampAir)",
+         "description" : "Temperature of the air in the main compartment of the greenhouse (below the screen)",
+         "init" : "16.5",
+         "reference" : "Vanthoor 2011, Equation 8.2; Katzin 2021, Equation 7.1"
+      },
+      "tCan" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capCan) * (rParSunCan + rNirSunCan + rPipeCan - hCanAir - lCanAir - rCanCovIn - rCanFlr - rCanSky - rCanThScr - rCanBlScr + rParLampCan + rNirLampCan + rFirLampCan + rGroPipeCan + rParIntLampCan + rNirIntLampCan + rFirIntLampCan)",
+         "description" : "Canopy temperature",
+         "init" : "20.5",
+         "reference" : "Katzin 2021, Equation 7.1"
+      },
+      "tPipe" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "1 / capPipe * (hBoilPipe + hIndPipe + hGeoPipe - rPipeSky - rPipeCovIn - rPipeCan - rPipeFlr - rPipeThScr - hPipeAir - rPipeBlScr + rLampPipe + rIntLampPipe + hBufHotPipe)",
+         "description" : "Temperature of the pipe rail heating pipe",
+         "init" : "16.5",
+         "reference" : "Vanthoor 2011, Equation 8.9; Katzin 2021, Equation 7.1, 7.48"
+      },
+      "tFlr" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capFlr) * (hAirFlr + rParSunFlr + rNirSunFlr + rCanFlr + rPipeFlr - hFlrSo1 - rFlrCovIn - rFlrSky - rFlrThScr - rFlrBlScr + rParLampFlr + rNirLampFlr + rFirLampFlr + rParIntLampFlr + rNirIntLampFlr + rFirIntLampFlr)",
+         "description" : "Floor temperature",
+         "init" : "16.5",
+         "reference" : "Vanthoor 2011, Equation 8.3; Katzin 2020, Equation A1; Katzin 2021, Equation 7.1"
+      },
+      "tGroPipe" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "1 / capGroPipe * (hBoilGroPipe - rGroPipeCan - hGroPipeAir)",
+         "description" : "Temperature of the grow pipe heating pipe",
+         "init" : "16.5",
+         "reference" : "Katzin 2021, Equation 7.1"
+      },
+      "tLamp" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capLamp) * (qLampIn - rLampSky - rLampCovIn - rLampThScr - rLampBlScr - hLampAir - rParLampCan - rNirLampCan - rFirLampCan - rLampPipe - rParLampFlr - rNirLampFlr - rFirLampFlr - rLampAir - hLampCool + rIntLampLamp)",
+         "description" : "Top lighting temperature",
+         "init" : "16.5",
+         "reference" : "Katzin 2020, Equation A1; Katzin 2021, Equation 7.1"
+      },
+      "tIntLamp" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "(1/capIntLamp) * (qIntLampIn - rIntLampSky - rIntLampCovIn - rIntLampThScr - rIntLampBlScr - hIntLampAir - rParIntLampCan - rNirIntLampCan - rFirIntLampCan - rIntLampPipe - rParIntLampFlr - rNirIntLampFlr - rFirIntLampFlr - rIntLampAir -  rIntLampLamp)",
+         "description" : "Interlighting temperature",
+         "init" : "16.5",
+         "reference" : "Katzin 2021, Equation 7.1"
+      }
+   },
+   "State equations - vapor states" : {
+      "vpAir" : {
+         "unit" : "Pa",
+         "type" : "state",
+         "definition" : "(1/capVpAir) * (mvCanAir + mvPadAir + mvFogAir + mvBlowAir - mvAirThScr - mvAirTop - mvAirOut - mvAirOutPad - mvAirBlScr - mvAirMech)",
+         "description" : "Vapour pressure of the air in the main compartment of the greenhouse (below the screen)",
+         "reference" : "Vanthoor 2011, Equation 8.10; Katzin 2021, Equation 7.40, 7.50",
+         "init" : "1681.91"
+      }
+   },
+   "Lumped cover layer" : {
+      "reference" : "Katzin 2021, Section 7.4.3",
+      "PAR" : {
+         "tauBlScrLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uBlScr * (1 - tauBlScrPar)",
+            "description" : "PAR transmission coefficient of the blackout screen \"layer\": the vertical area of the blackout screen (whether the screen is deployed or not)",
+            "reference" : "Katzin 2021, part of Equation 7.5"
+         },
+         "rhoBlScrLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uBlScr * rhoBlScrPar",
+            "description" : "PAR reflection coefficient of the blackout screen \"layer\": the vertical area of the blackout screen (whether the screen is deployed or not)",
+            "reference" : "Katzin 2021, part of Equation 7.5"
+         },
+         "tauCovBlScrPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauCovParVanthoor, tauBlScrLayerPar, rhoCovParVanthoorUp, rhoCovParVanthoorDn, rhoBlScrLayerPar, rhoBlScrLayerPar)",
+            "description" : "PAR transmission coefficient of the cover as in Vanthoor plus the blackout screen",
+            "reference" : "Katzin 2021, Equation 7.5"
+         },
+         "rhoCovBlScrParUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauCovParVanthoor, tauBlScrLayerPar, rhoCovParVanthoorUp, rhoCovParVanthoorDn, rhoBlScrLayerPar, rhoBlScrLayerPar)",
+            "description" : "PAR upwards reflection coefficient of the cover as in Vanthoor plus the blackout screen",
+            "reference" : "Katzin 2021, Equation 7.5"
+         },
+         "rhoCovBlScrParDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauCovParVanthoor, tauBlScrLayerPar, rhoCovParVanthoorUp, rhoCovParVanthoorDn, rhoBlScrLayerPar, rhoBlScrLayerPar)",
+            "description" : "PAR downwards reflection coefficient of the cover as in Vanthoor plus the blackout screen",
+            "reference" : "Katzin 2021, Equation 7.5"
+         },
+         "tauCovPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauCovBlScrPar, tauLampPar, rhoCovBlScrParUp, rhoCovBlScrParDn, rhoLampPar, rhoLampPar)",
+            "description" : "PAR transmission coefficient of the cover",
+            "reference" : "Katzin 2021, Equation 7.6"
+         },
+         "rhoCovPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauCovBlScrPar, tauLampPar, rhoCovBlScrParUp, rhoCovBlScrParDn, rhoLampPar, rhoLampPar)",
+            "description" : "PAR reflection coefficient of the cover",
+            "reference" : "Katzin 2021, Equation 7.6"
+         }
+      },
+      "NIR" : {
+         "tauBlScrLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uBlScr * (1 - tauBlScrNir)",
+            "description" : "NIR transmission coefficient of the blackout screen \"layer\": the vertical area of the blackout screen (whether the screen is deployed or not)",
+            "reference" : "Katzin 2021, part of Equation 7.5; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         },
+         "rhoBlScrLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uBlScr * rhoBlScrNir",
+            "description" : "NIR reflection coefficient of the blackout screen \"layer\": the vertical area of the blackout screen (whether the screen is deployed or not)",
+            "reference" : "Katzin 2021, part of Equation 7.5; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         },
+         "tauCovBlScrNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauCovNirVanthoor, tauBlScrLayerNir, rhoCovNirVanthoorUp, rhoCovNirVanthoorDn, rhoBlScrLayerNir, rhoBlScrLayerNir)",
+            "description" : "NIR transmission coefficient of the cover as in Vanthoor plus the blackout screen",
+            "reference" : "Katzin 2021, Equation 7.5; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         },
+         "rhoCovBlScrNirUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauCovNirVanthoor, tauBlScrLayerNir, rhoCovNirVanthoorUp, rhoCovNirVanthoorDn, rhoBlScrLayerNir, rhoBlScrLayerNir)",
+            "description" : "NIR downwards reflection coefficient of the cover as in Vanthoor plus the blackout screen",
+            "reference" : "Katzin 2021, Equation 7.5; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         },
+         "rhoCovBlScrNirDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauCovNirVanthoor, tauBlScrLayerNir, rhoCovNirVanthoorUp, rhoCovNirVanthoorDn, rhoBlScrLayerNir, rhoBlScrLayerNir)",
+            "description" : "NIR downwards reflection coefficient of the cover as in Vanthoor plus the blackout screen",
+            "reference" : "Katzin 2021, Equation 7.5; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         },
+         "tauCovNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauCovBlScrNir, tauLampNir, rhoCovBlScrNirUp, rhoCovBlScrNirDn, rhoLampNir, rhoLampNir)",
+            "description" : "NIR transmission coefficient of the cover",
+            "reference" : "Katzin 2021, Equation 7.6; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         },
+         "rhoCovNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauCovBlScrNir, tauLampNir, rhoCovBlScrNirUp, rhoCovBlScrNirDn, rhoLampNir, rhoLampNir)",
+            "description" : "NIR reflection coefficient of the cover",
+            "reference" : "Katzin 2021, Equation 7.6; pg. 234 \"The optical properties for NIR are calculated analogously\""
+         }
+      }
+   },
+   "Shortwave heat exchanges" : {
+      "reference" : "Katzin 2021, Section 7.4.4",
+      "rParGhLamp" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "etaLampPar * qLampIn",
+         "description" : "PAR above the canopy from the lamps",
+         "reference" : "Katzin 2021, Equation 7.7"
+      },
+      "rParGhIntLamp" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "etaIntLampPar * qIntLampIn",
+         "description" : "PAR outside the canopy from the interlights",
+         "reference" : "Katzin 2021, Equation 7.7"
+      },
+      "rParCan" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "rParSunCan + rParGhLamp + rParGhIntLamp",
+         "description" : "Total PAR above and outside the canopy",
+         "reference" : "Katzin 2021, pg. 234: \"the PAR above the canopy is supplemented by the PAR emitted by the toplights and interlights)"
+      },
+      "PAR and NIR from the toplights" : {
+         "reference" : "Katzin 2021, Section 7.4.4.1",
+         "qLampIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "uLamp * thetaLampMax",
+            "description" : "Lamp electrical input",
+            "reference" : "Katzin 2021, Equation 7.8"
+         },
+         "rParLampCanDown" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhLamp * (1 - rhoCanPar) * (1 - exp(-k1Par * lai))",
+            "description" : "PAR from the lamps directly absorbed by the canopy",
+            "reference" : "Katzin 2021, Equation 7.9"
+         },
+         "rParLampFlrCanUp" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhLamp * exp(-k1Par * lai) * rhoFlrPar * (1 - rhoCanPar) * (1 - exp(-k2Par * lai))",
+            "description" : "PAR from the lamps absorbed by the canopy after reflection from the floor",
+            "reference" : "Katzin 2021, Equation 7.9"
+         },
+         "rParLampCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParLampCanDown + rParLampFlrCanUp",
+            "description" : "Total PAR from the lamps absorbed by the canopy",
+            "reference" : "Katzin 2021, Equation 7.9"
+         },
+         "rNirLampCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "etaLampNir * qLampIn * (1 - rhoCanNir) * (1 - exp(-kNir * lai))",
+            "description" : "NIR from the lamps absorbed by the canopy",
+            "reference" : "Katzin 2021, Equation 7.10"
+         },
+         "rParLampFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhLamp * (1 - rhoFlrPar) * exp(-k1Par * lai)",
+            "description" : "PAR from the lamps absorbed by the floor",
+            "reference" : "Katzin 2021, Equation 7.11"
+         },
+         "rNirLampFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "etaLampNir * qLampIn * (1 - rhoFlrNir) * exp(-kNir * lai)",
+            "description" : "NIR from the lamps absorbed by the floor",
+            "reference" : "Katzin 2021, Equation 7.11"
+         },
+         "rLampAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(etaLampPar + etaLampNir) * qLampIn - rParLampCan - rNirLampCan - rParLampFlr - rNirLampFlr",
+            "description" : "PAR and NIR from the lamps absorbed by the greenhouse air",
+            "reference" : "Katzin 2021, Equation 7.12"
+         }
+      },
+      "PAR and NIR from the interlights" : {
+         "reference" : "Katzin 2021, Section 7.4.4.2",
+         "fIntLampCanPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - fIntLampDown * exp(-k1IntPar * vIntLampPos * lai) + (fIntLampDown - 1) * exp(-k1IntPar * (1-vIntLampPos) * lai)",
+            "description" : "Fraction of PAR from the interlights reaching the canopy",
+            "reference" : "Katzin 2021, Equation 7.13"
+         },
+         "fIntLampCanNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - fIntLampDown * exp(-kIntNir * vIntLampPos * lai) + (fIntLampDown - 1) * exp(-kIntNir * (1 - vIntLampPos) * lai)",
+            "description" : "Fraction of NIR from the interlights reaching the canopy",
+            "reference" : "Katzin 2011, analogous to Equation 7.13"
+         },
+         "qIntLampIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "uIntLamp * thetaIntLampMax",
+            "description" : "Interlight electrical input",
+            "reference" : "Katzin 2021, Equation 7.15"
+         },
+         "rParIntLampCanDown" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhIntLamp * fIntLampCanPar * (1 - rhoCanPar)",
+            "description" : "PAR from the interlights directly absorbed by the canopy",
+            "reference" : "Katzin 2021, Equation 7.16"
+         },
+         "rParIntLampFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhIntLamp * fIntLampDown * exp(-k1IntPar * vIntLampPos * lai) * (1 - rhoFlrPar) ",
+            "description" : "PAR from the interlights absorbed by the floor",
+            "reference" : "Katzin 2021, Equation 7.17"
+         },
+         "rParIntLampFlrCanUp" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhIntLamp * fIntLampDown * rhoFlrPar * (1 - rhoCanPar) * (1 - exp(-k2IntPar * lai)) * exp(-k1IntPar * vIntLampPos * lai)",
+            "description" : "PAR from the interlights absorbed by the canopy after reflection from the floor",
+            "reference" : "Katzin 2021, Equation 7.18"
+         },
+         "rParIntLampCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParIntLampCanDown + rParIntLampFlrCanUp",
+            "description" : "Total PAR from the interlights absorbed by the canopy",
+            "reference" : "Katzin 2021, Equation 7.19"
+         },
+         "rNirIntLampCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "etaIntLampNir * qIntLampIn * fIntLampCanNir * (1 - rhoCanNir)",
+            "description" : "NIR from the interlights absorbed by the canopy",
+            "reference" : "Katzin 2021, Equation 7.20"
+         },
+         "rNirIntLampFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "etaIntLampNir * qIntLampIn * fIntLampDown * (1 - rhoFlrNir) * exp(-kIntNir * vIntLampPos * lai)",
+            "description" : "NIR from the interlights absorbed by the floor",
+            "reference" : "Katzin 2021, Equation 7.21"
+         },
+         "rIntLampAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(etaIntLampPar + etaIntLampNir) * qIntLampIn - rParIntLampCan - rNirIntLampCan - rParIntLampFlr - rNirIntLampFlr",
+            "description" : "PAR and NIR from the interlights absorbed by the greenhouse air",
+            "reference" : "Katzin 2021, Equation 7.22"
+         }
+      },
+      "Influence of shortwave radiation on transpiration and photosynthesis" : {
+         "reference" : "Katzin 2021, Section 7.4.4.3",
+         "rCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rCanSun + rCanLamp + rCanIntLamp",
+            "description" : "Global radiation above and outside the canopy (PAR+NIR, where UV is counted together with NIR)",
+            "reference" : "Katzin 2021, Equation 7.23"
+         },
+         "rCanLamp" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(etaLampPar + etaLampNir) * qLampIn",
+            "description" : "Shortwave radiation above the canopy from the lamps (PAR+NIR, where UV is counted together with NIR)",
+            "reference" : "Katzin 2021, Equation 7.25"
+         },
+         "rCanIntLamp" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(etaIntLampPar + etaIntLampNir) * qIntLampIn",
+            "description" : "Shortwave radiation outside the canopy from the interlight lamps (PAR+NIR, where UV is counted together with NIR)",
+            "reference" : "Katzin 2021, Equation 7.26"
+         },
+         "parCan" : {
+            "unit" : "µmol{photons} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "parJtoUmolSun * rParSunCan + zetaLampPar * rParLampCan + zetaIntLampPar * rParIntLampCan",
+            "description" : "Total PAR absorbed by the canopy, expressed in µmol m**-2 s**-1",
+            "reference" : "Katzin 2021, Equation 7.27"
+         }
+      }
+   },
+   "Long wave (FIR) heat exchanges" : {
+      "reference" : "Katzin 2021, Section 7.4.5",
+      "fIntLampCanUp" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "1 - exp(-kIntFir * (1 - vIntLampPos) * lai)",
+         "description" : "Fraction of radiation going up from the interlights to the canopy",
+         "reference" : "Katzin 2021, Equation 7.29"
+      },
+      "fIntLampCanDown" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "1 - exp(-kIntFir * vIntLampPos * lai)",
+         "description" : "Fraction of radiation going down from the interlights to the canopy",
+         "reference" : "Katzin 2021, Equation 7.30"
+      },
+      "tauBlScrFirU" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "(1 - uBlScr * (1 - tauBlScrFir))",
+         "description" : "FIR transmission coefficient of the blackout screen",
+         "reference" : "Following Vanthoor 2011, Equation 8.39. Note that Fir here is used instead of TIR"
+      },
+      "Table 7.4" : {
+         "rCanCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aCan, epsCan, epsCovFir, tauLampFir * tauThScrFirU * tauBlScrFirU, tCan, tCovIn)",
+            "description" : "FIR between canopy and cover",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rCanSky" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aCan, epsCan, epsSky, tauLampFir * tauCovFir * tauThScrFirU * tauBlScrFirU, tCan, tSky)",
+            "description" : "FIR between canopy and sky",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rCanThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aCan, epsCan, epsThScrFir, tauLampFir * uThScr * tauBlScrFirU, tCan, tThScr)",
+            "description" : "FIR between canopy and thermal screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rPipeCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aPipe, epsPipe, epsCovFir, tauIntLampFir * tauLampFir * tauThScrFirU * tauBlScrFirU * 0.49 * exp(-kFir * lai), tPipe, tCovIn)",
+            "description" : "FIR between pipes and cover",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rPipeSky" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aPipe, epsPipe, epsSky, tauIntLampFir * tauLampFir * tauCovFir * tauThScrFirU * tauBlScrFirU * 0.49 * exp(-kFir * lai), tPipe, tSky)",
+            "description" : "FIR between pipes and sky",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rPipeThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aPipe, epsPipe, epsThScrFir, tauIntLampFir * tauLampFir * uThScr * tauBlScrFirU * 0.49 * exp(-kFir * lai), tPipe, tThScr)",
+            "description" : "FIR between pipes and thermal screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFlrCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(1, epsFlr, epsCovFir, tauIntLampFir * tauLampFir * tauThScrFirU * tauBlScrFirU * (1 - 0.49 * pi * lPipe* phiPipeE) * exp(-kFir * lai), tFlr, tCovIn)",
+            "description" : "FIR between floor and cover",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFlrSky" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(1, epsFlr, epsSky, tauIntLampFir * tauLampFir * tauCovFir * tauThScrFirU * tauBlScrFirU * (1 - 0.49 * pi * lPipe * phiPipeE) * exp(-kFir * lai), tFlr, tSky)",
+            "description" : "FIR between floor and sky",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFlrThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(1, epsFlr, epsThScrFir, tauIntLampFir * tauLampFir * uThScr * tauBlScrFirU * (1 - 0.49 * pi * lPipe * phiPipeE) * exp(-kFir * lai), tFlr, tThScr)",
+            "description" : "FIR between floor and thermal screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rLampSky" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampTop, epsSky, tauCovFir*tauThScrFirU*tauBlScrFirU, tLamp, tSky)",
+            "description" : "FIR between lamps and sky",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rLampCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampTop, epsCovFir, tauThScrFirU*tauBlScrFirU, tLamp, tCovIn)",
+            "description" : "FIR between lamps and cover",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rLampThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampTop, epsThScrFir, uThScr*tauBlScrFirU, tLamp, tThScr)",
+            "description" : "FIR between lamps and thermal screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rLampBlScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampTop, epsBlScrFir, uBlScr, tLamp, tBlScr)",
+            "description" : "FIR between lamps and blackout screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFirLampCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampBottom, epsCan, aCan, tLamp, tCan)",
+            "description" : "FIR between lamps and canopy",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rLampPipe" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampBottom, epsPipe, tauIntLampFir * 0.49 * pi * lPipe * phiPipeE * exp(-kFir * lai), tLamp, tPipe)",
+            "description" : "FIR between lamps and pipe",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFirLampFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aLamp, epsLampBottom, epsFlr, tauIntLampFir * (1 - 0.49 * pi * lPipe * phiPipeE) * exp(-kFir * lai), tLamp, tFlr)",
+            "description" : "FIR between lamps and floor",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rGroPipeCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aGroPipe, epsGroPipe, epsCan, 1, tGroPipe, tCan)",
+            "description" : "FIR between grow pipes and canopy",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rBlScrSky" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(uBlScr, epsBlScrFir, epsSky, tauCovFir * tauThScrFirU, tBlScr, tSky)",
+            "description" : "FIR between blackout screen and sky",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rBlScrCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(uBlScr, epsBlScrFir, epsCovFir, tauThScrFirU, tBlScr, tCovIn)",
+            "description" : "FIR between blackout screen and cover",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rBlScrThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(uBlScr, epsBlScrFir, epsThScrFir, uThScr, tBlScr, tThScr)",
+            "description" : "FIR between blackout screen and thermal screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rCanBlScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aCan, epsCan, epsBlScrFir, tauLampFir * uBlScr, tCan, tBlScr)",
+            "description" : "FIR between canopy and blackout screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rPipeBlScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aPipe, epsPipe, epsBlScrFir, tauIntLampFir * tauLampFir * uBlScr * 0.49 * exp(-kFir * lai), tPipe, tBlScr)",
+            "description" : "FIR between blackout screen and pipe",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFlrBlScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(1, epsFlr, epsBlScrFir, tauIntLampFir * tauLampFir * uBlScr * (1 - 0.49 * pi * lPipe * phiPipeE) * exp(-kFir * lai), tFlr, tBlScr)",
+            "description" : "FIR between blackout screen and floor",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rIntLampSky" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsSky, tauCovFir * tauThScrFirU * tauBlScrFirU * tauLampFir * (1 - fIntLampCanUp), tIntLamp, tSky)",
+            "description" : "FIR between interlights and sky",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rIntLampCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsCovFir, tauThScrFirU * tauBlScrFirU * tauLampFir * (1 - fIntLampCanUp), tIntLamp, tCovIn)",
+            "description" : "FIR between interlights and cover",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rIntLampThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsThScrFir, uThScr * tauBlScrFirU * tauLampFir * (1 - fIntLampCanUp), tIntLamp, tThScr)",
+            "description" : "FIR between interlights and thermal screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rIntLampBlScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsBlScrFir, uBlScr * tauLampFir * (1 - fIntLampCanUp), tIntLamp, tBlScr)",
+            "description" : "FIR between interlights and blackout screen",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rIntLampLamp" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsLampBottom, (1-fIntLampCanUp) * aLamp, tIntLamp, tLamp)",
+            "description" : "FIR between interlights and toplights",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFirIntLampCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsCan, fIntLampCanDown + fIntLampCanUp, tIntLamp, tCan)",
+            "description" : "FIR between interlights and canopy",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rIntLampPipe" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsPipe, 0.49 * pi * lPipe * phiPipeE * (1-fIntLampCanDown), tIntLamp, tPipe)",
+            "description" : "FIR between interlights and pipe",
+            "reference" : "Katzin 2021, Table 7.4"
+         },
+         "rFirIntLampFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fir(aIntLamp, epsIntLamp, epsFlr, (1 - 0.49 * pi * lPipe * phiPipeE) * (1 - fIntLampCanDown), tIntLamp, tFlr)",
+            "description" : "FIR between interlights and floor",
+            "reference" : "Katzin 2021, Table 7.4"
+         }
+      }
+   },
+   "Convection and capacities" : {
+      "reference" : "Katzin 2021, Section 7.4.6",
+      "hAirBlScr" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "sensible(1.7 * uBlScr * abs(tAir - tBlScr)**0.33, tAir, tBlScr)",
+         "description" : "Convective heat exchange between air in main compartment (below the screens) and blackout screen",
+         "reference" : "Katzin 2021, Equations 7.31-7.32"
+      },
+      "hLampAir" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "sensible(cHecLampAir, tLamp, tAir)",
+         "description" : "Convective heat exchange between top lamps and air in main compartment",
+         "reference" : "Katzin 2021, Equations 7.31"
+      },
+      "hIntLampAir" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "sensible(cHecIntLampAir, tIntLamp, tAir)",
+         "description" : "Convective heat exchange between interlights and air in main compartment",
+         "reference" : "Katzin 2021, Equations 7.31"
+      },
+      "hGroPipeAir" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "sensible(1.99 * pi * phiGroPipeE * lGroPipe * (abs(tGroPipe - tAir))**0.32, tGroPipe, tAir)",
+         "description" : "Convective heat exchange between grow pipes and air in main compartment",
+         "reference" : "Katzin 2021, Equations 7.31, 7.33; Vanthoor 2011, Table 8.4. Note there is a mistake in Katzin 2021."
+      },
+      "hLampCool" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "etaLampCool * qLampIn",
+         "description" : "Lamp cooling",
+         "reference" : "Katzin 2021, Equations 7.34"
+      },
+      "capGroPipe" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "0.25 * pi * lGroPipe * ((phiGroPipeE**2 - phiGroPipeI**2) * rhoSteel * cPSteel + phiGroPipeI**2 * rhoWater * cPWater)",
+         "description" : "Heat capacity of grow pipes",
+         "reference" : "Katzin 2021, Equations 7.35"
+      },
+      "hBlScrTop" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "sensible(1.7 * uBlScr * abs(tBlScr - tTop)**0.33, tBlScr, tTop)",
+         "description" : "Convective heat exchange between air in top compartment (above the screens) and blackout screen",
+         "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+      },
+      "hBoilGroPipe" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "uBoilGro * pBoilGro / aFlr",
+         "description" : "Heat from boiler to grow pipes",
+         "reference" : "Vanthoor 2011, Equation 8.56"
+      }
+   },
+   "Blackout screen" : {
+      "reference" : "Katzin 2021, Section 7.4.7",
+      "fBlScr" : {
+         "unit" : "m s**-1",
+         "type" : "aux",
+         "definition" : "uBlScr * kBlScr * (abs((tAir - tTop))**0.66) + ((1 - uBlScr) / rhoAirMean) * sqrt(0.5 * rhoAirMean * (1 - uBlScr) * g * abs(rhoAir - rhoTop))",
+         "description" : "Air flux through the screen",
+         "reference" : "Katzin 2021, Equations 7.37"
+      },
+      "fScr" : {
+         "unit" : "m s**-1",
+         "type" : "aux",
+         "definition" : "min(fThScr, fBlScr)",
+         "description" : "Air flux through the screens layer (may include multiple screens)",
+         "reference" : "Katzin 2021, Equations 7.38"
+      },
+      "mvAirBlScr" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "max(0, cond(1.7 * uBlScr * abs(tAir - tBlScr)**0.33, vpAir, satVp(tBlScr)))",
+         "description" : "Condensation from main compartment on blackout screen ",
+         "reference" : " Katzin 2021, Equation 7.39"
+      },
+      "capBlScr" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hBlScr * rhoBlScr * cPBlScr",
+         "description" : "Heat capacity of blackout screen",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "lAirBlScr" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "L * mvAirBlScr",
+         "description" : "Latent heat flux by condensation on blackout screen",
+         "reference" : "Katzin 2021, Equation 7.41"
+      },
+      "Parameters" : {
+         "reference" : "Katzin 2021, Table 7.5",
+         "epsBlScrFir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.67",
+            "description" : "FIR emission coefficient of the blackout screen"
+         },
+         "rhoBlScr" : {
+            "unit" : "kg m**-3",
+            "type" : "const",
+            "definition" : "0.2e3",
+            "description" : "Density of the blackout screen"
+         },
+         "rhoBlScrNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.35",
+            "description" : "NIR reflection coefficient of blackout screen"
+         },
+         "rhoBlScrPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.35",
+            "description" : "PAR reflection coefficient of blackout screen"
+         },
+         "tauBlScrNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.01",
+            "description" : "NIR transmission coefficient of blackout screen"
+         },
+         "tauBlScrPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.01",
+            "description" : "PAR transmission coefficient of blackout screen"
+         },
+         "tauBlScrFir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.7",
+            "description" : "FIR transmission coefficient of blackout screen"
+         },
+         "cPBlScr" : {
+            "unit" : "J kg**-1 K**-1",
+            "type" : "const",
+            "definition" : "1.8e3",
+            "description" : "Specific heat capacity of blackout screen"
+         },
+         "hBlScr" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.35e-3",
+            "description" : "Thickness of the blackout screen"
+         },
+         "kBlScr" : {
+            "unit" : "m**3 m**-2 K**(-2/3) s**-1",
+            "type" : "const",
+            "definition" : "5e-5",
+            "description" : "Blackout screen flux coefficient"
+         }
+      }
+   },
+   "Leakage ventilation" : {
+      "reference" : "Katzin 2021, Section 7.4.8",
+      "fVentRoof" : {
+         "unit" : "m**3 m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "ifElse(etaRoof >= etaRoofThr, etaInsScr * fVentRoof2 + cLeakTop * fLeakage, etaInsScr * (max(uThScr, uBlScr) * fVentRoof2 + (1 - max(uThScr, uBlScr)) * fVentRoofSide2 * etaRoof) + cLeakTop * fLeakage)",
+         "description" : "Total ventilation through the roof",
+         "reference" : "Vanthoor 2011, Equation 8.72; Katzin 2021, Equation 7.42. The if/else condition from Vanthoor was combined with the equation of Katzin to include the possibility of sidewall ventilation; max(uBlScr, uThScr) is taken, since it is assumed in Vanthoor that the degree of opening of the screen influences how much ventilation comes through the side and roof (fVentRoofSide2) and how much directly through the roof (fVentRoof2)"
+      },
+      "fVentSide" : {
+         "unit" : "m**3 m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "ifElse(etaRoof >= etaRoofThr, etaInsScr * fVentSide2 + (1 - cLeakTop) * fLeakage, etaInsScr * (max(uThScr, uBlScr) * fVentSide2 + (1 - max(uThScr, uBlScr)) * fVentRoofSide2 * etaSide) + (1 - cLeakTop) * fLeakage)",
+         "description" : "Total ventilation through side vents",
+         "reference" : "Vanthoor 2011, Equation 8.72; Katzin 2021, Equation 7.42. The if/else condition from Vanthoor was combined with the equation of Katzin to include the possibility of sidewall ventilation; max(uBlScr, uThScr) is taken, since it is assumed in Vanthoor that the degree of opening of the screen influences how much ventilation comes through the side and roof (fVentRoofSide2) and how much directly through the roof (fVentRoof2)"
+      }
+   },
+   "Heat harvesting - currently not implemented" : {
+      "reference" : "Katzin 2021, Section 7.4.10",
+      "Mechanical cooling and dehumidification" : {
+         "reference" : "Katzin 2021, Section 7.4.10.1",
+         "hAirMech" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "-hMechAir",
+            "description" : "Heat flux from the mechanical cooling to the greenhouse air",
+            "reference" : "Vanthoor 2011, pg. 221; Equation 8.40"
+         },
+         "mvMechAir" : {
+            "unit" : "kg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "-mvAirMech",
+            "description" : "Vapour flux from the greenhouse air to the surface of the mechanical cooling system",
+            "reference" : "Vanthoor 2011, pg.221; Equation 8.43-8.44"
+         },
+         "hBufHotPipe" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "0",
+            "description" : "Energy from the hot buffer to the heating pipes",
+            "reference" : "Assumed no heat harvesting"
+         }
+      }
+   },
+   "Parameters" : {
+      "references" : "Katzin 2021, Tables 4.2, 4.3 and 7.6. Parameters used here are for LEDs (based on Chapter 4 of Katzin 2021)",
+      "Greenhouse design parameters" : {
+         "reference" : "Katzin 2021, Table 4.2",
+         "psi" : {
+            "unit" : "°",
+            "type" : "const",
+            "definition" : "22",
+            "description" : "Mean greenhouse cover slope",
+            "reference" : "Katzin 2021, Table 4.2"
+         },
+         "aFlr" : {
+            "unit" : "m**2",
+            "type" : "const",
+            "definition" : "4e4",
+            "description" : "Floor area of greenhouse",
+            "reference" : "Katzin 2021, Table 4.2. Note a mistake there: the values for aCov and aFlr are flipped"
+         },
+         "aCov" : {
+            "unit" : "m**2",
+            "type" : "const",
+            "definition" : "4.84e4",
+            "description" : "Surface of the cover including side walls",
+            "reference" : "Katzin 2021, Table 4.2. Note a mistake there: the values for aCov and aFlr are flipped"
+         },
+         "hRf" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "4e-3",
+            "description" : "Thickness of roof layer",
+            "reference" : "Vanthoor 2011, Table 8.2 (Netherlands); Katzin 2021, Table 4.2"
+         },
+         "hAir" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "6.3",
+            "description" : "Height of the main compartment (below the screen)",
+            "reference" : "Katzin 2021, Table 4.2"
+         },
+         "hGh" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "6.9",
+            "description" : "Mean height of the greenhouse",
+            "reference" : "Katzin 2021, Table 4.2"
+         },
+         "aRoof" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "4676",
+            "description" : "Roof ventilation area",
+            "reference" : "Katzin 2021, Table 4.2"
+         },
+         "hVent" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "1.3",
+            "description" : "Vertical dimension of a single ventilation opening",
+            "reference" : "Katzin 2021, Table 4.2"
+         },
+         "cLeakage" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1e-4",
+            "description" : "Greenhouse leakage coefficient",
+            "reference" : "Vanthoor 2011, Table 8.2 (Netherlands); Katzin 2021, Table 4.2"
+         },
+         "lPipe" : {
+            "unit" : "m m**-2",
+            "type" : "const",
+            "definition" : "1.25",
+            "description" : "Length of heating pipes per greenhouse floor area",
+            "reference" : "Katzin 2021, Table 4.2"
+         },
+         "pBoil" : {
+            "unit" : "W",
+            "type" : "const",
+            "definition" : "1200e4",
+            "description" : "Heat capacity of boiler",
+            "reference" : "Katzin 2021, Table 4.2: 300*4e4"
+         },
+         "phiExtCo2" : {
+            "unit" : "mg s**-1",
+            "type" : "const",
+            "definition" : "20.56e4",
+            "description" : "Capacity of external CO2 source",
+            "reference" : "Katzin 2021, Table 4.2: 5.14*4e4"
+         }
+      },
+      "Lamp parameters: toplights" : {
+         "thetaLampMax" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "200/3",
+            "description" : "Electrical energy input to the lamps",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "aLamp" : {
+            "unit" : "m**2{lamp} m**-2{floor}",
+            "type" : "const",
+            "definition" : "0.02",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "tauLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1 - aLamp",
+            "description" : "transmissivity of toplight lamp layer to PAR",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "tauLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1 - aLamp",
+            "description" : "Transmissivity of toplight lamp layer to NIR",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "tauLampFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - aLamp",
+            "description" : "Transmissivity of toplight lamp layer to FIR",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "etaLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.55",
+            "description" : "Fraction of lamp electrical input converted to PAR by the toplights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "zetaLampPar" : {
+            "unit" : "µmol{PAR} J{PAR}**-1",
+            "type" : "const",
+            "definition" : "5.4",
+            "description" : "Photons per joule in PAR emitted by the lamp",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "etaLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.02",
+            "description" : "Fraction of lamp electrical input converted to NIR by the toplights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "capLamp" : {
+            "unit" : "J K**-1 m**-2",
+            "type" : "const",
+            "definition" : "10",
+            "description" : "Heat capacity of the toplights",
+            "reference" : "Katzin 2021 Table 7.6"
+         },
+         "cHecLampAir" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "const",
+            "definition" : "2.3",
+            "description" : "Heat exchange coefficient between the toplights and the surrounding air",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "cLampOffTime" : {
+            "unit" : "s",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Time between lamp switch off until next lamp switch on",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "rhoLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Reflectivity of lamp layer to PAR",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "rhoLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Reflectivity of lamp layer to NIR",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "epsLampTop" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.88",
+            "description" : "Emissivity of top side of lamp",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "epsLampBottom" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.88",
+            "description" : "emissivity of bottom side of lamp",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "etaLampCool" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Fraction of lamp input removed by cooling",
+            "reference" : "Katzin 2021, Table 4.3"
+         }
+      },
+      "Lamp parameters: interlights" : {
+         "zetaIntLampPar" : {
+            "unit" : "µmol{PAR} J{PAR}**-1",
+            "type" : "const",
+            "definition" : "5.41",
+            "description" : "Photons per joule in PAR emitted by the interlight",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "thetaIntLampMax" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Electrical energy input to the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "etaIntLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.55",
+            "description" : "Fraction of lamp electrical input converted to PAR by the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "etaIntLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.02",
+            "description" : "Fraction of lamp electrical input converted to NIR by the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "capIntLamp" : {
+            "unit" : "J K**-1 m**-2",
+            "type" : "const",
+            "definition" : "10",
+            "description" : "Heat capacity of interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "cHecIntLampAir" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "const",
+            "definition" : "2.3",
+            "description" : "Heat exchange coefficient between the interlights and surrounding air",
+            "reference" : "Katzin 2021, Table 7.6"
+         }
+      },
+      "Leakage ventilation" : {
+         "cLeakTop" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.5",
+            "description" : "Fraction of leakage ventilation coming from the top compartment (above the screens)",
+            "reference" : "Katzin 2021, Table 7.6"
+         }
+      },
+      "Interlighting radiative exchanges" : {
+         "aIntLamp" : {
+            "unit" : "m**2{lamp} m**-2{floor}",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Interlight lamp area",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "fIntLampDown" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.5",
+            "description" : "Fraction of light emitted by the interlights that is directed downwards",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "k1IntPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1.4",
+            "description" : "PAR extinction coefficient of the canopy for light coming from the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "k2IntPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1.4",
+            "description" : "PAR extinction coefficient for light from the interlights reflected by the floor and reaching the canopy",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "kIntFir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1.88",
+            "description" : "FIR extinction coefficient of the canopy for light coming from the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "kIntNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.54",
+            "description" : "NIR extinction coefficient of the canopy for light coming from the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "epsIntLamp" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.88",
+            "description" : "Emissivity of interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "tauIntLampFir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1",
+            "description" : "Transmissivity of FIR passing through the interlights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "vIntLampPos" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.5",
+            "description" : "Vertical position of the interlights with respect to the canopy LAI",
+            "reference" : "Katzin 2021, Table 7.6"
+         }
+      },
+      "Grow pipes" : {
+         "reference" : "We assume here that no grow pipe system is present, thus parameters are chosen so that they have no effect on the system. Where needed, parameters are taken from Katzin 2021, Table 3.1",
+         "lGroPipe" : {
+            "unit" : "m m**-2",
+            "type" : "const",
+            "definition" : "1.655",
+            "description" : "length of grow pipes per greenhouse floor area",
+            "reference" : "Katzin 2021, Table 3.1. We assume no grow pipes so these parameters are not important, but they cannot be 0 because the ODE for the grow pipe still exists"
+         },
+         "aGroPipe" : {
+            "unit" : "m**2{pipe} m**-2{floor}",
+            "type" : "const",
+            "definition" : "pi * lGroPipe * phiGroPipeE",
+            "description" : "Surface area of pipes per greenhouse floor area",
+            "reference" : "Katzin 2021, Table 3.1."
+         },
+         "phiGroPipeE" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "35e-3",
+            "description" : "External diameter of grow pipes",
+            "reference" : "Katzin 2021, Table 3.1. We assume no grow pipes so these parameters are not important, but they cannot be 0 because the ODE for the grow pipe still exists"
+         },
+         "phiGroPipeI" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.0338",
+            "description" : "Internal diameter of grow pipes",
+            "reference" : "Katzin 2021, Table 3.1. We assume no grow pipes so these parameters are not important, but they cannot be 0 because the ODE for the grow pipe still exists"
+         },
+         "epsGroPipe" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Emissivity of grow pipes",
+            "reference" : "Assumed no grow pipes"
+         },
+         "pBoilGro" : {
+            "unit" : "W",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Capacity of the grow pipe heating system",
+            "reference" : "Assumed no grow pipes"
+         }
+      }
+   },
+   "Greenhouse climate control" : {
+      "reference" : "Katzin 2021, Chapter 4",
+      "proportionalControl(processVar, setPt, pBand, min_val, max_val)" : {
+         "type" : "function",
+         "definition" : "min_val + (max_val - min_val) * (1 / (1 + exp(-2 / pBand * log(100) * (processVar - setPt - pBand / 2))))",
+         "description" : "Smooth proportional controller steering processVar towards setPt",
+         "reference" : "Katzin 2021, Equation 4.4"
+      },
+      "time_state" : {
+         "unit" : "day",
+         "type" : "state",
+         "definition" : "1/86400",
+         "description" : "Time variable for greenhouse control",
+         "init" : "0"
+      },
+      "isDayInside" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "max(smoothLamp, isDay)",
+         "description" : "Indicates whether daytime climate settings should be used, i.e., if the sun is out or the lamps are on"
+      },
+      "timeOfDay" : {
+         "unit" : "h",
+         "type" : "aux",
+         "definition" : "24 * mod(time_state, 1)",
+         "description" : "Hours since midnight"
+      },
+      "dayOfYear" : {
+         "unit" : "d",
+         "type" : "aux",
+         "definition" : "mod(time_state, 365.2425)",
+         "description" : "Day of year"
+      },
+      "Heating" : {
+         "tSpDay" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "19.5",
+            "description" : "Heat is on below this point in day",
+            "reference" : "Katzin 2021, pg. 122"
+         },
+         "tSpNight" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "18.5",
+            "description" : "Heat is on below this point in night",
+            "reference" : "Katzin 2021, pg. 122"
+         },
+         "heatCorrection" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Correction for temperature setpoint when lamps are on",
+            "reference" : "Katzin 2021, pg. 122"
+         },
+         "heatSetPoint" : {
+            "unit" : "°C",
+            "type" : "aux",
+            "definition" : "isDayInside * tSpDay + (1 - isDayInside) * tSpNight + heatCorrection * lampNoCons",
+            "description" : "Heating set point",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "tHeatBand" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "-1",
+            "description" : "P-band for heating",
+            "reference" : "Katzin 2021, pg. 121"
+         },
+         "uBoil" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "proportionalControl(tAir, heatSetPoint, tHeatBand, 0, 1)",
+            "description" : "Control valve of the heating from the boiler to the pipe rail system",
+            "reference" : "Katzin 2021, Equation 4.4"
+         },
+         "uBoilGro" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uBoil",
+            "description" : "Control valve of the heating from the boiler to the grow pipes",
+            "reference" : "Assumed to be equal to the control of the pipe rails"
+         }
+      },
+      "Ventilation" : {
+         "Ventilation due to excess heat" : {
+            "heatMax" : {
+               "unit" : "°C",
+               "type" : "aux",
+               "definition" : "heatSetPoint + heatDeadZone",
+               "description" : "Ventilation setpoint due to excess heating set point",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "heatDeadZone" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "5",
+               "description" : "Zone between heating setpoint and ventilation setpoint",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "ventHeatPband" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "4",
+               "description" : "P-band for ventilation due to excess heat",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "ventHeat" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tAir, heatMax, ventHeatPband, 0, 1)",
+               "description" : "Ventilation due to excess heat, 0 means vents are closed",
+               "reference" : "Katzin 2021, Equation 4.4"
+            }
+         },
+         "Ventilation due to excess humidity" : {
+            "rhIn" : {
+               "unit" : "%",
+               "type" : "aux",
+               "definition" : "100 * vpAir / (satVp(tAir))",
+               "description" : "Relative humidity of the indoor air"
+            },
+            "rhMax" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "87",
+               "description" : "Upper bound on relative humidity",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "ventRhPband" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "50",
+               "description" : "P-band for ventilation due to relative humidity",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "ventRh" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(rhIn, rhMax + mechAllowed * mechDehumidPband, ventRhPband, 0, 1)",
+               "description" : "Ventilation due to excess humidity",
+               "reference" : "Katzin 2021, pg. 119; pg. 156-157: The setpoint of when to start ventilating depends on the mechanical dehumidification, if it is on (mechAllowed == 1), start ventilating only when mechanical dehumidification is at full capacity. If it is off (mechAllowed == 0), start at the normal setpoint"
+            }
+         },
+         "Ventilation closure due to cold temperature" : {
+            "tVentOff" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "Distance from heating setpoint where ventilation stops (even if humidity is too high)",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "ventColdPband" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "-1",
+               "description" : "P-band for ventilaiton closure due to too cold temperature",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "ventCold" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tAir, heatSetPoint - tVentOff, ventColdPband, 1, 0)",
+               "description" : "Ventilation closure due to too cold temperatures",
+               "reference" : "Katzin 2021, Equation 4.4"
+            }
+         },
+         "uRoof" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "min(ventCold, max(ventHeat, ventRh))",
+            "description" : "Control of the roof ventilation",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "uSide" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Control of the side ventilation",
+            "reference" : "Assuming no side ventilation"
+         }
+      },
+      "Thermal screen" : {
+         "Control of thermal screen due to cold outdoor temperature" : {
+            "thScrSpDay" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "5",
+               "description" : "Screen is closed at day when outdoor air is below this temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrSpNight" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "10",
+               "description" : "Screen is closed at night when outdoor air is below this temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrSp" : {
+               "unit" : "°C",
+               "type" : "aux",
+               "definition" : "isDay * thScrSpDay + (1 - isDay) * thScrSpNight",
+               "description" : "Setpoint for closing the thermal screen",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrPband" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "-1",
+               "description" : "P-band for thermal screen",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "thScrCold" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tOut, thScrSp, thScrPband, 0, 1)",
+               "description" : "Closure of the thermal screen based on outdoor temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            }
+         },
+         "Control of thermal screen related to high humidity" : {
+            "thScrMaxRh" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "-2",
+               "description" : "Relative humidity where thermal screen is forced to open, with respect to rhMax",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrRhPband" : {
+               "unit" : "%",
+               "type" : "const",
+               "definition" : "10",
+               "description" : "P-band for thermal screen opening due to excess relative humidity",
+               "reference" : "Katzin 2021, pg. 121"
+            },
+            "thScrRh" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "max(proportionalControl(rhIn, rhMax + thScrMaxRh, thScrRhPband, 1, 0), 1 - ventCold)",
+               "description" : "Opening of thermal screen due to high humidity",
+               "reference" : "Katzin 2021, pg. 119. Note that if ventCold == 0 (it's too cold inside to ventilate), the screen will not open - better to reduce RH by increasing temperature"
+            }
+         },
+         "Control of thermal screen related to high indoor temperature" : {
+            "thScrDeadZone" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "4",
+               "description" : "Zone between heating setpoint and point where screen opens due to too high temperature",
+               "reference" : "Katzin 2021, pg. 119"
+            },
+            "thScrHeat" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "proportionalControl(tAir, heatSetPoint + thScrDeadZone, - thScrPband, 1, 0)",
+               "description" : "Opening of thermal screen closure due to too high temperatures",
+               "reference" : "Katzin 2021, pg. 119"
+            }
+         },
+         "uThScr" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "min(thScrCold, min(thScrHeat, thScrRh))",
+            "description" : "Closure of thermal screen, 0 is open (folded screen), 1 is closed (spread out screen)",
+            "reference" : "Katzin 2021, pg. 119"
+         }
+      },
+      "Blackout screen" : {
+         "useBlScr" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Determines whether a blackout screen is used (1 if used, 0 otherwise)",
+            "reference" : "Assuming no blackout screen"
+         },
+         "blScrExtraRh" : {
+            "unit" : "%",
+            "type" : "const",
+            "definition" : "100",
+            "description" : "Control for blackout screen due to humidity - screens open and lamps shut off if relative humidity exceeds rhMax+blScrExtraRh",
+            "reference" : "Assuming no blackout screen. Must keep this at a high value so lamps don't switch off at high humidity"
+         },
+         "uBlScr" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "useBlScr * (1 - isDaySmooth) * max(uLamp, uIntLamp)",
+            "description" : "Closure of blackout screen, 0 is open (folded screen), 1 is closed (spread out screen)",
+            "reference" : "Katzin 2021, pg. 155"
+         }
+      },
+      "Lamps" : {
+         "lampTimeOn" : {
+            "unit" : "hours since midnight",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Time of day to switch on lamps",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "lampTimeOff" : {
+            "unit" : "hours since midnight",
+            "type" : "const",
+            "definition" : "18",
+            "description" : "time of day to switch off lamps",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "dayLampStart" : {
+            "unit" : "day of year",
+            "type" : "const",
+            "definition" : "-1",
+            "description" : "Day of year when lamps start",
+            "reference" : "Katzin 2021, pg. 119 - lamps are allowed on every day of the year"
+         },
+         "dayLampStop" : {
+            "unit" : "day of year",
+            "type" : "const",
+            "definition" : "400",
+            "description" : "Day of year when lamps stop",
+            "reference" : "Katzin 2021, pg. 119 - lamps are allowed on every day of the year"
+         },
+         "lampsOffSun" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "400",
+            "description" : "Lamps are switched off if global radiation is above this value",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "lampRadSumLimit" : {
+            "unit" : "MJ m**-2 day**-1",
+            "type" : "const",
+            "definition" : "10",
+            "description" : "Predicted daily radiation sum from the sun where lamps are not used that day",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "lampExtraHeat" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "100",
+            "description" : "Control for lamps due to too much heat - switched off if indoor temperature is above setpoint+heatDeadZone+lampExtraHeat",
+            "reference" : "Katzin 2021, pg. 155. Here we do not switch off lamps due to extra heat (Katzin 2021, Chapter 4)"
+         },
+         "lampTimeOfDay" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "ifElse(lampTimeOn <= lampTimeOff, logical_and(lampTimeOn < timeOfDay, timeOfDay < lampTimeOff), logical_or(lampTimeOn < timeOfDay, timeOfDay < lampTimeOff))",
+            "description" : "Control of the lamp according to the time of day",
+            "reference" : "If lampTimeOn < lampTimeOff, lamps are on from lampTimeOn to lampTimeOff each day, if lampTimeOn > lampTimeOff, lamps are on from lampTimeOn until lampTimeOff the next day, if lampTimeOn == lampTimeOff, lamps are always off. For continuous light, set lampTimeOn = -1, lampTimeOff = 25"
+         },
+         "lampDayOfYear" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "ifElse(dayLampStart <= dayLampStop, logical_and(dayLampStart < dayOfYear, dayOfYear < dayLampStop), logical_or(dayLampStart < dayOfYear, dayOfYear < dayLampStop))",
+            "description" : "Control of the lamp according to the day of year",
+            "reference" : "If dayLampStart < dayLampStop, lamps are on from dayLampStart to dayLampStop, if dayLampStart > dayLampStop, lamps are on from lampTimeOn until lampTimeOff the next year, if dayLampStart == dayLampStop, lamps are always off. For no influence of day of year, set dayLampStart = -1, dayLampStop > 366"
+         },
+         "lampNoCons" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "(iGlob < lampsOffSun) * (dayRadSum < lampRadSumLimit) * lampTimeOfDay * lampDayOfYear",
+            "description" : "Control for the lamps disregarding temperature and humidity constraints",
+            "reference" : "This variable is used to decide if the greenhouse is in the light period, needed to set the climate setpoints. However, the lamps may be switched off if it is too hot or too humid in the greenhouse. In this case, the greenhouse is still considered to be in the light period"
+         },
+         "linearLampSwitchOn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "max(0, min(1, timeOfDay - lampTimeOn + 1))",
+            "description" : "Linear version of lamp switch on",
+            "reference" : "Value of 1 at lampTimeOn, 0 one hour before lampTimeOn, with linear transition between the two"
+         },
+         "linearLampSwitchOff" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "max(0, min(1, lampTimeOff - timeOfDay + 1))",
+            "description" : "Linear version of lamp switching off",
+            "reference" : "Value of 0 at lampOff, 0 one hour after lampOff, with linear transition between these values"
+         },
+         "linearLampBothSwitches" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "(lampTimeOn != lampTimeOff) * ifElse(lampTimeOn < lampTimeOff, min(linearLampSwitchOn, linearLampSwitchOff),  max(linearLampSwitchOn, linearLampSwitchOff))",
+            "description" : "Linear transition between lamp on and lamp off",
+            "reference" : "Combination of linear transitions above, if lampTimeOn < lampTimeOff, take the minimum of the above, if lampTimeOn > lampTimeOff, take the maximum, if lampTimeOn == lampTimeOff, set at 0"
+         },
+         "smoothLamp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "linearLampBothSwitches * (dayRadSum < lampRadSumLimit) * lampDayOfYear",
+            "description" : "Smooth (linear) approximation of the lamp control",
+            "reference" : "Allows smooth transition between light period and dark period setpoints, 1 when lamps are on, 0 when lamps are off, with a linear interpolation in between. Does not take into account the lamp switching off due to instantaenous sun radiation, excess heat or humidity"
+         },
+         "uLamp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "lampNoCons * proportionalControl(tAir, heatMax + lampExtraHeat, -0.5, 0, 1) * (isDaySmooth + (1 - isDaySmooth) * max(proportionalControl(rhIn, rhMax + blScrExtraRh, -0.5, 0, 1), 1 - ventCold))",
+            "description" : "Control for the top lights, 1 if lamps are on, 0 if lamps are off",
+            "reference" : "setGlAux.m"
+         },
+         "uIntLamp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uLamp",
+            "description" : "Control for the interlights, 1 if interlights are on, 0 if interlights are off",
+            "reference" : "Assuming control of interlights is equal to toplights"
+         }
+      },
+      "CO2 injection" : {
+         "co2SpDay" : {
+            "unit" : "ppm",
+            "type" : "const",
+            "definition" : "1000",
+            "description" : "CO2 is supplied if CO2 is below this point during day",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "co2SetPoint" : {
+            "unit" : "ppm",
+            "type" : "aux",
+            "definition" : "isDayInside * co2SpDay",
+            "description" : "CO2 set point",
+            "reference" : "Katzin 2021, pg. 119"
+         },
+         "co2Band" : {
+            "unit" : "ppm",
+            "type" : "const",
+            "definition" : "-100",
+            "description" : "P-band for CO2 supply",
+            "reference" : "Katzin 2021, pg. 121"
+         },
+         "uExtCo2" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "proportionalControl(co2InPpm, co2SetPoint, co2Band, 0, 1)",
+            "description" : "Control of the external CO2 source",
+            "reference" : "Katzin 2021, Equation 4.4"
+         }
+      },
+      "Mechanical cooling and dehumidification" : {
+         "mechCoolPband" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "1",
+            "description" : "P-band for mechanical cooling",
+            "reference" : "Katzin 2021, pg. 158"
+         },
+         "mechDehumidPband" : {
+            "unit" : "%",
+            "type" : "const",
+            "definition" : "2",
+            "description" : "P-band for mechanical dehumidification",
+            "reference" : "Katzin 2021, pg. 158"
+         },
+         "heatBufPband" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "-1",
+            "description" : "P-band for heating from the buffer",
+            "reference" : "Katzin 2021, pg. 157"
+         },
+         "mechCoolDeadZone" : {
+            "unit" : "°C",
+            "type" : "const",
+            "definition" : "2",
+            "description" : "Zone between heating setpoint and mechanical cooling setpoint",
+            "reference" : "Katzin 2021, pg. 156"
+         },
+         "mechAllowed" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "0",
+            "description" : "Decision on whether mechanical cooling and dehumidification is allowed to work",
+            "reference" : "Assuming no mechanical cooling and dehumidification"
+         },
+         "hotBufAllowed" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "0",
+            "description" : "Decision on whether heating from buffer is allowed to run",
+            "reference" : "Assuming no heating from the buffer"
+         }
+      }
+   },
+   "Inputs" : {
+      "about" : "Input variables required for the model that are not included in greenhouse_vanthoor_2011_chapter_8.json. These inputs are used for control decisions.  Here they are given as constants. In order to run meaningful simulations, a file with time series input data should be provided",
+      "isDay" : {
+         "unit" : "-",
+         "type" : "input",
+         "definition" : "0",
+         "description" : "Indicates whether it is day outside. 1 is day, 0 is night."
+      },
+      "isDaySmooth" : {
+         "unit" : "-",
+         "type" : "input",
+         "definition" : "0",
+         "description" : "Indicates whether it is day outside, with a smooth transition between day and night"
+      },
+      "dayRadSum" : {
+         "unit" : "MJ m**-2 day**-1",
+         "type" : "input",
+         "definition" : "0",
+         "description" : "Daily radiation sum of outdoor solar global radiation"
+      }
+   }
+}

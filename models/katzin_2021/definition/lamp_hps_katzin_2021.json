@@ -1,0 +1,74 @@
+{
+   "Info" : {
+      "About" : "Parameter file for describing the HPS lamps used in Katzin (2021a), which also appeared as Chapter 4 in Katzin (2021).",
+      "Usage" : "This file cannot be used on its own, it must be used together with the Katzin (2021) model extension_greenhouse_katzin_2021_vanthoor_2011.json.\r\n\rFor an example on how to run this file with the Katzin model, see scripts\\katzin_2021\\katzin_2021_run_sims.py",
+      "References" : {
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434",
+         "Katzin 2021a" : "Katzin, Marcelis, Van Mourik (2021). Energy Savings in Greenhouses by Transition from High-Pressure Sodium to LED Lighting. Applied Energy 281:116019. https://doi.org/10.1016/j.apenergy.2020.116019"
+      },
+      "Authors" : "This file was written by David Katzin (Wageningen University & Research), Pierre-Olivier Schwarz (Université Laval), and Joshi Graf (Wageningen University & Research)",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/lamp_hps_katzin_2021.json"
+   },
+   "Parameters" : {
+      "Lamp parameters: toplights" : {
+         "thetaLampMax" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "200/1.8",
+            "description" : "Electrical energy input to the lamps",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "etaLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1.8/4.9",
+            "description" : "Fraction of lamp electrical input converted to PAR by the toplights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "zetaLampPar" : {
+            "unit" : "µmol{PAR} J{PAR}**-1",
+            "type" : "const",
+            "definition" : "4.9",
+            "description" : "Photons per joule in PAR emitted by the lamp",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "etaLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.22",
+            "description" : "Fraction of lamp electrical input converted to NIR by the toplights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "capLamp" : {
+            "unit" : "J K**-1 m**-2",
+            "type" : "const",
+            "definition" : "100",
+            "description" : "Heat capacity of the toplights",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "cHecLampAir" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "const",
+            "definition" : "0.09",
+            "description" : "Heat exchange coefficient between the toplights and the surrounding air",
+            "reference" : "Katzin 2021, Table 7.6"
+         },
+         "epsLampTop" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.1",
+            "description" : "Emissivity of top side of lamp",
+            "reference" : "Katzin 2021, Table 4.3"
+         },
+         "epsLampBottom" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.9",
+            "description" : "emissivity of bottom side of lamp",
+            "reference" : "Katzin 2021, Table 4.3"
+         }
+      }
+   }
+}

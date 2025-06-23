@@ -1,0 +1,87 @@
+{
+   "Info" : {
+      "About" : "Model addition to allow running only the tomato crop model of Vanthoor (2011), simplified by Katzin (2021), without simulating a greenhouse.",
+      "Usage" : "Use this file together with crop_vanthoor_2011_chapter_9_simplified.json. See example in main_vanthoor_crop.json\r\n\rInput variables here are been set as constants. In order to run meaningful simulations, input values must be provided, see the example.",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+      },
+      "Authors" : "This file was written by David Katzin (Wageningen University & Research)",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/vanthoor_2011/extension_crop_vanthoor_2011_for_standalone.json"
+   },
+   "Inputs" : {
+      "parGh" : {
+         "unit" : "µmol{photons} m**-2 s**-1",
+         "type" : "input",
+         "definition" : "1000",
+         "description" : "PAR above the canopy"
+      },
+      "co2InPpm" : {
+         "unit" : "ppm",
+         "type" : "input",
+         "definition" : "800",
+         "description" : "CO2 concentration of the air around the crop"
+      },
+      "tCan" : {
+         "unit" : "°C",
+         "type" : "input",
+         "definition" : "20",
+         "description" : "Canopy temperature"
+      }
+   },
+   "Auxiliary states" : {
+      "parCan" : {
+            "unit" : "µmol{photons} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "parGhCan + parFlrCan ",
+            "description" : "Total PAR absorbed by the canopy, expressed in µmol m**-2 s**-1. This value is passed to the crop model to calculate photosynthesis",
+            "reference" : "Vanthoor 2011, Equation 9.17"
+         },
+      "parGhCan" : {
+            "unit" : "µmol{photons} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "parGh * (1-rhoCanPar) * (1-exp(-k1Par * lai))",
+            "description" : "PAR from above absorbed by the canopy",
+            "reference" : "Vanthoor 2011, Equation 9.18"
+         },
+      "parFlrCan" : {
+            "unit" : "µmol{photons} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "rhoFlrPar * parGh * (1 - rhoCanPar) * exp(-k1Par * lai)  * (1 - exp(-k2Par * lai))",
+            "description" : "PAR absorbed by the canopy after reflection from the floor",
+            "reference" : "Vanthoor 2011, Equation 9.1"
+         }
+   },
+   "Parameters" : {
+      "k1Par" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.7",
+            "description" : "PAR extinction coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "k2Par" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.7",
+            "description" : "PAR extinction coefficient of the canopy for PAR reflected from the floor",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoCanPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.07",
+            "description" : "PAR reflection coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoFlrPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.65",
+               "description" : "PAR reflection coefficient of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+         }
+   }
+}

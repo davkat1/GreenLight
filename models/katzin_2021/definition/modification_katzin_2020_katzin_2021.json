@@ -1,0 +1,514 @@
+{
+   "Info" : {
+      "About" : "Modifications to the Katzin (2021) model according to the simulations performed in Katzin (2020). Parameters and initial values are modified to represent the greenhousss modelled in Katzin (2020), leaf pruning and fruit harvest is modified as in Katzin (2020)",
+      "Usage" : "This file cannot be used on its own, it must be used together with the Katzin (2021) model extension_greenhouse_katzin_2021_vanthoor_2011.json.\r\n\rFor an example on how to run this file with the Katzin model, see main_katzin_2020.json",
+      "References" : {
+         "Katzin 2020" : "Katzin, D., van Mourik, S., Kempkes, F., & van Henten, E. J. (2020). GreenLight – An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps. Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434"
+      },
+      "Authors" : "This file was written by David Katzin (Wageningen University & Research), Pierre-Olivier Schwarz (Université Laval), and Joshi Graf (Wageningen University & Research)",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/modification_katzin_2020_katzin_2021.json"
+   },
+   "Parameters" : {
+      "Table 1 (Katzin 2020)" : {
+         "psi" : {
+            "unit" : "°",
+            "type" : "const",
+            "definition" : "23",
+            "description" : "Mean greenhouse cover slope",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "aCov" : {
+            "unit" : "m**2",
+            "type" : "const",
+            "definition" : "216.6",
+            "description" : "Surface of the cover including side walls",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "aFlr" : {
+            "unit" : "m**2",
+            "type" : "const",
+            "definition" : "144",
+            "description" : "Floor area of greenhouse",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "hAir" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "5.7",
+            "description" : "Height of the main compartment (below the screen)",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "hGh" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "6.2",
+            "description" : "Mean height of the greenhouse",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "aRoof" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "52.2",
+            "description" : "Roof ventilation area",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "hVent" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.87",
+            "description" : "Vertical dimension of a single ventilation opening",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "cLeakage" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.3e-4",
+            "description" : "Greenhouse leakage coefficient",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "cDgh" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.35",
+            "description" : "Ventilation discharge coefficient",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "cWgh" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.02",
+            "description" : "Ventilation global wind pressure coefficient",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "cLeakTop" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.9",
+            "description" : "Fraction of leakage ventilation coming from the top compartment (above the screens)",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauThScrPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.75",
+            "description" : "PAR transmission coefficient of thermal screen",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauBlScrPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.01",
+            "description" : "PAR transmission coefficient of blackout screen",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "kThScr" : {
+            "unit" : "m**3 m**-2 K**(2/3) s**-1",
+            "type" : "const",
+            "definition" : "5e-4",
+            "description" : "Thermal screen flux coefficient",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "kBlScr" : {
+            "unit" : "m^{3} m**-2 K^{-2/3} s**-1",
+            "type" : "const",
+            "definition" : "5e-4",
+            "description" : "Blackout screen flux coefficient",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauRfPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.57",
+            "description" : "PAR transmission coefficient of the roof",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauRfNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.57",
+            "description" : "NIR transmission coefficient of the roof",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "cHecIn" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "const",
+            "definition" : "3.5",
+            "description" : "Convective heat exchange between cover and outdoor air",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "phiExtCo2" : {
+            "unit" : "mg s**-1",
+            "type" : "const",
+            "definition" : "720",
+            "description" : "Capacity of external CO2 source",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "phiPipeE" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "51e-3",
+            "description" : "External diameter of heating pipes",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "phiPipeI" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "48.75e-3",
+            "description" : "Internal diameter of heating pipes",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "lPipe" : {
+            "unit" : "m m**-2",
+            "type" : "const",
+            "definition" : "1.3375",
+            "description" : "Length of heating pipes per greenhouse floor area",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "phiGroPipeE" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.035",
+            "description" : "External diameter of grow pipes",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "phiGroPipeI" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.0338",
+            "description" : "Internal diameter of grow pipes",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "lGroPipe" : {
+            "unit" : "m m**-2",
+            "type" : "const",
+            "definition" : "1.655",
+            "description" : "length of grow pipes per greenhouse floor area",
+            "reference" : "Katzin 2020, Table 1"
+         }
+      },
+      "Table 2 (Katzin 2020, LED)" : {
+         "thetaLampMax" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "116",
+            "description" : "Electrical energy input to the lamps",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "aLamp" : {
+            "unit" : "m^{2}{lamp} m**-2{floor}",
+            "type" : "const",
+            "definition" : "0.05",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.95",
+            "description" : "transmissivity of toplight lamp layer to PAR",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "rhoLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Reflectivity of lamp layer to PAR",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.95",
+            "description" : "Transmissivity of toplight lamp layer to NIR",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "rhoLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0",
+            "description" : "Reflectivity of lamp layer to NIR",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "tauLampFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "0.95",
+            "description" : "Transmissivity of toplight lamp layer to FIR",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "etaLampPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.31",
+            "description" : "Fraction of lamp electrical input converted to PAR by the toplights",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "etaLampNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.02",
+            "description" : "Fraction of lamp electrical input converted to NIR by the toplights",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "epsLampTop" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.88",
+            "description" : "Emissivity of top side of lamp",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "epsLampBottom" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.88",
+            "description" : "emissivity of bottom side of lamp",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "etaLampCool" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.63",
+            "description" : "Fraction of lamp input removed by cooling",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "capLamp" : {
+            "unit" : "J K**-1 m**-2",
+            "type" : "const",
+            "definition" : "10",
+            "description" : "Heat capacity of the toplights",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "cHecLampAir" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "const",
+            "definition" : "2.3",
+            "description" : "Heat exchange coefficient between the toplights and the surrounding air",
+            "reference" : "Katzin 2020, Table 1"
+         },
+         "zetaLampPar" : {
+            "unit" : "µmol{PAR} J{PAR}**-1",
+            "type" : "const",
+            "definition" : "5.2",
+            "description" : "Photons per joule in PAR emitted by the lamp",
+            "reference" : "Katzin 2020, Table 1"
+         }
+      },
+      "Other parameters" : {
+         "about" : "Some parameters were modified for this model run but were not reported in the Katzin 2020 paper. See https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setParamsBleiswijk2010.m",
+         "pBoil" : {
+            "unit" : "W",
+            "type" : "const",
+            "definition" : "18000",
+            "description" : "Heat capacity of boiler",
+            "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/runScenarios/evaluateEnergyUseLed.m"
+         },
+         "pBoilGro" : {
+            "unit" : "W",
+            "type" : "const",
+            "definition" : "18000",
+            "description" : "Capacity of the grow pipe heating system",
+            "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setParamsBleiswijk2010.m"
+         },
+         "epsGroPipe" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.88",
+            "description" : "Emissivity of grow pipes",
+            "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setParamsBleiswijk2010.m"
+         }
+      }
+   },
+   "State initial values" : {
+      "about" : "The initial values, taken from the dataset (#TODO)",
+      "Temperature states" : {
+         "reference" : "",
+         "tCovE" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Temperature of the internal side of the greenhouse cover",
+            "reference" : "Vanthoor 2011, Equation 8.8",
+            "init" : "23.7"
+         },
+         "tCovIn" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Temperature of the internal side of the greenhouse cover",
+            "init" : "23.7",
+            "reference" : "Katzin 2021, Equation 7.1"
+         },
+         "tTop" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Temperature of the air in the top compartment of the greenhouse (above the screen)",
+            "init" : "23.7",
+            "reference" : "Katzin 2021, Equation 7.1"
+         },
+         "tBlScr" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Blackout screen temperature",
+            "init" : "23.7",
+            "reference" : "Katzin 2021, Equation 7.1"
+         },
+         "tThScr" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Thermal screen temperature",
+            "init" : "23.7",
+            "reference" : "Vanthoor 2011, Equation 8.5; Katzin 2020, Equation A1 ; Katzin 2021, Equation 7.1 [6]"
+         },
+         "tAir" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Temperature of the air in the main compartment of the greenhouse (below the screen)",
+            "init" : "23.7"
+         },
+         "tCan" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Canopy temperature",
+            "init" : "27.7"
+         },
+         "tCan24" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Average Canopy Temperature in previous 24 Hours",
+            "init" : "27.7"
+         },
+         "tFlr" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Floor temperature",
+            "init" : "23.7",
+            "reference" : "Vanthoor 2011, Equation 8.3; Katzin 2020, Equation A1; Katzin 2021, Equation 7.1"
+         },
+         "tLamp" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Top lighting temperature",
+            "init" : "23.7",
+            "reference" : "Katzin 2020, Equation A1; Katzin 2021, Equation 7.1"
+         },
+         "tIntLamp" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Interlighting temperature",
+            "init" : "23.7",
+            "reference" : "Katzin 2021, Equation 7.1"
+         },
+         "tSo1" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Soil layer 1 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "23.7"
+         },
+         "tSo2" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Soil layer 2 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "20.8495"
+         },
+         "tSo3" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Soil layer 3 temperature",
+            "init" : "17.9989",
+            "reference" : "Vanthoor 2011, Equation 8.4"
+         },
+         "tSo4" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Soil layer 4 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "15.1484"
+         },
+         "tSo5" : {
+            "unit" : "°C",
+            "type" : "state",
+            "description" : "Soil layer 5 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "12.2979"
+         }
+      },
+      "Vapour pressure states" : {
+         "reference" : "Vanthoor 2011, Section 8.3.3.2",
+         "vpAir" : {
+            "unit" : "Pa",
+            "type" : "state",
+            "description" : "Vapour pressure of the air in the main compartment of the greenhouse (below the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.10",
+            "init" : "1907.9"
+         },
+         "vpTop" : {
+            "unit" : "Pa",
+            "type" : "state",
+            "description" : "Vapour pressure of the air in the top compartment of the greenhouse (above the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.11",
+            "init" : "1907.9"
+         }
+      },
+      "CO2 concentration states" : {
+         "reference" : "Vanthoor 2011, Section 8.3.3.3",
+         "co2Air" : {
+            "unit" : "mg m**-3",
+            "type" : "state",
+            "description" : "CO2 concentration of the air in the main compartment of the greenhouse (below the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.12",
+            "init" : "1291.8"
+         },
+         "co2Top" : {
+            "unit" : "mg m**-3",
+            "type" : "state",
+            "description" : "CO2 concentration of the air in the top compartment of the greenhouse (above the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.13",
+            "init" : "1291.8"
+         }
+      },
+      "Crop states" : {
+         "about" : "The initial values for the crop states were modified for this model simulation, see https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/runScenarios/evaluateClimateModelHps.m",
+         "cLeaf" : {
+            "unit" : "mg{CH2O} m**-2",
+            "type" : "state",
+            "description" : "Carbohydrates in the leaves",
+            "init" : "43680",
+            "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/runScenarios/evaluateClimateModelHps.m"
+         },
+         "cStem" : {
+            "unit" : "mg{CH2O} m**-2",
+            "type" : "state",
+            "description" : "Carbohydrates in the stems",
+            "init" : "15600",
+            "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/runScenarios/evaluateClimateModelHps.m"
+         },
+         "cFruit" : {
+            "unit" : "mg{CH2O} m**-2",
+            "type" : "state",
+            "description" : "Carbohydrates in the fruit",
+            "init" : "3120",
+            "reference" : "https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/runScenarios/evaluateClimateModelHps.m"
+         }
+      }
+   },
+   "Leaf pruning and fruit harvest" : {
+      "about" : "Leaf pruning as in Katzin 2020",
+      "reference" : "Katzin 2020, Equation A45",
+      "mcLeafHar" : {
+         "unit" : "mg{CH2O} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "ifElse(cLeaf < cLeafMax, 0, cLeaf - cLeafMax)",
+         "description" : "Leaf pruning",
+         "reference" : "Katzin 2020, Equation A45"
+      },
+      "mcFruitHar" : {
+         "unit" : "mg{CH2O} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "ifElse(cFruit < cFruitMax, 0, cFruit - cFruitMax)",
+         "description" : "Fruit harvest rate",
+         "reference" : "Katzin 2020, Equation A45"
+      }
+   }
+}

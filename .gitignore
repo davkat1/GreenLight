@@ -1,5 +1,122 @@
-Code/inputs/toplight2010/
-*.asv
-tempFileDynamicModel*
-Output/*
-*.mat
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OSX useful to ignore
+*.DS_Store
+._.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.run/
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+.pytest_cache/
+
+
+# PyBuilder
+target/
+
+# Cookiecutter
+python_boilerplate/
+cookiecutter-pypackage-env/
+
+# IDE settings
+.vscode/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# IntelliJ Idea family of suites
+.idea
+*.iml
+## File-based project format:
+*.ipr
+*.iws
+## mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# data
+# do not upload data to git. Its slow and privacy sensitive.
+# If you want, you can add some demo/dummy data by using git add -f data/...
+data/
+**/input_data/
+!**/input_data/.gitkeep
+
+# Model output
+**/output/
+!**/output/.gitkeep
+
+# Model output
+# Use <model_name>/output/ for storing model outputs. Like other data, this is not included in git
+output/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# pyproject cookiecutter template files
+create_git_repo_windows.bat
+create_git_repo.sh
+
+# Other files

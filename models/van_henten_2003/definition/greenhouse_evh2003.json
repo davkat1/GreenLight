@@ -1,0 +1,307 @@
+{
+   "info" : {
+      "about" : "Greenhouse model based on Van Henten (2003). The original Van Henten model was designed to perform optimal control of the greenhouse climate. In this file, the climate controls are set as constant. The controls may be modified by adjusting or appending other files to this one.",
+      "usage" : "This file can be run as standalone, in which case the weather inputs and climate controls are all constant. For meaningful results, provide weather data for the weather inputs, and climate control settings or data for the climate control inputs.",
+      "references" : {
+         "Van Henten 2003" : "Van Henten (2003). Sensitivity Analysis of an Optimal Control Problem in Greenhouse Climate Management. Biosystems Engineering, 85(3), 355-364. https://doi.org/10.1016/S1537-5110(03)00068-0",
+         "Van Henten 1994" : "Van Henten (1994). Greenhouse climate management: an optimal control approach. PhD thesis, Wageningen University. https://edepot.wur.nl/205106"
+      },
+      "notation" : "This file uses the same notation convention as Van Henten (2003), with the following exceptions: subscripts are denoted by a _, and commas are replaced by underscores",
+      "author" : "This file was written by David Katzin, Wageningen University and Research. david.katzin@wur.nl",
+      "created" : "May 2025",
+	  "URL" : "https://github.com/davkat1/GreenLight",
+	  "File" : "GreenLight/models/van_henten_2003/definition/greenhouse_evh2003.json"
+   },
+   "parameters" : {
+      "c_ai_ou" : {
+         "unit" : "W m**-2 °C**-1",
+         "type" : "const",
+         "definition" : "6.1",
+         "description" : "Heat transmission coefficient through the greenhouse cover",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_cap_c" : {
+         "unit" : "m",
+         "type" : "const",
+         "definition" : "4.1",
+         "description" : "Volumetric capacity of greenhouse air for carbon dioxide",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_cap_h" : {
+         "unit" : "m",
+         "type" : "const",
+         "definition" : "4.1",
+         "description" : "Volumetric capacity of greenhouse air for humidity",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_cap_q" : {
+         "unit" : "J m**-2 °C**-1",
+         "type" : "const",
+         "definition" : "30000",
+         "description" : "Heat capacity of greenhouse air",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_cap_q_v" : {
+         "unit" : "J m**-3 °C**-1",
+         "type" : "const",
+         "definition" : "1290",
+         "description" : "Heat capacity per volume unit of greenhouse air",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_co2_1" : {
+         "unit" : "m s**-1 °C**-2",
+         "type" : "const",
+         "definition" : "5.11e-6",
+         "description" : "Temperature effect on CO2 diffusion in leaves",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_co2_2" : {
+         "unit" : "m s**-1 °C**-1",
+         "type" : "const",
+         "definition" : "2.3e-4",
+         "description" : "Temperature effect on CO2 diffusion in leaves",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_co2_3" : {
+         "unit" : "m s**-1",
+         "type" : "const",
+         "definition" : "6.29e-4",
+         "description" : "Temperature effect on CO2 diffusion in leaves",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_leak" : {
+         "unit" : "m s**-1",
+         "type" : "const",
+         "definition" : "0.75e-4",
+         "description" : "Leakage air exchange through greenhouse cover",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_pl_d" : {
+         "unit" : "m^2 kg**-1",
+         "type" : "const",
+         "definition" : "53",
+         "description" : "Effective canopy surface",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_R" : {
+         "unit" : "J K**-1 kmol**-1",
+         "type" : "const",
+         "definition" : "8314",
+         "description" : "Gas constant",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_rad_phot" : {
+         "unit" : "kg J**-1",
+         "type" : "const",
+         "definition" : "3.55e-9",
+         "description" : "Light use efficiency",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_rad_q" : {
+         "unit" : "",
+         "type" : "const",
+         "definition" : "0.2",
+         "description" : "Heat load coefficient due to solar radiation",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_resp_d" : {
+         "unit" : "s**-1",
+         "type" : "const",
+         "definition" : "2.65e-7",
+         "description" : "Respiration rate in terms of respired dry matter",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_resp_c" : {
+         "unit" : "s**-1",
+         "type" : "const",
+         "definition" : "4.87e-7",
+         "description" : "Respiration rate in terms of produced carbon dioxide",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_T_abs" : {
+         "unit" : "K",
+         "type" : "const",
+         "definition" : "273.15",
+         "description" : "Temperature in K at 0°C",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_v_pl_ai" : {
+         "unit" : "m s**-1",
+         "type" : "const",
+         "definition" : "3.6e-3",
+         "description" : "Canopy transpiration mass transfer coefficient",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_v_1" : {
+         "unit" : "J m**-3",
+         "type" : "const",
+         "definition" : "9348",
+         "description" : "Parameter defining saturation water vapour pressure",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_v_2" : {
+         "unit" : "",
+         "type" : "const",
+         "definition" : "17.4",
+         "description" : "Parameter defining saturation water vapour pressure",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_v_3" : {
+         "unit" : "°C",
+         "type" : "const",
+         "definition" : "239",
+         "description" : "Parameter defining saturation water vapour pressure",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_v_4" : {
+         "unit" : "J m**-3",
+         "type" : "const",
+         "definition" : "10998",
+         "description" : "Parameter defining saturation water vapour pressure",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_alpha_beta" : {
+         "unit" : "",
+         "type" : "const",
+         "definition" : "0.544",
+         "description" : "Yield factor",
+         "reference" : "Van Henten 2003, Notation table"
+      },
+      "c_Gamma" : {
+         "unit" : "kg m**-3",
+         "type" : "const",
+         "definition" : "5.2e-5",
+         "description" : "Carbon dioxide compensation point",
+         "reference" : "Van Henten 2003, Notation table"
+      }
+   },
+   "inputs" : {
+      "V_rad" : {
+         "unit" : "W m**-2",
+         "type" : "input",
+         "description" : "Solar radiation outside the greenhouse",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "0"
+      },
+      "V_T" : {
+         "unit" : "°C",
+         "type" : "input",
+         "description" : "Outdoor temperature",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "20"
+      },
+      "V_h" : {
+         "unit" : "kg m**-3",
+         "type" : "input",
+         "description" : "Outdoor humidity concentration",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "5e-3"
+      },
+      "V_c" : {
+         "unit" : "kg m**-3",
+         "type" : "input",
+         "description" : "Carbon dioxide concentration outside the greenhouse",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "7.2e-4"
+      },
+      "U_c" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "input",
+         "description" : "Supply rate of carbon dioxide",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "0"
+      },
+      "U_v" : {
+         "unit" : "m s**-1",
+         "type" : "input",
+         "description" : "Ventilation rate",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "5e-5"
+      },
+      "U_q" : {
+         "unit" : "W m**-2",
+         "type" : "input",
+         "description" : "Energy supply by the heating system",
+         "reference" : "Van Henten 2003, Notation table. Constant value here given as an example",
+         "definition" : "0"
+      }
+   },
+   "states" : {
+      "X_d" : {
+         "unit" : "kg m**-2",
+         "type" : "state",
+         "definition" : "c_alpha_beta*phi_phot_c - c_resp_d*X_d*2**(0.1*X_T - 2.5)",
+         "description" : "Crop dry weight",
+         "init" : "2.7e-3",
+         "reference" : "Van Henten 2003, eq. 2; Van Henten 1994, pg. 33 (for the initial value)"
+      },
+      "X_c" : {
+         "unit" : "kg m**-3",
+         "type" : "state",
+         "definition" : "1/c_cap_c * (-phi_phot_c + c_resp_c*X_d*2**(0.1*X_T - 2.5) + U_c - phi_vent_c)",
+         "description" : "Carbon dioxide concentration in greenhouse",
+         "init" : "720e-6",
+         "reference" : "Van Henten 2003, eq. 3"
+      },
+      "X_T" : {
+         "unit" : "°C",
+         "type" : "state",
+         "definition" : "1/c_cap_q * (U_q - Q_vent_q + Q_rad_q)",
+         "description" : "Air temperature in the greenhouse",
+         "init" : "15",
+         "reference" : "Van Henten 2003, eq. 4"
+      },
+      "X_h" : {
+         "unit" : "kg m**-3",
+         "type" : "state",
+         "definition" : "1/c_cap_h * (phi_transp_h - phi_vent_h)",
+         "description" : "Humidity concentration in greenhouse",
+         "init" : "9.5e-3",
+         "reference" : "Van Henten 2003, eq. 5"
+      }
+   },
+   "aux_states" : {
+      "phi_phot_c" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "(1-exp(-c_pl_d*X_d)) * (c_rad_phot*V_rad*(-c_co2_1*X_T**2 + c_co2_2*X_T - c_co2_3)*(X_c-c_Gamma))/(c_rad_phot*V_rad + (-c_co2_1*X_T**2 + c_co2_2*X_T - c_co2_3)*(X_c-c_Gamma))",
+         "description" : "Gross canopy photosynthesis rate",
+         "reference" : "Van Henten 2003, eq. 6"
+      },
+      "phi_vent_c" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "(U_v + c_leak) * (X_c - V_c)",
+         "description" : "Mass exchange of carbon dioxide through the vents",
+         "reference" : "Van Henten 2003, eq. 7"
+      },
+      "Q_vent_q" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "(c_cap_q_v*U_v + c_ai_ou)*(X_T-V_T)",
+         "description" : "Energy exchange by ventilation and transmission through the cover",
+         "reference" : "Van Henten 2003, eq. 8"
+      },
+      "Q_rad_q" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "c_rad_q * V_rad",
+         "description" : "Heat load by solar radiation",
+         "reference" : "Van Henten 2003, eq. 9"
+      },
+      "phi_transp_h" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "(1-exp(-c_pl_d*X_d))*c_v_pl_ai*(c_v_1 / (c_R*(X_T + c_T_abs)) * exp(c_v_2*X_T/(X_T+c_v_3)) - X_h)",
+         "description" : "Canopy transpiration",
+         "reference" : "Van Henten 2003, eq. 10"
+      },
+      "phi_vent_h" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "c_leak*(X_h - V_h)",
+         "description" : "Mass exchange of humidity through the vents",
+         "reference" : "Van Henten 2003, eq. 11"
+      }
+   }
+}

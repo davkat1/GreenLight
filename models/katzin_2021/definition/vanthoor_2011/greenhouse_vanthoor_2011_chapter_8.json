@@ -1,0 +1,2791 @@
+{
+   "Info" : {
+      "About" : "This model is based on the greenhouse climate model described in Chapter 8 of Vanthoor (2011). Further description of the model is in Chapter 2 of Vanthoor (2011), also published as Vanthoor et al. (2011a).\r\n\r\nEquations for radiative transmission and reflection of multiple layers have been adjusted according to Katzin et al. (2020), to allow for easier model extension. See functions tau12, rho12Up, rho12Dn, under \"Lumped cover layers\", below.\r\n\rInitial values for the model states were chosen to represent 16.5°C, roughly 70% RH, and 390 ppm.",
+      "Usage" : "This file follows Vanthoor 2011, Chapter 8 and therefore only models a greenhouse, and contains no definitions for the crop or greenhouse climate control. All values related to the crop and climate control has been set to zero, therefore simulations using this file alone represent a greenhouse with no crop, closed windows, and no active climate control.\r\n\r\nIn this file, input variables have been given as constants. In order to run meaningful simulations, a file with time-series input data is needed.\r\n\rFor an example on how to run this file with a crop model and weather inputs, see main_vanthoor_2011.json",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Vanthoor 2011a" : "Vanthoor, B. H. E., Stanghellini, C., van Henten, E. J., & de Visser, P. H. B. (2011). A methodology for model-based greenhouse design: Part 1, a greenhouse climate model for a broad range of designs and climates. Biosystems Engineering, 110(4), 363–377. https://doi.org/10.1016/j.biosystemseng.2011.06.001",
+         "Katzin 2020" : "Katzin, D., van Mourik, S., Kempkes, F., & van Henten, E. J. (2020). GreenLight – An open source model for greenhouses with supplemental lighting: Evaluation of heat requirements under LED and HPS lamps. Biosystems Engineering, 194, 61–81. https://doi.org/10.1016/j.biosystemseng.2020.03.010",
+         "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434",
+         "De Zwart 1996" : "De Zwart, H. F. (1996) Analyzing energy-saving options in greenhouse cultivation using a simulation model. PhD thesis, Landbouwuniversiteit Wageningen. https://edepot.wur.nl/195238",
+         "Stanghellini 2019" : "Stanghellini, S., Van 't Ooster, B., Heuvelink E. (2019). Greenhouse horticulture: Technology for optimal crop production. Brill, Wageningen Academic. http://doi.org/10.1163/9789004697041"
+      },
+      "Notation" : "Several notations used in Vanthoor (2011) have been modified here: aGhPar used in Vanthoor is denoted aCovPar here; DeltaH used in Vanthoor is L here; vWind used in Vanthoor is wind here.",
+      "Authors" : "This file was written by David Katzin (Wageningen University & Research), Pierre-Olivier Schwarz (Université Laval), and Joshi Graf (Wageningen University & Research)",
+      "Date" : "This file was created in May 2025",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json"
+   },
+   "Time" : {
+      "unit" : "s",
+      "type" : "time",
+      "description" : "Time unit used in the model state equations (ordinary differential equations, ODEs)"
+   },
+   "State equations" : {
+      "reference" : "Vanthoor 2011, Section 8.3.3",
+      "Temperature states" : {
+         "reference" : "Vanthoor 2011, Section 8.3.3.1",
+         "tCan" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capCan) * (rParSunCan + rNirSunCan + rPipeCan - hCanAir - lCanAir - rCanCovIn - rCanFlr - rCanSky - rCanThScr)",
+            "description" : "Canopy temperature",
+            "reference" : "Vanthoor 2011, Equation 8.1",
+            "init" : "20.5"
+         },
+         "tAir" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capAir) * (hCanAir + hPadAir + hMechAir + hPipeAir + hPasAir + hBlowAir + rGlobSunAir - hAirFlr - hAirThScr - hAirOut - hAirTop - hAirOutPad - lAirFog)",
+            "description" : "Temperature of the air in the main compartment of the greenhouse (below the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.2",
+            "init" : "16.5"
+         },
+         "tFlr" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capFlr) * (hAirFlr + rParSunFlr + rNirSunFlr + rCanFlr + rPipeFlr - hFlrSo1 - rFlrCovIn - rFlrSky - rFlrThScr)",
+            "description" : "Floor temperature",
+            "reference" : "Vanthoor 2011, Equation 8.3",
+            "init" : "16.5"
+         },
+         "tSo1" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "1 / capSo1 * (hFlrSo1 - hSo1So2)",
+            "description" : "Soil layer 1 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "16.5"
+         },
+         "tSo2" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "1 / capSo2 * (hSo1So2 - hSo2So3)",
+            "description" : "Soil layer 2 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "13.364"
+         },
+         "tSo3" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "1 / capSo3 * (hSo2So3 - hSo3So4)",
+            "description" : "Soil layer 3 temperature",
+            "init" : "10.228",
+            "reference" : "Vanthoor 2011, Equation 8.4"
+         },
+         "tSo4" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "1 / capSo4 * (hSo3So4 - hSo4So5)",
+            "description" : "Soil layer 4 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "7.092"
+         },
+         "tSo5" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "1 / capSo5 * (hSo4So5 - hSo5SoOut)",
+            "description" : "Soil layer 5 temperature",
+            "reference" : "Vanthoor 2011, Equation 8.4",
+            "init" : "3.9560"
+         },
+         "tThScr" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capThScr) * (hAirThScr + lAirThScr + rCanThScr + rFlrThScr + rPipeThScr - hThScrTop - rThScrCovIn - rThScrSky)",
+            "description" : "Thermal screen temperature",
+            "reference" : "Vanthoor 2011, Equation 8.5",
+            "init" : "16.5"
+         },
+         "tTop" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capTop) * (hThScrTop +hAirTop-hTopCovIn-hTopOut)",
+            "description" : "Temperature of the air in the top compartment of the greenhouse (above the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.6",
+            "init" : "16.5"
+         },
+         "tCovIn" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capCovIn) * (hTopCovIn + lTopCovIn + rCanCovIn + rFlrCovIn + rPipeCovIn + rThScrCovIn - hCovInCovE)",
+            "description" : "Temperature of the internal side of the greenhouse cover",
+            "reference" : "Vanthoor 2011, Equation 8.7",
+            "init" : "16.5"
+         },
+         "tCovE" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "(1/capCovE) * (rGlobSunCovE + hCovInCovE - hCovEOut - rCovESky)",
+            "description" : "Temperature of the internal side of the greenhouse cover",
+            "reference" : "Vanthoor 2011, Equation 8.8",
+            "init" : "16.5"
+         },
+         "tPipe" : {
+            "unit" : "°C",
+            "type" : "state",
+            "definition" : "1 / capPipe * (hBoilPipe + hIndPipe + hGeoPipe - rPipeSky - rPipeCovIn - rPipeCan - rPipeFlr - rPipeThScr - hPipeAir)",
+            "description" : "Temperature of the heating pipes",
+            "reference" : "Vanthoor 2011, Equation 8.9",
+            "init" : "16.5"
+         }
+      },
+      "Vapour pressure states" : {
+         "reference" : "Vanthoor 2011, Section 8.3.3.2",
+         "vpAir" : {
+            "unit" : "Pa",
+            "type" : "state",
+            "definition" : "(1/capVpAir) * (mvCanAir + mvPadAir + mvFogAir + mvBlowAir - mvAirThScr - mvAirTop - mvAirOut - mvAirOutPad - mvAirMech)",
+            "description" : "Vapour pressure of the air in the main compartment of the greenhouse (below the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.10",
+            "init" : "1313"
+         },
+         "vpTop" : {
+            "unit" : "Pa",
+            "type" : "state",
+            "definition" : "(1/capVpTop) * (mvAirTop - mvTopCovIn - mvTopOut)",
+            "description" : "Vapour pressure of the air in the top compartment of the greenhouse (above the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.11",
+            "init" : "1313"
+         }
+      },
+      "CO2 concentration states" : {
+         "reference" : "Vanthoor 2011, Section 8.3.3.3",
+         "co2Air" : {
+            "unit" : "mg m**-3",
+            "type" : "state",
+            "definition" : "(1/capCo2Air) * (mcBlowAir + mcExtAir + mcPadAir - mcAirCan - mcAirTop - mcAirOut)",
+            "description" : "CO2 concentration of the air in the main compartment of the greenhouse (below the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.12",
+            "init" : "722"
+         },
+         "co2Top" : {
+            "unit" : "mg m**-3",
+            "type" : "state",
+            "definition" : "(1/capCo2Top) * (mcAirTop - mcTopOut)",
+            "description" : "CO2 concentration of the air in the top compartment of the greenhouse (above the screen)",
+            "reference" : "Vanthoor 2011, Equation 8.13",
+            "init" : "722"
+         }
+      }
+   },
+   "Lumped cover layers" : {
+      "about" : "Description of the \"lumped\" cover layers, i.e., the combined properties of the movable outdoor shading scr (ShScr), the semi-permanent shading screen (ShScrPer), the greenhouse roof (Rf), and the movable indoor thermal screen (ThScr)",
+      "reference" : "Vanthoor 2011, Section 8.4",
+      "functions" : {
+         "tau12(tau1, tau2, rho1Up, rho1Dn, rho2Up, rho2Dn)" : {
+            "type" : "function",
+            "definition" : "tau1 * tau2 / (1 - rho1Dn * rho2Up)",
+            "description" : "Transmission coefficient of a double layer, modified according to Katzin 2020, Equation A4. The unused arguments (rho1Up, rho2Dn) are included so that calls to tau12, rhoUp, rhoDn all have the same arguments. 1 is the top layer and 2 the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.14; Katzin 2020, Equation A4"
+         },
+         "rhoUp(tau1, tau2, rho1Up, rho1Dn, rho2Up, rho2Dn)" : {
+            "type" : "function",
+            "definition" : "rho1Up + (tau1**2 * rho2Up) / (1 - rho1Dn * rho2Up)",
+            "description" : "Upwards reflection coefficient of a double layer, modified according to Katzin 2020, Equation A5. The unused arguments (tau2, rho2Dn) are included so that calls to tau12, rhoUp, rhoDn all have the same arguments. 1 is the top layer and 2 the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15; Katzin 2020, Equation A5"
+         },
+         "rhoDn(tau1, tau2, rho1Up, rho1Dn, rho2Up, rho2Dn)" : {
+            "type" : "function",
+            "definition" : "rho2Dn + (tau2**2 * rho1Dn) / (1 - rho1Dn * rho2Up)",
+            "description" : "Downward reflection coefficient of a double layer, modified according to Katzin 2020, Equation A6. The unused arguments (tau1, rho1Up) are included so that calls to tau12, rhoUp, rhoDn all have the same arguments. 1 is the top layer and 2 the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15; Katzin 2020, Equation A6"
+         }
+      },
+      "PAR" : {
+         "tauShScrLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uShScr * (1 - tauShScrPar)",
+            "description" : "PAR transmission coefficient of the shading screen \"layer\": the vertical area of the shading screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "tauShScrPerLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uShScrPer * (1 - tauShScrPerPar)",
+            "description" : "PAR transmission coefficient of the semi-permanent shading screen \"layer\": the vertical area of the semi-permanent shading screen (whether it is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "rhoShScrLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uShScr * rhoShScrPar",
+            "description" : "PAR reflection coefficient of the shading screen \"layer\": the vertical area of the shading screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "rhoShScrPerLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uShScrPer * rhoShScrPerPar",
+            "description" : "PAR reflection coefficient of the semi-permanent shading screen \"layer\": the vertical area of the screen (whether it is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "tauShScrShScrPerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauShScrLayerPar, tauShScrPerLayerPar, rhoShScrLayerPar, rhoShScrLayerPar, rhoShScrPerLayerPar, rhoShScrPerLayerPar)",
+            "description" : "PAR transmission coefficient of the shading screen and semi-permanent shading screen combined layer",
+            "reference" : "Vanthoor 2011, Equation 8.14, 8.16"
+         },
+         "rhoShScrShScrPerParUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauShScrLayerPar, tauShScrPerLayerPar, rhoShScrLayerPar, rhoShScrLayerPar, rhoShScrPerLayerPar, rhoShScrPerLayerPar)",
+            "description" : "PAR reflection coefficient of the shading screen and semi-permanent shading screen combined layer towards the top",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020 Equation A5"
+         },
+         "rhoShScrShScrPerParDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauShScrLayerPar, tauShScrPerLayerPar, rhoShScrLayerPar, rhoShScrLayerPar, rhoShScrPerLayerPar, rhoShScrPerLayerPar)",
+            "description" : "PAR reflection coefficient of the shading screen and semi-permanent shading screen combined layer towards the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020 Equation A6"
+         },
+         "tauThScrLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uThScr * (1 - tauThScrPar)",
+            "description" : "PAR transmission coefficient of the thermal screen \"layer\": the vertical area of the thermal screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208 (as above); pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "rhoThScrLayerPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uThScr * rhoThScrPar",
+            "description" : "PAR reflection coefficient of the thermal screen \"layer\": the vertical area of the thermal screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208 (as above); pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "tauRfThScrPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauRfPar, tauThScrLayerPar, rhoRfPar, rhoRfPar, rhoThScrLayerPar, rhoThScrLayerPar)",
+            "description" : "PAR transmission coefficient of the thermal screen and roof combined layer",
+            "reference" : "Vanthoor 2011, Equation 8.14, 8.16; pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "rhoRfThScrParUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauRfPar, tauThScrLayerPar, rhoRfPar, rhoRfPar, rhoThScrLayerPar, rhoThScrLayerPar)",
+            "description" : "PAR reflection coefficient of the thermal screen and roof combined layer towards the top",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020, Equation A5; Vanthoor 2011, pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "rhoRfThScrParDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauRfPar, tauThScrLayerPar, rhoRfPar, rhoRfPar, rhoThScrLayerPar, rhoThScrLayerPar)",
+            "description" : "PAR reflection coefficient of the thermal screen and roof combined layer towards the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020, Equation A6; Vanthoor 2011, pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "tauCovParVanthoor" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauShScrShScrPerPar, tauRfThScrPar, rhoShScrShScrPerParUp, rhoShScrShScrPerParDn, rhoRfThScrParUp, rhoRfThScrParDn)",
+            "description" : "PAR transmission coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the transmission coefficient [...] determined using Eqs. (8.14) [...] of the two combined layers\". Extra variable added for easier model extension"
+         },
+         "rhoCovParVanthoorUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauShScrShScrPerPar, tauRfThScrPar, rhoShScrShScrPerParUp, rhoShScrShScrPerParDn, rhoRfThScrParUp, rhoRfThScrParDn)",
+            "description" : "PAR reflection coefficient of the cover towards the top",
+            "reference" : "Vanthoor 2011, pg. 209: \"the reflection coefficient [...] determined using Eqs. [...] (8.15) [...] of the two combined layers\". Extra variable added for easier model extension"
+         },
+         "rhoCovParVanthoorDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauShScrShScrPerPar, tauRfThScrPar, rhoShScrShScrPerParUp, rhoShScrShScrPerParDn, rhoRfThScrParUp, rhoRfThScrParDn)",
+            "description" : "PAR reflection coefficient of the cover towards the top",
+            "reference" : "Vanthoor 2011, pg. 209: \"the reflection coefficient [...] determined using Eqs. [...] (8.15) [...] of the two combined layers\". Extra variable added for easier model extension"
+         },
+         "rhoCovPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoCovParVanthoorUp",
+            "description" : "PAR reflection coefficient of the cover towards the top",
+            "reference" : " Extra variable added for easier model extension"
+         },
+         "tauCovPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tauCovParVanthoor",
+            "description" : "PAR reflection coefficient of the cover towards the top",
+            "reference" : " Extra variable added for easier model extension"
+         },
+         "aCovPar" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - tauCovPar - rhoCovPar",
+            "description" : "PAR absorption coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the absorption coefficient is one minus the sum of the transmission and reflection coefficient\". Note that Vanthoor 2011 uses the notation aGhPar while here we use aCovPar"
+         }
+      },
+      "NIR" : {
+         "about" : "This section is analogous to the section \"PAR\", above, following Vanthoor 2011, pg. 208: \"The optical properties for NIR are calculated in a similar way\".",
+         "tauShScrLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uShScr * (1 - tauShScrNir)",
+            "description" : "NIR transmission coefficient of the shading screen \"layer\": the vertical area of the shading screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "tauShScrPerLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uShScrPer * (1 - tauShScrPerNir)",
+            "description" : "NIR transmission coefficient of the semi-permanent shading screen \"layer\": the vertical area of the semi-permanent shading screen (whether it is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "rhoShScrLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uShScr * rhoShScrNir",
+            "description" : "NIR reflection coefficient of the shading screen \"layer\": the vertical area of the shading screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "rhoShScrPerLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uShScrPer * rhoShScrPerNir",
+            "description" : "NIR reflection coefficient of the semi-permanent shading screen \"layer\": the vertical area of the semi-permanent shading screen (whether it is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "tauShScrShScrPerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauShScrLayerNir, tauShScrPerLayerNir, rhoShScrLayerNir, rhoShScrLayerNir, rhoShScrPerLayerNir, rhoShScrPerLayerNir)",
+            "description" : "NIR transmission coefficient of the shading screen and semi-permanent shading screen combined layer",
+            "reference" : "Vanthoor 2011, Equation 8.14, 8.16"
+         },
+         "rhoShScrShScrPerNirUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauShScrLayerNir, tauShScrPerLayerNir, rhoShScrLayerNir, rhoShScrLayerNir, rhoShScrPerLayerNir, rhoShScrPerLayerNir)",
+            "description" : "NIR reflection coefficient of the shading screen and semi-permanent shading screen combined layer towards the top",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020 Equation A5"
+         },
+         "rhoShScrShScrPerNirDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauShScrLayerNir, tauShScrPerLayerNir, rhoShScrLayerNir, rhoShScrLayerNir, rhoShScrPerLayerNir, rhoShScrPerLayerNir)",
+            "description" : "NIR reflection coefficient of the shading screen and semi-permanent shading screen combined layer towards the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020 Equation A6"
+         },
+         "tauThScrLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uThScr * (1 - tauThScrNir)",
+            "description" : "NIR transmission coefficient of the thermal screen \"layer\": the vertical area of the thermal screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208 (as above); pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "rhoThScrLayerNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uThScr * rhoThScrNir",
+            "description" : "NIR reflection coefficient of the thermal screen \"layer\": the vertical area of the thermal screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208 (as above); pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "tauRfThScrNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauRfNir, tauThScrLayerNir, rhoRfNir, rhoRfNir, rhoThScrLayerNir, rhoThScrLayerNir)",
+            "description" : "NIR transmission coefficient of the thermal screen and roof combined layer",
+            "reference" : "Vanthoor 2011, Equation 8.14, 8.16; pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "rhoRfThScrNirUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauRfNir, tauThScrLayerNir, rhoRfNir, rhoRfNir, rhoThScrLayerNir, rhoThScrLayerNir)",
+            "description" : "NIR reflection coefficient of the thermal screen and roof combined layer towards the top",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020, Equation A5; Vanthoor 2011, pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "rhoRfThScrNirDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauRfNir, tauThScrLayerNir, rhoRfNir, rhoRfNir, rhoThScrLayerNir, rhoThScrLayerNir)",
+            "description" : "NIR reflection coefficient of the thermal screen and roof combined layer towards the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020, Equation A6; Vanthoor 2011, pg. 208-209: \"the last 2 cover layers [...] are calculated analogously to Eqs. (8.16) and (8.17)\""
+         },
+         "tauCovNirVanthoor" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauShScrShScrPerNir, tauRfThScrNir, rhoShScrShScrPerNirUp, rhoShScrShScrPerNirDn, rhoRfThScrNirUp, rhoRfThScrNirDn)",
+            "description" : "NIR transmission coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the transmission coefficient [...] determined using Eqs. (8.14) [...] of the two combined layers\".  Extra variable added for easier model extension"
+         },
+         "rhoCovNirVanthoorUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauShScrShScrPerNir, tauRfThScrNir, rhoShScrShScrPerNirUp, rhoShScrShScrPerNirDn, rhoRfThScrNirUp, rhoRfThScrNirDn)",
+            "description" : "NIR reflection coefficient of the cover towards the top",
+            "reference" : "Vanthoor 2011, pg. 209: \"the reflection coefficient [...] determined using Eqs. [...] (8.15) [...] of the two combined layers\".  Extra variable added for easier model extension"
+         },
+         "rhoCovNirVanthoorDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauShScrShScrPerNir, tauRfThScrNir, rhoShScrShScrPerNirUp, rhoShScrShScrPerNirDn, rhoRfThScrNirUp, rhoRfThScrNirDn)",
+            "description" : "NIR reflection coefficient of the cover towards the top",
+            "reference" : "Vanthoor 2011, pg. 209: \"the reflection coefficient [...] determined using Eqs. [...] (8.15) [...] of the two combined layers\".  Extra variable added for easier model extension"
+         },
+         "rhoCovNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoCovNirVanthoorUp",
+            "description" : "NIR reflection coefficient of the cover towards the top",
+            "reference" : " Extra variable added for easier model extension"
+         },
+         "tauCovNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tauCovNirVanthoor",
+            "description" : "NIR reflection coefficient of the cover towards the top",
+            "reference" : " Extra variable added for easier model extension"
+         },
+         "aCovNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - tauCovNir - rhoCovNir",
+            "description" : "NIR absorption coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the absorption coefficient is one minus the sum of the transmission and reflection coefficient\". Note that Vanthoor 2011 uses the notation aGhPar while here we use aCovPar"
+         }
+      },
+      "FIR" : {
+         "about" : "This section is analogous to the section \"PAR\", above, following Vanthoor 2011, pg. 209: \"The optical properties öf FIR for the lumped cover layer [...] are calculated analogously to the optical properties of PAR\".",
+         "tauShScrLayerFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uShScr * (1 - tauShScrFir)",
+            "description" : "FIR transmission coefficient of the shading screen \"layer\": the vertical area of the shading screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "tauShScrPerLayerFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - uShScrPer * (1 - tauShScrPerFir)",
+            "description" : "FIR transmission coefficient of the semi-permanent shading screen \"layer\": the vertical area of the semi-permanent shading screen (whether it is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "rhoShScrLayerFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uShScr * rhoShScrFir",
+            "description" : "FIR reflection coefficient of the shading screen \"layer\": the vertical area of the shading screen (whether the screen is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "rhoShScrPerLayerFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "uShScrPer * rhoShScrPerFir",
+            "description" : "FIR reflection coefficient of the semi-permanent shading screen \"layer\": the vertical area of the semi-permanent shading screen (whether it is deployed or not)",
+            "reference" : "Vanthoor 2011, pg. 208"
+         },
+         "tauShScrShScrPerFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauShScrLayerFir, tauShScrPerLayerFir, rhoShScrLayerFir, rhoShScrLayerFir, rhoShScrPerLayerFir, rhoShScrPerLayerFir)",
+            "description" : "FIR transmission coefficient of the shading screen and semi-permanent shading screen combined layer",
+            "reference" : "Vanthoor 2011, Equation 8.14, 8.16"
+         },
+         "rhoShScrShScrPerFirUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauShScrLayerFir, tauShScrPerLayerFir, rhoShScrLayerFir, rhoShScrLayerFir, rhoShScrPerLayerFir, rhoShScrPerLayerFir)",
+            "description" : "FIR reflection coefficient of the shading screen and semi-permanent shading screen combined layer towards the top",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020 Equation A5"
+         },
+         "rhoShScrShScrPerFirDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauShScrLayerFir, tauShScrPerLayerFir, rhoShScrLayerFir, rhoShScrLayerFir, rhoShScrPerLayerFir, rhoShScrPerLayerFir)",
+            "description" : "FIR reflection coefficient of the shading screen and semi-permanent shading screen combined layer towards the bottom",
+            "reference" : "Vanthoor 2011, Equation 8.15, 8.17; Katzin 2020 Equation A6"
+         },
+         "tauCovFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauShScrShScrPerFir, tauRfFir, rhoShScrShScrPerFirUp, rhoShScrShScrPerFirDn, rhoRfFir, rhoRfFir)",
+            "description" : "FIR transmission coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the transmission coefficient [...] determined using Eqs. (8.14) [...] of the two combined layers\""
+         },
+         "rhoCovFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauShScrShScrPerFir, tauRfFir, rhoShScrShScrPerFirUp, rhoShScrShScrPerFirDn, rhoRfFir, rhoRfFir)",
+            "description" : "FIR reflection coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the reflection coefficient [...] determined using Eqs. [...] (8.15) [...] of the two combined layers\""
+         },
+         "epsCovFir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - tauCovFir - rhoCovFir",
+            "description" : "FIR emission coefficient of the cover",
+            "reference" : "Vanthoor 2011, pg. 209: \"the absorption coefficient is one minus the sum of the transmission and reflection coefficient [...] The FIR emission coefficient [...] equals the FIR absorption coefficient\"."
+         }
+      },
+      "capCov" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "aux",
+         "definition" : "cos(psi*pi/180) * (uShScrPer * hShScrPer * rhoShScrPer * cPShScrPer + hRf * rhoRf * cPRf)",
+         "description" : "Heat capacity of the lumped cover",
+         "reference" : "Vanthoor 2011, Equation 8.18"
+      },
+      "hecCovInCovE" : {
+         "unit" : "W m**-2 K**-1",
+         "type" : "aux",
+         "definition" : "1 / (hRf / lambdaRf + uShScrPer * hShScrPer / lambdaShScrPer)",
+         "description" : "Heat exchange coefficient through the lumped cover",
+         "reference" : "Vanthoor 2011, Equation 8.19"
+      }
+   },
+   "Capacities" : {
+      "about" : "Capacities for heat, vapour pressure, and CO2",
+      "reference" : "Vanthoor 2011, Section 8.5",
+      "capCan" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "aux",
+         "definition" : "capLeaf * lai",
+         "description" : "Heat capacity of canopy",
+         "reference" : "Vanthoor 2011, Equation 8.20"
+      },
+      "capCovE" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "aux",
+         "definition" : "0.1 * capCov",
+         "description" : "Heat capacity of external cover",
+         "reference" : "Vanthoor 2011, Equation 8.21"
+      },
+      "capCovIn" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "aux",
+         "definition" : "0.1 * capCov",
+         "description" : "Heat capacity of internal cover",
+         "reference" : "Vanthoor 2011, Equation 8.21"
+      },
+      "capPipe" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "0.25 * pi * lPipe * ((phiPipeE**2 - phiPipeI**2) * rhoSteel * cPSteel + phiPipeI**2 * rhoWater * cPWater)",
+         "description" : "Heat capacity of heating pipes",
+         "reference" : "Vanthoor 2011, Equation 8.22"
+      },
+      "capAir" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hAir * rhoAirCap * cPAir",
+         "description" : "heat capacity of air in main compartment",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capFlr" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hFlr * rhoFlr * cPFlr",
+         "description" : "heat capacity of floor",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capSo1" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hSo1 * rhoCpSo",
+         "description" : "heat capacity of soil layer 1",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capSo2" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hSo2 * rhoCpSo",
+         "description" : "heat capacity of soil layer 2",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capSo3" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hSo3 * rhoCpSo",
+         "description" : "heat capacity of soil layer 3",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capSo4" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hSo4 * rhoCpSo",
+         "description" : "heat capacity of soil layer 4",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capSo5" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hSo5 * rhoCpSo",
+         "description" : "heat capacity of soil layer 5",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capThScr" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "hThScr * rhoThScr * cPThScr",
+         "description" : "heat capacity of thermal screen",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "capTop" : {
+         "unit" : "J K**-1 m**-2",
+         "type" : "const",
+         "definition" : "(hGh - hAir) * rhoAirCap * cPAir",
+         "description" : "heat capacity of air in top compartment - above the screen",
+         "reference" : "Vanthoor 2011, Equation 8.23"
+      },
+      "rhoAirCap" : {
+         "unit" : "kg m**-3",
+         "type" : "const",
+         "definition" : "rhoAir0 * exp(g * mAir * hElevation / (293.15 * R))",
+         "description" : "Density of the air used for calculating capacities",
+         "reference" : "Vanthoor 2011, Equation 8.24"
+      },
+      "capVpAir" : {
+         "unit" : "kg m**3 J**-1",
+         "type" : "aux",
+         "definition" : "mWater * hAir / (R * (tAir + 273.15))",
+         "description" : "Vapour pressure capacity of main compartment - below the screen",
+         "reference" : "Vanthoor 2011, Equation 8.25"
+      },
+      "capVpTop" : {
+         "unit" : "kg m**3 J**-1",
+         "type" : "aux",
+         "definition" : "mWater * (hGh-hAir) / (R * (tTop + 273.15))",
+         "description" : "Vapour pressure capacity of top compartment - above the screen",
+         "reference" : "Vanthoor 2011, Equation 8.25"
+      },
+      "capCo2Air" : {
+         "unit" : "m",
+         "type" : "const",
+         "definition" : "hAir",
+         "description" : "CO2 capacity of main compartment - below the screen",
+         "reference" : "Vanthoor 2011, pg. 211"
+      },
+      "capCo2Top" : {
+         "unit" : "m",
+         "type" : "const",
+         "definition" : "hGh - hAir",
+         "description" : "CO2 capacity of top compartment - above the screen",
+         "reference" : "Vanthoor 2011, pg. 211"
+      }
+   },
+   "Heat fluxes" : {
+      "reference" : "Vanthoor 2011, Section 8.6",
+      "Global, PAR and NIR heat fluxes" : {
+         "reference" : "Vanthoor 2011, Section 8.6.1",
+         "rParSunCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParSunCanDn + rParSunFlrCanUp",
+            "description" : "Total PAR from the sun absorbed by the canopy",
+            "reference" : "Vanthoor 2011, Equation 8.26"
+         },
+         "rParSunCanDn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhSun * (1 - rhoCanPar) * (1 - exp(-k1Par * lai))",
+            "description" : "PAR from the sun directly absorbed by the canopy",
+            "reference" : "Vanthoor 2011, Equation 8.27"
+         },
+         "rParGhSun" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(1 - etaGlobAir) * tauCovPar * etaGlobPar * iGlob",
+            "description" : "PAR above the canopy from the sun",
+            "reference" : "Vanthoor 2011, Equation 8.28"
+         },
+         "rParCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParSunCan",
+            "description" : "Total PAR above the canopy. Added here to allow easier modification of the model.",
+            "reference" : "Vanthoor 2011, Equation 8.28"
+         },
+         "rParSunFlrCanUp" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "rParGhSun * exp(-k1Par * lai) * rhoFlrPar * (1 - rhoCanPar) * (1 - exp(-k2Par * lai))",
+            "description" : "PAR from the sun absorbed by the canopy after reflection from the floor",
+            "reference" : "Vanthoor 2011, Equation 8.29"
+         },
+         "tauHatCovNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - rhoCovNir",
+            "description" : "Virtual NIR transmission for the cover-canopy-floor lumped model",
+            "reference" : "Vanthoor 2011, Equation 8.30"
+         },
+         "tauHatFlrNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - rhoFlrNir",
+            "description" : "Virtual NIR transmission for the cover-canopy-floor lumped model",
+            "reference" : "Vanthoor 2011, Equation 8.30"
+         },
+         "tauHatCanNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "exp(-kNir * lai)",
+            "description" : "NIR transmission coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Equation 8.31"
+         },
+         "rhoHatCanNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoCanNir * (1 - tauHatCanNir)",
+            "description" : "NIR reflection coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Equation 8.32"
+         },
+         "tauCovCanNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauHatCovNir, tauHatCanNir, rhoCovNir, rhoCovNir, rhoHatCanNir, rhoHatCanNir)",
+            "description" : "NIR transmission coefficient of the cover and canopy",
+            "reference" : "Vanthoor 2011, pg. 213: \"The NIR transmission, reflection [...] are determined [...] in a similar way as Eqs. 8.14-8.17\""
+         },
+         "rhoCovCanNirUp" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauHatCovNir, tauHatCanNir, rhoCovNir, rhoCovNir, rhoHatCanNir, rhoHatCanNir)",
+            "description" : "NIR reflection coefficient of the cover and canopy towards the top",
+            "reference" : "Vanthoor 2011, pg. 213: \"The NIR transmission, reflection [...] are determined [...] in a similar way as Eqs. 8.14-8.17\""
+         },
+         "rhoCovCanNirDn" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoDn(tauHatCovNir, tauHatCanNir, rhoCovNir, rhoCovNir, rhoHatCanNir, rhoHatCanNir)",
+            "description" : "NIR reflection coefficient of the cover and canopy towards the bottom",
+            "reference" : "Vanthoor 2011, pg. 213: \"The NIR transmission, reflection [...] are determined [...] in a similar way as Eqs. 8.14-8.17\""
+         },
+         "tauCovCanFlrNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tau12(tauCovCanNir, tauHatFlrNir, rhoCovCanNirUp, rhoCovCanNirDn, rhoFlrNir, rhoFlrNir)",
+            "description" : "NIR transmission coefficient of the cover, canopy and floor lumped layer",
+            "reference" : "Vanthoor 2011, pg. 213: \"The NIR transmission, reflection [...] are determined [...] in a similar way as Eqs. 8.14-8.17\""
+         },
+         "rhoCovCanFlrNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "rhoUp(tauCovCanNir, tauHatFlrNir, rhoCovCanNirUp, rhoCovCanNirDn, rhoFlrNir, rhoFlrNir)",
+            "description" : "NIR reflection coefficient of the cover, canopy and floor",
+            "reference" : "Vanthoor 2011, pg. 213: \"The NIR transmission, reflection [...] are determined [...] in a similar way as Eqs. 8.14-8.17\""
+         },
+         "aCanNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "1 - tauCovCanFlrNir - rhoCovCanFlrNir",
+            "description" : "The NIR absorption coefficient of the canopy",
+            "reference" : "Vanthoor 2011, pg. 213: \"the calculated absorption coefficient of the multiple-layers (which is 1-tauCovCanFlrNir-rhoChoCanFlrNir) equals the overall NIR absorption coefficient of the canopy aCanNir\""
+         },
+         "aFlrNir" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "tauCovCanFlrNir",
+            "description" : " The overall NIR absorption coefficient of the floor",
+            "reference" : "Vanthoor 2011, pg. 213: \"the calculated transmission coefficient of the multiple-layers (which is tauCovCanFlrNir) equals the overall NIR absorption coefficient of the floor, aFlrNir"
+         },
+         "rNirSunCan" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(1 - etaGlobAir) * aCanNir * etaGlobNir * iGlob",
+            "description" : "NIR from the sun absorbed by the canopy",
+            "reference" : "Vanthoor 2011, Equation 8.33"
+         },
+         "rNirSunFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(1 - etaGlobAir) * aFlrNir * etaGlobNir * iGlob",
+            "description" : "NIR from the sun absorbed by the floor",
+            "reference" : "Vanthoor 2011, Equation 8.34"
+         },
+         "rParSunFlr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(1 - rhoFlrPar) * exp(-k1Par * lai) * rParGhSun",
+            "description" : "PAR from the sun absorbed by the floor",
+            "reference" : "Vanthoor 2011, Equation 8.35"
+         },
+         "rGlobSunAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "etaGlobAir * iGlob * (tauCovPar * etaGlobPar + (aCanNir + aFlrNir) * etaGlobNir)",
+            "description" : "Global radiation from the sun absorbed by the greenhouse air",
+            "reference" : "Vanthoor 2011, Equation 8.36"
+         },
+         "rGlobSunCovE" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "(aCovPar * etaGlobPar + aCovNir * etaGlobNir) * iGlob",
+            "description" : "Global radiation from the sun absorbed by the cover",
+            "reference" : "Vanthoor 2011, Equation 8.37. Note that aCovPar, aCovNir is used here instead of aGhPar, aGhNir there"
+         },
+         "parCan" : {
+            "unit" : "µmol{photons} m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "parJtoUmolSun * rParSunCan",
+            "description" : "Total PAR absorbed by the canopy, expressed in µmol m**-2 s**-1. This value is passed to the crop model to calculate photosynthesis. Added here to allow easier modification of the model.",
+            "reference" : "Vanthoor 2011, Section 9.5.1.3"
+         }
+      },
+      "FIR heat fluxes" : {
+         "reference" : "Vanthoor 2011, Section 8.6.2, Table 8.3",
+         "fir(a1, eps1, eps2, f12, t1, t2)" : {
+            "unit" : "W m**-2",
+            "type" : "function",
+            "definition" : "a1 * eps1 * eps2 * f12 * 5.67e-8 * ((t1 + 273.15)**4 - (t2 + 273.15)**4 )",
+            "description" : "Net far infrared flux from 1 to 2",
+            "reference" : "Vanthoor 2011, Equation 8.38"
+         },
+         "tauThScrFirU" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "(1 - uThScr * (1 - tauThScrFir))",
+            "description" : "FIR transmission coefficient of the thermal screen",
+            "reference" : "Vanthoor 2011, Equation 8.39. Note that Fir here is used instead of TIR"
+         },
+         "Table 8.3" : {
+            "aCan" : {
+               "unit" : "-",
+               "type" : "aux",
+               "definition" : "1 - exp(-kFir * lai)",
+               "description" : "Surface of canopy per floor area for calculation of FIR exchanges",
+               "reference" : "Vanthoor 2011, Table 8.3"
+            },
+            "fCanFlr" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1-0.49*pi*lPipe*phiPipeE",
+               "description" : "View factor from canopy to floor",
+               "reference" : "Vanthoor 2011, Table 8.3"
+            },
+            "aPipe" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "pi * lPipe * phiPipeE",
+               "description" : "Surface of pipes for floor area",
+               "reference" : "Vanthoor 2011, Table 8.3"
+            },
+            "rCanCovIn" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aCan, epsCan, epsCovFir, tauThScrFirU, tCan, tCovIn)",
+               "description" : "FIR between canopy and cover",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rCanSky" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aCan, epsCan, epsSky, tauCovFir*tauThScrFirU, tCan, tSky)",
+               "description" : "FIR between canopy and sky",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rCanThScr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aCan, epsCan, epsThScrFir, uThScr, tCan, tThScr)",
+               "description" : "FIR between canopy and thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rCanFlr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aCan, epsCan, epsFlr, fCanFlr, tCan, tFlr)",
+               "description" : "FIR between canopy and floor",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rPipeCovIn" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aPipe, epsPipe, epsCovFir, tauThScrFirU*0.49*exp(-kFir*lai), tPipe, tCovIn)",
+               "description" : "FIR between pipes and cover",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rPipeSky" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aPipe, epsPipe, epsSky, tauCovFir*tauThScrFirU*0.49*exp(-kFir*lai), tPipe, tSky)",
+               "description" : "FIR between pipes and sky",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rPipeThScr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aPipe, epsPipe, epsThScrFir, uThScr*0.49*exp(-kFir*lai), tPipe, tThScr)",
+               "description" : "FIR between pipes and thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rPipeFlr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aPipe, epsPipe, epsFlr, 0.49, tPipe, tFlr)",
+               "description" : "FIR between pipes and floor",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rPipeCan" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(aPipe, epsPipe, epsCan, 0.49*(1-exp(-kFir*lai)), tPipe, tCan)",
+               "description" : "FIR between pipes and canopy",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rFlrCovIn" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(1, epsFlr, epsCovFir, tauThScrFirU*(1-0.49*pi*lPipe*phiPipeE)*exp(-kFir*lai), tFlr, tCovIn)",
+               "description" : "FIR between floor and cover",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rFlrSky" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(1, epsFlr, epsSky, tauCovFir*tauThScrFirU*(1-0.49*pi*lPipe*phiPipeE)*exp(-kFir*lai), tFlr, tSky)",
+               "description" : "FIR between floor and sky",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rFlrThScr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(1, epsFlr, epsThScrFir, uThScr*(1-0.49*pi*lPipe*phiPipeE)*exp(-kFir*lai), tFlr, tThScr)",
+               "description" : "FIR between floor and thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rThScrCovIn" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(1, epsThScrFir, epsCovFir, uThScr, tThScr, tCovIn)",
+               "description" : "FIR between thermal screen and cover",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rThScrSky" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(1, epsThScrFir, epsSky, tauCovFir*uThScr, tThScr, tSky)",
+               "description" : "FIR between thermal screen and sky",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            },
+            "rCovESky" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "fir(1, epsCovFir, epsSky, 1, tCovE, tSky)",
+               "description" : "FIR between cover and sky",
+               "reference" : "Vanthoor 2011, Table 8.3 and equation 8.38"
+            }
+         }
+      },
+      "Convection and conduction" : {
+         "reference" : "Vanthoor 2011, Section 8.6.3",
+         "sensible(hec, t1, t2)" : {
+            "unit" : "W m**-2",
+            "type" : "function",
+            "definition" : "abs(hec) * (t1 - t2)",
+            "description" : "Convection or conduction from object 1 to object 2",
+            "reference" : "Vanthoor 2011, Equation 8.40. Note that abs of hec is taken to ensure that heat flow is always from 1 to 2"
+         },
+         "Table 8.4" : {
+            "hCanAir" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 * alfaLeafAir * lai, tCan, tAir)",
+               "description" : "Convection between canopy and air in main compartment",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hAirFlr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(ifElse(tFlr>tAir, 1.7*abs((tFlr - tAir))**0.33, 1.3 * abs((tAir - tFlr))**0.25), tAir, tFlr)",
+               "description" : "Convection between air in main compartment and floor",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hAirThScr" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(1.7 * uThScr * (abs(tAir - tThScr))**0.33, tAir, tThScr)",
+               "description" : "Convection between air in main compartment and thermal screen",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hAirOut" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(rhoAirCap * cPAir * (fVentSide + fVentForced), tAir, tOut)",
+               "description" : "Convection between air in main compartment and outside air",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hAirTop" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(rhoAirCap * cPAir * fScr, tAir, tTop)",
+               "description" : "Convection between air in main and top compartment",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hThScrTop" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(1.7 * uThScr * abs(tThScr - tTop)**0.33, tThScr, tTop)",
+               "description" : "Convection between thermal screen and air in top compartment",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hTopCovIn" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(cHecIn * abs(tTop - tCovIn)**0.33 * aCov / aFlr, tTop, tCovIn)",
+               "description" : "Convection between air in top compartment and cover",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hTopOut" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(rhoAirCap * cPAir * fVentRoof, tTop, tOut)",
+               "description" : "Convection between air in top compartment and outside air",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hCovEOut" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(aCov / aFlr * (cHecOut1 + cHecOut2 * wind**cHecOut3), tCovE, tOut)",
+               "description" : "Convection between cover and outside air",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hPipeAir" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(1.99 * pi * phiPipeE * lPipe * (abs(tPipe - tAir))**0.32, tPipe, tAir)",
+               "description" : "Convection between pipes and air in main compartment",
+               "reference" : "Vanthoor 2011, Equation 8.40 and Table 8.4"
+            },
+            "hFlrSo1" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 / (hFlr / lambdaFlr + hSo1 / lambdaSo), tFlr, tSo1)",
+               "description" : "Conduction between floor and soil layer 1",
+               "reference" : "Vanthoor 2011, Equations 8.4, 8.40 and 8.78 and Table 8.4"
+            },
+            "hSo1So2" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 * lambdaSo / (hSo1 + hSo2), tSo1, tSo2)",
+               "description" : "Conduction between soil layers 1 and 2",
+               "reference" : "Vanthoor 2011, Equations 8.4, 8.40 and 8.78 and Table 8.4"
+            },
+            "hSo2So3" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 * lambdaSo / (hSo2 + hSo3), tSo2, tSo3)",
+               "description" : "Conduction between soil layers 2 and 3",
+               "reference" : "Vanthoor 2011, Equations 8.4, 8.40 and 8.78 and Table 8.4"
+            },
+            "hSo3So4" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 * lambdaSo / (hSo3 + hSo4), tSo3, tSo4)",
+               "description" : "Conduction between soil layers 3 and 4",
+               "reference" : "Vanthoor 2011, Equations 8.4, 8.40 and 8.78 and Table 8.4"
+            },
+            "hSo4So5" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 * lambdaSo / (hSo4 + hSo5), tSo4, tSo5)",
+               "description" : "Conduction between soil layers 4 and 5",
+               "reference" : "Vanthoor 2011, Equations 8.4, 8.40 and 8.78 and Table 8.4"
+            },
+            "hSo5SoOut" : {
+               "unit" : "W m**-2",
+               "type" : "aux",
+               "definition" : "sensible(2 * lambdaSo / (hSo5 + hSoOut), tSo5, tSoOut)",
+               "description" : "Conduction between soil layer 5 and the external soil layer",
+               "reference" : "Vanthoor 2011, Equations 8.4, 8.40 and 8.78 and Table 8.4"
+            }
+         },
+         "fThScr" : {
+            "unit" : "m s**-1",
+            "type" : "aux",
+            "definition" : "uThScr * kThScr * (abs((tAir - tTop))**0.66) + ((1 - uThScr) / rhoAirMean) * sqrt(0.5 * rhoAirMean * (1 - uThScr) * g * abs(rhoAir - rhoTop))",
+            "description" : "Air flux through the screen",
+            "reference" : "Vanthoor 2011, Equation 8.41; De Zwart 1996, Equation 5.68\r\n\r\nNote that there is a mistake in Vanthoor: according to De Zwart (1996), Equation 5.68, pg. 91, tOut, rhoOut, should be tTop, rhoTop. There is also a mistake in De Zwart: whenever sqrt is taken, abs should be included\r\n\r\nAlso note, that rhoAir is used here (see below), and not rhoAirCap which is used in calculating capacities (Eq. 8.24 in Vanthoor 2011). Note that fScr is used here instead of fThScr in Vanthoor."
+         },
+         "fScr" : {
+            "unit" : "m s**-1",
+            "type" : "aux",
+            "definition" : "fThScr",
+            "description" : "Air flux through the screens layer (may include multiple screens)",
+            "reference" : "Added here for easier model extension"
+         },
+         "rhoAir" : {
+            "unit" : "kg m**-3",
+            "type" : "aux",
+            "definition" : "mAir * pressure / ((tAir + 273.15) * R)",
+            "description" : "Density of the air in the main compartment (below the screen)",
+            "reference" : "Calculated for dry air using the ideal gas law. See, e.g., https://en.wikipedia.org/wiki/Density_of_air"
+         },
+         "rhoTop" : {
+            "unit" : "kg m**-3",
+            "type" : "aux",
+            "definition" : "mAir * pressure / ((tTop + 273.15) * R)",
+            "description" : "Density of the air in the top compartment (above the screen)",
+            "reference" : "Calculated for dry air using the ideal gas law. See, e.g., https://en.wikipedia.org/wiki/Density_of_air"
+         },
+         "pressure" : {
+            "unit" : "Pa",
+            "type" : "const",
+            "definition" : "101325*(1-2.5577e-5*hElevation)**5.25588",
+            "description" : "Absolute air pressure at given elevation",
+            "reference" : "https://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html"
+         },
+         "rhoAirMean" : {
+            "unit" : "kg m**-3",
+            "type" : "aux",
+            "definition" : "0.5 * (rhoTop + rhoAir)",
+            "description" : "Mean density of the air below and above the screen.",
+            "reference" : "Vanthoor 2011, pg. 215; De Zwart 1996, Equation 5.68\r\n\r\nNote that there is a mistake in Vanthoor: according to De Zwart (1996), Equation 5.68, pg. 91, tOut, rhoOut, should be tTop, rhoTop"
+         },
+         "hCovInCovE" : {
+            "unit" : "W K**-1 m**-2",
+            "type" : "aux",
+            "definition" : "sensible(hecCovInCovE, tCovIn, tCovE)",
+            "description" : "Conductive heat flux through the lumped cover",
+            "reference" : "Vanthoor 2011, Equation 8.40 and 8.19"
+         }
+      },
+      "Latent heat fluxes" : {
+         "reference" : "Vanthoor 2011, Section 8.6.4",
+         "lCanAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "L * mvCanAir",
+            "description" : "Latent heat flux by transpiration",
+            "reference" : "Vanthoor 2011, Equation 8.42"
+         },
+         "lAirThScr" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "L * mvAirThScr",
+            "description" : "Latent heat flux by condensation on thermal screen",
+            "reference" : "Vanthoor 2011, Equation 8.42"
+         },
+         "lTopCovIn" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "L * mvTopCovIn",
+            "description" : "Latent heat flux by condensation on cover",
+            "reference" : "Vanthoor 2011, Equation 8.42"
+         }
+      }
+   },
+   "Vapour fluxes" : {
+      "reference" : "Vanthoor 2011, Section 8.7",
+      "cond(hec, vp1, vp2)" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "function",
+         "definition" : "1 / (1 + exp(-0.1 * (vp1 - vp2))) * 6.4e-9 * hec * (vp1-vp2)",
+         "description" : "Vapour flux from the air to an object by condensation",
+         "reference" : "Vanthoor 2011, Equation 8.44. Note that according to Vanthoor Table 8.1 (pg. 232), sMV12 is -0.1"
+      },
+      "mvAirThScr" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "cond(1.7*uThScr*abs(tAir - tThScr)**0.33, vpAir, satVp(tThScr))",
+         "description" : "Condensation from main compartment on thermal screen - Vapour fluxes",
+         "reference" : "Vanthoor 2011, pg. 216, Table 8.4"
+      },
+      "mvTopCovIn" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "cond(cHecIn * abs(tTop - tCovIn)**0.33 * aCov / aFlr, vpTop, satVp(tCovIn))",
+         "description" : "Condensation from top compartment to cover - Vapour fluxes",
+         "reference" : "Vanthoor 2011, Equation 8.43 and Table 4"
+      },
+      "airMv(f12, vp1, vp2, t1, t2)" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "function",
+         "definition" : "(18 / 8314) * abs(f12) * (vp1 / (t1 + 273.15) - vp2 / (t2 + 273.15))",
+         "description" : "Vapour flux accompanying an air flux",
+         "reference" : "Vanthoor 2011, Equation 8.45. Note that according to Table 8.1 (pg. 232), mWater is 18 and R is 8314. Also note that abs(f12) is taken so that the vapour flux is always from high vapour to low vapour"
+      },
+      "mvAirTop" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "airMv(fScr, vpAir, vpTop, tAir, tTop)",
+         "description" : "Vapour flux from main to top compartment (through the screen layer)",
+         "reference" : "Vanthoor 2011, pg. 216."
+      },
+      "mvAirOut" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "airMv(fVentSide+fVentForced, vpAir, vpOut, tAir, tOut)",
+         "description" : "Vapour flux from main compartment to outside",
+         "reference" : "Vanthoor 2011, pg. 216."
+      },
+      "mvTopOut" : {
+         "unit" : "kg  m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "airMv(fVentRoof, vpTop, vpOut, tTop, tOut)",
+         "description" : "Vapour flux from top compartment to outside",
+         "reference" : "Vanthoor 2011, pg. 216."
+      },
+      "satVp(temp)" : {
+         "unit" : "Pa",
+         "type" : "function",
+         "definition" : "610.78 * exp(17.2694 *temp / (temp + 238.3))",
+         "description" : "Saturated vapour pressure (Pa) at temperature temp (°C)",
+         "reference" : "http://www.conservationphysics.org/atmcalc/atmoclc2.pdf"
+      }
+   },
+   "CO2 fluxes" : {
+      "reference" : "Vanthoor 2011, Section 8.8",
+      "airMc(f12, c1, c2)" : {
+         "unit" : "mg m**-2 s**-1",
+         "type" : "function",
+         "definition" : "abs(f12) * (c1 - c2)",
+         "description" : "CO2 flux accompanying an air flux",
+         "reference" : "Vanthoor 2011, pg. 216-217"
+      },
+      "mcAirTop" : {
+         "unit" : "mg{CO2} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "airMc(fScr, co2Air, co2Top)",
+         "description" : "CO2 flux from main to top compartment (through the screen layer)",
+         "reference" : "Vanthoor 2011, pg. 216-217"
+      },
+      "mcAirOut" : {
+         "unit" : "mg{CO2} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "airMc(fVentSide + fVentForced, co2Air, co2Out)",
+         "description" : "Vapour flux from main compartment to outside",
+         "reference" : "Vanthoor 2011, pg. 216-217"
+      },
+      "mcTopOut" : {
+         "unit" : "mg{CO2} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "airMc(fVentRoof, co2Top, co2Out)",
+         "description" : "Vapour flux from top compartment to outside",
+         "reference" : "Vanthoor 2011, pg. 216-217"
+      }
+   },
+   "Canopy transpiration" : {
+      "reference" : "Vanthoor 2011, Section 8.9",
+      "mvCanAir" : {
+         "unit" : "kg m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "vecCanAir * (satVp(tCan) - vpAir)",
+         "description" : "Canopy transpiration",
+         "reference" : "Vanthoor 2011, Equation 8.47"
+      },
+      "vecCanAir" : {
+         "unit" : "kg m**-2 Pa**-1 s**-1",
+         "type" : "aux",
+         "definition" : "2 * rhoAirCap * cPAir * lai / (L * gammaPsych * (rB + rS))",
+         "description" : "Vapour transfer coefficient of canopy transpiration",
+         "reference" : "Vanthoor 2011, Equation 8.48. Note L is used here instead of DeltaH there"
+      },
+      "rS" : {
+         "unit" : "s m**-1",
+         "type" : "aux",
+         "definition" : "rSMin * rfRCan * rfCo2 * rfVp",
+         "description" : "Stomatal resistance",
+         "reference" : "Vanthoor 2011, Equation 8.49"
+      },
+      "rfRCan" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "(rCan + cEvap1) / (rCan + cEvap2)",
+         "description" : "Radiation influence on stomatal resistance",
+         "reference" : "Vanthoor 2011, Equation 8.50"
+      },
+      "rCanSun" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "(1 - etaGlobAir) * (tauCovPar * etaGlobPar + tauCovNir * etaGlobNir)  * iGlob",
+         "description" : "Global radiation (PAR+NIR) above the canopy from the sun",
+         "reference" : "Following Vanthoor 2011, Equation 8.28"
+      },
+      "rCan" : {
+         "unit" : "W m**-2",
+         "type" : "aux",
+         "definition" : "rCanSun",
+         "description" : "Global radiation (PAR+NIR) above the canopy",
+         "reference" : "Following Vanthoor 2011, Equation 8.28. Added for easier model extension"
+      },
+      "rfCo2" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "min(1.5, 1 + cEvap3 * (etaMgPpm * co2Air - 200)**2)",
+         "description" : "CO2 influence on stomatal resistance",
+         "reference" : "Vanthoor 2011, Equation 8.50, and note below \"Stanghellini limited the resistance factor for high CO2 levels to 1.5\""
+      },
+      "rfVp" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "min(5.8, 1 + cEvap4 * (satVp(tCan) - vpAir)**2)",
+         "description" : "Vapour pressure influence on stomatal resistance",
+         "reference" : "Vanthoor 2011, Equation 8.50, and note below \"Stanghellini limited [...] the resistance factor for large vapour pressure differences to 5.8\""
+      },
+      "sRs" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "1 / (1 + exp(sRsSlope * (rCan - rCanSp)))",
+         "description" : "Smooth switch between day and night, needed to account for difference in day/night transpiration paramemters",
+         "reference" : "Vanthoor 2011, Equation 8.51"
+      },
+      "cEvap3" : {
+         "unit" : "ppm{CO2}**-2",
+         "type" : "aux",
+         "definition" : "cEvap3Night * (1 - sRs) + cEvap3Day * sRs",
+         "description" : "Parameter for CO2 influence on stomatal resistance",
+         "reference" : "Vanthoor 2011, Equation 8.52. Note that the unit there is incorrect. Also note that cEvap3Night there erroneously appears twice."
+      },
+      "cEvap4" : {
+         "unit" : "Pa**-2",
+         "type" : "aux",
+         "definition" : "cEvap4Night * (1 - sRs) + cEvap4Day * sRs",
+         "description" : "Parameter for vapour pressure influence on stomatal resistance - Canopy Transpiration",
+         "reference" : "Vanthoor 2011, Equation 8.52. Note that the unit there is incorrect. Also note that cEvap3Night there erroneously appears twice."
+      }
+   },
+   "Greenhouse design elements" : {
+      "reference" : "Vanthoor 2011, Section 8.10",
+      "Direct air heater" : {
+         "reference" : "Vanthoor 2011, Section 8.10.1",
+         "hBlowAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "uBlow * pBlow / aFlr",
+            "description" : "Heat flux from direct air heater",
+            "reference" : "Vanthoor 2011, Equation 8.53"
+         },
+         "mcBlowAir" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "etaHeatCo2 * hBlowAir",
+            "description" : "CO2 flux from direct air heater",
+            "reference" : "Vanthoor 2011, Equation 8.54"
+         },
+         "mvBlowAir" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "etaHeatVap * hBlowAir",
+            "description" : "Vapour flux from direct air heater",
+            "reference" : "Vanthoor 2011, Equation 8.55"
+         }
+      },
+      "Heat from boiler, industrial, and geothermal" : {
+         "reference" : "Vanthoor 2011, Section 8.10.2",
+         "hBoilPipe" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "uBoil * pBoil / aFlr",
+            "description" : "Heat flux from the boiler to the heating pipe",
+            "reference" : "Vanthoor 2011, Equation 8.56"
+         },
+         "hIndPipe" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "uHeatInd * pInd / aFlr",
+            "description" : "Heat flux from an industrial source to the heating pipe",
+            "reference" : "Vanthoor 2011, Equation 8.56. Note uHeatInd is used here instead of uInd there"
+         },
+         "hGeoPipe" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "uHeatGeo * pGeo / aFlr",
+            "description" : "Heat flux from a geothermal source to the heating pipe",
+            "reference" : "Vanthoor 2011, Equation 8.56. Note uHeatGeo is used here instead of uGeo there"
+         }
+      },
+      "Passive heat storage" : {
+         "reference" : "Vanthoor 2011, Section 8.10.3",
+         "hPasAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "hecPasAir * (tSo3 - tAir)",
+            "description" : "Heat flux from the buffer to the heating pipe",
+            "reference" : "Vanthoor 2011, Equation 8.57"
+         }
+      },
+      "Pad and fan cooling" : {
+         "reference" : "Vanthoor 2011, Section 8.10.4",
+         "mvPadAir" : {
+            "unit" : "kg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "rhoAir * fPad * (etaPad * (xPad - xOut) + xOut)",
+            "description" : "Vapour flux from the pad and fan to the greenhouse air",
+            "reference" : "Vanthoor 2011, Equation 8.58"
+         },
+         "fPad" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "uPad * phiPad / aFlr",
+            "description" : "Ventilation flux due to the pad and fan system",
+            "reference" : "Vanthoor 2011, Equation 8.59"
+         },
+         "hPadAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fPad * (rhoAir * cPAir * tOut - L * rhoAir * (etaPad * (xPad - xOut)))",
+            "description" : "Sensible heat flux from the pad to the greenhouse air",
+            "reference" : "Vanthoor 2011, Equation 8.60"
+         },
+         "xOut" : {
+            "unit" : "kg {water} kg**-1 {air}",
+            "type" : "aux",
+            "definition" : "18 / 29 * vpOut / (101325 - vpOut)",
+            "description" : "Water vapour content of the outdoor air",
+            "reference" : "Stanghellini 2019, Equation 4.3"
+         },
+         "hAirOutPad" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "fPad * rhoAir * cPAir * tAir",
+            "description" : "Sensible heat flux from the greenhouse air to the outside air",
+            "reference" : "Vanthoor 2011, Equation 8.61"
+         },
+         "mvAirOutPad" : {
+            "unit" : "kg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "fPad * mWater / R * vpAir / (tAir + 273.15)",
+            "description" : "Vapour flux from the greenhouse air to the outside air due to the pad and fan",
+            "reference" : "Vanthoor 2011, Equation 8.62. Note that this may be a mistake - compare to Vanthoor 2011, Equation 8.45"
+         },
+         "mcPadAir" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "fPad * (co2Out - co2Air)",
+            "description" : "Net CO2 flux from the outside air to the greenhouse due to the pad and fan",
+            "reference" : "Vanthoor 2011, pg. 221; Equation 8.46"
+         }
+      },
+      "Mechanical cooling" : {
+         "reference" : "Vanthoor 2011, Section 8.10.5",
+         "hecMechAir" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "aux",
+            "definition" : "(uMechCool * copMechCool * pMechCool / aFlr) / (tAir - tMechCool + 6.4e-9 * L * (vpAir - satVp(tMechCool)))",
+            "description" : "Heat exchange coefficinet between the surface of the mechanical cooling unit and the greenhouse air",
+            "reference" : "Vanthoor 2011, Equation 8.63"
+         },
+         "hMechAir" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "sensible(hecMechAir, tMechCool, tAir)",
+            "description" : "Heat flux from the mechanical cooling to the greenhouse air",
+            "reference" : "Vanthoor 2011, pg. 221; Equation 8.40"
+         },
+         "mvAirMech" : {
+            "unit" : "kg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "cond(hecMechAir, vpAir, satVp(tMechCool))",
+            "description" : "Vapour flux from the greenhouse air to the surface of the mechanical cooling system",
+            "reference" : "Vanthoor 2011, pg.221; Equation 8.43-8.44"
+         }
+      },
+      "Fogging" : {
+         "reference" : "Vanthoor 2011, Section 8.10.6",
+         "mvFogAir" : {
+            "unit" : "kg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "uFog * phiFog / aFlr",
+            "description" : "Vapour flux from the fogging system to the greenhouse air",
+            "reference" : "Vanthoor 2011, Equation 8.64"
+         },
+         "lAirFog" : {
+            "unit" : "W m**-2",
+            "type" : "aux",
+            "definition" : "L * mvFogAir",
+            "description" : "Heat flux of the air needed to evaporate the fog",
+            "reference" : "Vanthoor 2011, pg. 222; Equation 8.42, 8.64"
+         }
+      },
+      "Natural ventilation" : {
+         "reference" : "Vanthoor 2011, Section 8.10.7",
+         "fVentRoof2" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "uRoof * aRoof * cD / (2 * aFlr) * sqrt(abs(g * hVent * (tAir - tOut) / (2 * (0.5 * tAir + 0.5 * tOut + 273.15)) + cW * wind**2))",
+            "description" : "Natural ventilation rate due to roof ventilation",
+            "reference" : "Vanthoor 2011, Equation 8.65"
+         },
+         "fVentRoofSide2" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "cD / aFlr * sqrt((aRoofU * aSideU / sqrt(max(aRoofU**2 + aSideU**2, 0.01)))**2 * (2 * g * hSideRoof * (tAir - tOut) / (0.5 * tAir + 0.5 * tOut + 273.15)) + ((aRoofU + aSideU) / 2)**2 * cW * wind**2)",
+            "description" : "Ventilation rate through roof and side vents",
+            "reference" : "Vanthoor 2011, Equation 8.66. A small modification has been added to avoid division by zero"
+         },
+         "fVentSide2" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "cD * aSideU * wind / (2 * aFlr) * sqrt(cW)",
+            "description" : "Ventilation rate through sidewall only",
+            "reference" : "Vanthoor 2011, Equation 8.67"
+         },
+         "aRoofU" : {
+            "unit" : "m**2",
+            "type" : "aux",
+            "definition" : "uRoof * aRoof",
+            "description" : "Aperture of the roof",
+            "reference" : "Vanthoor 2011, Equation 8.68"
+         },
+         "aSideU" : {
+            "unit" : "m**2",
+            "type" : "aux",
+            "definition" : "uSide * aSide",
+            "description" : "Aperture of the sidewall",
+            "reference" : "Vanthoor 2011, Equation 8.69"
+         },
+         "etaInsScr" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "zetaInsScr * (2 - zetaInsScr)",
+            "description" : "Ventilation reduction factor due to the insect screen",
+            "reference" : "Vanthoor 2011, Equation 8.70. Note that the unit there seems to be wrong"
+         },
+         "fLeakage" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "ifElse(wind < 0.25, 0.25 * cLeakage, cLeakage * wind)",
+            "description" : "Leakage ventilation",
+            "reference" : "Vanthoor 2011, Equation 8.71"
+         },
+         "fVentRoof" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "ifElse(etaRoof >= etaRoofThr, etaInsScr * fVentRoof2 + 0.5 * fLeakage, etaInsScr * (uThScr * fVentRoof2 + (1 - uThScr) * fVentRoofSide2 * etaRoof) + 0.5 * fLeakage)",
+            "description" : "Total ventilation through the roof",
+            "reference" : "Vanthoor 2011, Equation 8.72"
+         },
+         "fVentSide" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "ifElse(etaRoof >= etaRoofThr, etaInsScr * fVentSide2 + 0.5 * fLeakage, etaInsScr * (uThScr * fVentSide2 + (1 - uThScr) * fVentRoofSide2 * etaSide) + 0.5 * fLeakage)",
+            "description" : "Total ventilation through side vents",
+            "reference" : "Vanthoor 2011, Equation 8.73"
+         },
+         "etaRoof" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "aRoof / (aRoof + aSide)",
+            "description" : "Ratio between roof vent area and total ventilation area",
+            "reference" : "Vanthoor 2011, pg. 224"
+         },
+         "etaSide" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "aSide / (aRoof + aSide)",
+            "description" : "Ratio between side vent area and total ventilation area",
+            "reference" : "Vanthoor 2011, pg. 224"
+         },
+         "cD" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "cDgh * (1 - etaShScrCd * uShScr)",
+            "description" : "Discharge coefficient",
+            "reference" : "Vanthoor 2011, Equation 8.74"
+         },
+         "cW" : {
+            "unit" : "-",
+            "type" : "aux",
+            "definition" : "cWgh * (1 - etaShScrCw * uShScr)",
+            "description" : "Global wind pressure coefficient",
+            "reference" : "Vanthoor 2011, Equation 8.75"
+         }
+      },
+      "Forced ventilation" : {
+         "reference" : "Vanthoor 2011, Section 8.10.8",
+         "fVentForced2" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "uVentForced * phiVentForced / aFlr",
+            "description" : "Forced ventilation, not including the insect screen",
+            "reference" : "Vanthoor 2011, Equation 8.76"
+         },
+         "fVentForced" : {
+            "unit" : "m**3 m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "etaInsScr * fVentForced2",
+            "description" : "Forced ventilation",
+            "reference" : "Vanthoor 2011, pg. 225: \"The effect of the insect screens on the forced ventilation is determined using Eq. 8.70\""
+         }
+      },
+      "External CO2 source" : {
+         "reference" : "Vanthoor 2011, Section 8.10.9",
+         "mcExtAir" : {
+            "unit" : "mg m**-2 s**-1",
+            "type" : "aux",
+            "definition" : "uExtCo2 * phiExtCo2 / aFlr",
+            "description" : "CO2 added to the greenhouse by an external CO2 source",
+            "reference" : "Vanthoor 2011, Equation 8.77"
+         }
+      }
+   },
+   "Parameters" : {
+      "Table 8.1" : {
+         "alfaLeafAir" : {
+            "unit" : "W m**-2 K**-1",
+            "type" : "const",
+            "definition" : "5",
+            "description" : "Convective heat exchange coefficient from the canopy leaf to the greenhouse air",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "L" : {
+            "unit" : "J kg**-1{water}",
+            "type" : "const",
+            "definition" : "2.45e6",
+            "description" : "Latent heat of evaporation",
+            "reference" : "Vanthoor 2011, Table 8.1 (noted DeltaH there)"
+         },
+         "sigma" : {
+            "unit" : "W m**-2 K**-4",
+            "type" : "const",
+            "definition" : "5.67e-8",
+            "description" : "Stefan-Boltzmann constant",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "epsCan" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1",
+            "description" : "FIR emission coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "epsSky" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "1",
+            "description" : "FIR emission coefficient of the sky",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "etaGlobNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.5",
+            "description" : "Ratio between NIR and the outside global radiation",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "etaGlobPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.5",
+            "description" : "Ratio between PAR and the outside global radiation",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "etaHeatCo2" : {
+            "unit" : "mg{CO2} J**-1",
+            "type" : "const",
+            "definition" : "0.057",
+            "description" : "Amount of CO2 which is released when 1 Joule of sensible energy is produced by the heat blower",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "etaHeatVap" : {
+            "unit" : "kg{vapour} J**-1",
+            "type" : "const",
+            "definition" : "4.43e-8",
+            "description" : "Amount of vapour which is released when 1 Joule of sensible energy is produced by the heat blower",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "etaMgPpm" : {
+            "unit" : "ppm mg**-1 m**3",
+            "type" : "const",
+            "definition" : "0.554",
+            "description" : "CO2 conversion factor from mg m**-3 to ppm",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "etaRoofThr" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.9",
+            "description" : "Ratio between roof vent area and total ventilation area where no chimney effect is assumed",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoAir0" : {
+            "unit" : "kg m**-3",
+            "type" : "const",
+            "definition" : "1.2",
+            "description" : "Density of air at sea level",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoCanPar" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.07",
+            "description" : "PAR reflection coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoCanNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.35",
+            "description" : "NIR reflection coefficient of the top of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoSteel" : {
+            "unit" : "kg m**-3",
+            "type" : "const",
+            "definition" : "7850",
+            "description" : "Density of steel",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rhoWater" : {
+            "unit" : "kg m**-3",
+            "type" : "const",
+            "definition" : "1e3",
+            "description" : "Density of water",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "gammaPsych" : {
+            "unit" : "Pa K**-1",
+            "type" : "const",
+            "definition" : "65.8",
+            "description" : "Psychrometric constant",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "omega" : {
+            "unit" : "s**-1",
+            "type" : "const",
+            "definition" : "1.99e-7",
+            "description" : "Yearly frequency to calculate soil temperature",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "capLeaf" : {
+            "unit" : "J K**-1 m**-2{leaf}",
+            "type" : "const",
+            "definition" : "1.2e3",
+            "description" : "Heat capacity of a square meter of canopy leaves",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cEvap1" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "4.3",
+            "description" : "Coefficient for radiation effect on stomatal resistance",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cEvap2" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "0.54",
+            "description" : "Coefficient for radiation effect on stomatal resistance",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cEvap3Day" : {
+            "unit" : "ppm**-2",
+            "type" : "const",
+            "definition" : "6.1e-7",
+            "description" : "Coefficient for co2 effect on stomatal resistance (day)",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cEvap3Night" : {
+            "unit" : "ppm**-2",
+            "type" : "const",
+            "definition" : "1.1e-11",
+            "description" : "Coefficient for co2 effect on stomatal resistance (night)",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cEvap4Day" : {
+            "unit" : "Pa**-2",
+            "type" : "const",
+            "definition" : "4.3e-6",
+            "description" : "Coefficient for vapour pressure effect on stomatal resistance (day)",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cEvap4Night" : {
+            "unit" : "Pa**-2",
+            "type" : "const",
+            "definition" : "5.2e-6",
+            "description" : "Coefficient for vapour pressure effect on stomatal resistance (night)",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cPAir" : {
+            "unit" : "J K**-1 kg**-1",
+            "type" : "const",
+            "definition" : "1e3",
+            "description" : "Specific heat capacity of air",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cPSteel" : {
+            "unit" : "J K**-1 kg**-1",
+            "type" : "const",
+            "definition" : "0.64e3",
+            "description" : "Specific heat capacity of steel",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "cPWater" : {
+            "unit" : "J K**-1 kg**-1",
+            "type" : "const",
+            "definition" : "4.18e3",
+            "description" : "Specific heat capacity of water",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "g" : {
+            "unit" : "m s**-2",
+            "type" : "const",
+            "definition" : "9.81",
+            "description" : "Acceleration of gravity",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "hSo1" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.04",
+            "description" : "Thickness of soil layer 1",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "hSo2" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.08",
+            "description" : "Thickness of soil layer 2",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "hSo3" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.16",
+            "description" : "Thickness of soil layer 3",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "hSo4" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.32",
+            "description" : "Thickness of soil layer 4",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "hSo5" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "0.64",
+            "description" : "Thickness of soil layer 5",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "hSoOut" : {
+            "unit" : "m",
+            "type" : "const",
+            "definition" : "1.28",
+            "description" : "Thickness of the external soil layer",
+            "reference" : "assumed"
+         },
+         "k1Par" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.7",
+            "description" : "PAR extinction coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "k2Par" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.7",
+            "description" : "PAR extinction coefficient of the canopy for PAR reflected from the floor",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "kNir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.27",
+            "description" : "NIR extinction coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "kFir" : {
+            "unit" : "-",
+            "type" : "const",
+            "definition" : "0.94",
+            "description" : "FIR extinction coefficient of the canopy",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "mAir" : {
+            "unit" : "kg kmol**-1",
+            "type" : "const",
+            "definition" : "28.96",
+            "description" : "Molar mass of air",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "mWater" : {
+            "unit" : "kg kmol**-1",
+            "type" : "const",
+            "definition" : "18",
+            "description" : "Molar mass of water",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "R" : {
+            "unit" : "J kmol**-1 K**-1",
+            "type" : "const",
+            "definition" : "8314",
+            "description" : "Molar gas constant",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rCanSp" : {
+            "unit" : "W m**-2",
+            "type" : "const",
+            "definition" : "5",
+            "description" : "Radiation value above the canopy when night becomes day",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rB" : {
+            "unit" : "s m**-1",
+            "type" : "const",
+            "definition" : "275",
+            "description" : "Boundary layer resistance of the canopy for vapour transport",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "rSMin" : {
+            "unit" : "s m**-1",
+            "type" : "const",
+            "definition" : "82",
+            "description" : "Minimum canopy resistance for transpiration",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         },
+         "sRsSlope" : {
+            "unit" : "m W**-2",
+            "type" : "const",
+            "definition" : "-1",
+            "description" : "slope of smoothed stomatal resistance model",
+            "reference" : "Vanthoor 2011, Table 8.1"
+         }
+      },
+      "Table 8.2 (Netherlands)" : {
+         "Construction" : {
+            "etaGlobAir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.1",
+               "description" : "Ratio of global radiation absorbed by the greenhouse construction",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "psi" : {
+               "unit" : "°",
+               "type" : "const",
+               "definition" : "25",
+               "description" : "Mean greenhouse cover slope",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "aCov" : {
+               "unit" : "m**2",
+               "type" : "const",
+               "definition" : "1.8e4",
+               "description" : "Surface of the cover including side walls",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "aFlr" : {
+               "unit" : "m**2",
+               "type" : "const",
+               "definition" : "1.4e4",
+               "description" : "Floor area of greenhouse",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cHecIn" : {
+               "unit" : "W m**-2 K**-1",
+               "type" : "const",
+               "definition" : "1.86",
+               "description" : "Convective heat exchange between cover and outdoor air",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cHecOut1" : {
+               "unit" : "W m**-2{cover} K**-1",
+               "type" : "const",
+               "definition" : "2.8",
+               "description" : "Convective heat exchange parameter between cover and outdoor air",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cHecOut2" : {
+               "unit" : "J m**-3 K**-1",
+               "type" : "const",
+               "definition" : "1.2",
+               "description" : "Convective heat exchange parameter between cover and outdoor air",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cHecOut3" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "Convective heat exchange parameter between cover and outdoor air",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hAir" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "3.8",
+               "description" : "Height of the main compartment (below the screen)",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hElevation" : {
+               "unit" : "m above sea level",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Altitude of greenhouse",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hGh" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "4.2",
+               "description" : "Mean height of the greenhouse",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Ventilation properties" : {
+            "etaShScrCd" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Effect of shading screen on discharge coefficient",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no shading screen"
+            },
+            "etaShScrCw" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Effect of shading screen on wind pressure coefficient",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no shading screen"
+            },
+            "zetaInsScr" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "Porosity of the insect screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "aRoof" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1.4e3",
+               "description" : "Roof ventilation area",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "aSide" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Side ventilation area",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cDgh" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.75",
+               "description" : "Ventilation discharge coefficient",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cLeakage" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1e-4",
+               "description" : "Greenhouse leakage coefficient",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cWgh" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.09",
+               "description" : "Ventilation global wind pressure coefficient",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hSideRoof" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "Vertical distance between mid-points of side wall and roof ventilation openings",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no side wall"
+            },
+            "hVent" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "0.68",
+               "description" : "Vertical dimension of a single ventilation opening",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Roof" : {
+            "epsRfFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.85",
+               "description" : "FIR emission coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoRf" : {
+               "unit" : "kg m**-3",
+               "type" : "const",
+               "definition" : "2.6e3",
+               "description" : "Density of the roof layer",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoRfNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.13",
+               "description" : "NIR reflection coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoRfPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.13",
+               "description" : "PAR reflection coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoRfFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.15",
+               "description" : "FIR reflection coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "tauRfNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.85",
+               "description" : "NIR transmission coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "tauRfPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.85",
+               "description" : "PAR transmission coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "tauRfFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "FIR transmission coefficient of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "lambdaRf" : {
+               "unit" : "W m**-1 K**-1",
+               "type" : "const",
+               "definition" : "1.05",
+               "description" : "Thermal heat conductivity of the roof",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cPRf" : {
+               "unit" : "J K**-1 kg**-1",
+               "type" : "const",
+               "definition" : "0.84e3",
+               "description" : "Specific heat capacity of roof layer",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hRf" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "4e-3",
+               "description" : "Thickness of roof layer",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Whitewash" : {
+            "epsShScrPerFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "FIR emission coefficient of the whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "rhoShScrPer" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Density of the whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "rhoShScrPerNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "NIR reflection coefficient of whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "rhoShScrPerPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "PAR reflection coefficient of whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "rhoShScrPerFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "FIR reflection coefficient of whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "tauShScrPerNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "NIR transmission coefficient of whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "tauShScrPerPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "PAR transmission coefficient of whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "tauShScrPerFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "FIR transmission coefficient of whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "lambdaShScrPer" : {
+               "unit" : "W m**-1 K**-1",
+               "type" : "const",
+               "definition" : "1e10",
+               "description" : "Thermal heat conductivity of the whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash - value is Inf (or very high))"
+            },
+            "cPShScrPer" : {
+               "unit" : "J K**-1 kg**-1",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Specific heat capacity of the whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            },
+            "hShScrPer" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Thickness of the whitewash",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands - no whitewash)"
+            }
+         },
+         "Shading screen" : {
+            "rhoShScrNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "NIR reflection coefficient of shading screen",
+               "reference" : "Assuming no shading screen"
+            },
+            "rhoShScrPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "PAR reflection coefficient of shading screen",
+               "reference" : "Assuming no shading screen"
+            },
+            "rhoShScrFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "FIR reflection coefficient of shading screen",
+               "reference" : "Assuming no shading screen"
+            },
+            "tauShScrNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "NIR transmission coefficient of shading screen",
+               "reference" : "Assuming no shading screen"
+            },
+            "tauShScrPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "PAR transmission coefficient of shading screen",
+               "reference" : "Assuming no shading screen"
+            },
+            "tauShScrFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "FIR transmission coefficient of shading screen",
+               "reference" : "Assuming no shading screen"
+            },
+            "kShScr" : {
+               "unit" : "m**3 m**-2 K**(2/3) s**-1",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "shading screen flux coefficient",
+               "reference" : "Assuming no shading screen"
+            }
+         },
+         "Thermal screen" : {
+            "epsThScrFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.67",
+               "description" : "FIR emissions coefficient of the thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoThScr" : {
+               "unit" : "kg m**-3",
+               "type" : "const",
+               "definition" : "0.2e3",
+               "description" : "Density of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoThScrNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.35",
+               "description" : "NIR reflection coefficient of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoThScrPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.35",
+               "description" : "PAR reflection coefficient of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoThScrFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.18",
+               "description" : "FIR reflection coefficient of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "tauThScrNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.6",
+               "description" : "NIR transmission coefficient of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "tauThScrPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.6",
+               "description" : "PAR transmission coefficient of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "tauThScrFir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.15",
+               "description" : "FIR transmission coefficient of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cPThScr" : {
+               "unit" : "J kg**-1 K**-1",
+               "type" : "const",
+               "definition" : "1.8e3",
+               "description" : "Specific heat capacity of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hThScr" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "0.35e-3",
+               "description" : "Thickness of thermal screen",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "kThScr" : {
+               "unit" : "m**3 m**-2 K**(2/3) s**-1",
+               "type" : "const",
+               "definition" : "0.05e-3",
+               "description" : "Thermal screen flux coefficient",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Floor" : {
+            "epsFlr" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "1",
+               "description" : "FIR emission coefficient of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoFlr" : {
+               "unit" : "kg m**-3",
+               "type" : "const",
+               "definition" : "2300",
+               "description" : "Density of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoFlrNir" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.5",
+               "description" : "NIR reflection coefficient of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "rhoFlrPar" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.65",
+               "description" : "PAR reflection coefficient of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "lambdaFlr" : {
+               "unit" : "W m**-1 K**-1",
+               "type" : "const",
+               "definition" : "1.7",
+               "description" : "Thermal heat conductivity of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "cPFlr" : {
+               "unit" : "J kg**-1 K**-1",
+               "type" : "const",
+               "definition" : "0.88e3",
+               "description" : "Specific heat capacity of the floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "hFlr" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "0.02",
+               "description" : "Thickness of floor",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Soil" : {
+            "rhoCpSo" : {
+               "unit" : "J m**-3 K**-1",
+               "type" : "const",
+               "definition" : "1.73e6",
+               "description" : "Volumetric heat capacity of the soil",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "lambdaSo" : {
+               "unit" : "W m**-1 K**-1",
+               "type" : "const",
+               "definition" : "0.85",
+               "description" : "Thermal heat conductivity of the soil layers",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Heating system" : {
+            "epsPipe" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0.88",
+               "description" : "FIR emission coefficient of the heating pipes",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "phiPipeE" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "51e-3",
+               "description" : "External diameter of heating pipes",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "phiPipeI" : {
+               "unit" : "m",
+               "type" : "const",
+               "definition" : "47e-3",
+               "description" : "Internal diameter of heating pipes",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "lPipe" : {
+               "unit" : "m m**-2",
+               "type" : "const",
+               "definition" : "1.875",
+               "description" : "Length of heating pipes per greenhouse floor area",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            }
+         },
+         "Active climate control" : {
+            "etaPad" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Efficiency of the pad and fan system",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no pad and fan"
+            },
+            "phiFog" : {
+               "unit" : "kg {water} s**-1",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Capacity of the fogging system",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no fogging"
+            },
+            "phiPad" : {
+               "unit" : "m**3 s**-1",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Capacity of the air flux through the pad and fan",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no pad and fan"
+            },
+            "phiVentForced" : {
+               "unit" : "m**3 s**-1",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Air flow capacity of the forced ventilation system",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no forced ventilation"
+            },
+            "phiExtCo2" : {
+               "unit" : "mg s**-1",
+               "type" : "const",
+               "definition" : "7.2e4",
+               "description" : "Capacity of external CO2 source",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands)"
+            },
+            "copMechCool" : {
+               "unit" : "-",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Coefficient of performance of the mechanical cooling system",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no mechanical cooling"
+            },
+            "hecPasAir" : {
+               "unit" : "W m**-2 K**-1",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Convective heat exchange coefficient between passive heat storage and greenhouse air",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no heat storage"
+            },
+            "pBlow" : {
+               "unit" : "W",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Heat capacity of heat blowers",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no heat blowers"
+            },
+            "pBoil" : {
+               "unit" : "W",
+               "type" : "const",
+               "definition" : "21e5",
+               "description" : "Heat capacity of boiler",
+               "reference" : "Assuming 150 W m**-2 = 1.4e4*150"
+            },
+            "pGeo" : {
+               "unit" : "W",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Heat capacity of geothermal heat source",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no geothermal heat"
+            },
+            "pInd" : {
+               "unit" : "W",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Heat capacity of industrial heat source",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no industrial heat"
+            },
+            "pMechCool" : {
+               "unit" : "W",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Electrical capacity of mechanical cooling system",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no mechanical cooling"
+            },
+            "tMechCool" : {
+               "unit" : "°C",
+               "type" : "const",
+               "definition" : "0",
+               "description" : "Temperature of the cool surface of the mechanical cooling system",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no mechanical cooling"
+            },
+            "xPad" : {
+               "unit" : "kg {water} kg**-1 {air}",
+               "type" : "aux",
+               "definition" : "0",
+               "description" : "Water vapour content of the pad",
+               "reference" : "Vanthoor 2011, Table 8.2 (Netherlands) - no pad and fan"
+            }
+         }
+      },
+      "parJtoUmolSun" : {
+         "unit" : "umol{photons} J**-1",
+         "type" : "const",
+         "definition" : "4.6",
+         "description" : "Conversion factor of sun's PAR from J to µmol{photons}",
+         "reference" : "Based on the parameter etaGlobPar of Vanthoor (conversion of global radiation (J) to PAR (µmol), Table 9.1), and etaGlobPar of Vanthoor (Fraction of PAR in global radiation, Table 8.1). Included here for easier modification of the model."
+      },
+      "pi" : {
+         "unit" : "",
+         "type" : "const",
+         "definition" : "3.141592653589793",
+         "description" : "The constant pi",
+         "reference" : "Included here to ensure this constant is parsed correctly regardless of solver chosen."
+      }
+   },
+   "Crop" : {
+      "reference" : "Vanthoor 2011, pg. 217: \"mcAirCan depends on canopy photosynthesis [...] which were described in chapter 3\". In this file, we assume no crop.",
+      "mcAirCan" : {
+         "unit" : "mg{CO2} m**-2 s**-1",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Net photosynthesis",
+         "reference" : "Assuming no crop"
+      },
+      "lai" : {
+         "unit" : "m**2 {leaf} m**-2 {floor}",
+         "type" : "aux",
+         "definition" : "0.01",
+         "description" : "Leaf area index",
+         "reference" : "Assuming no crop"
+      },
+      "co2InPpm" : {
+         "unit" : "ppm",
+         "type" : "aux",
+         "definition" : "co2dens2ppm(tAir, (1e-6 * co2Air))",
+         "description" : "CO2 concentration in main compartment - Converted to ppm",
+         "reference" : "Conversion used in Katzin 2020, see line 884 in https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/createGreenLightModel/setGlAux.m"
+      },
+      "co2dens2ppm(temp, dens)" : {
+         "unit" : "ppm",
+         "type" : "function",
+         "definition" : "8.3144598e6* (temp + 273.15) * dens / (101325 * 44.01e-3)",
+         "description" : "Convert CO2 density (kg m^{-3}) to molar concentration (ppm); pressure is assumed to be 1 atm",
+         "reference" : "Calculation based on ideal gas law pV=nRT, used in Katzin 2020, see https://github.com/davkat1/GreenLight/blob/4ec6018e0aad2775ad11085d34f3886a7b7dd052/Code/serviceFunctions/co2dens2ppm.m"
+      }
+   },
+   "Greenhouse climate control" : {
+      "about" : "In this file, we assume no greenhouse climate control, therefore all controls are set to 0",
+      "uBlow" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the direct heat air blower",
+         "reference" : "Assuming no climate control"
+      },
+      "uBoil" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control valve of the heat boiler",
+         "reference" : "Assuming no climate control"
+      },
+      "uHeatInd" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the heat input from an industrial source",
+         "reference" : "Assuming no climate control"
+      },
+      "uHeatGeo" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the heat input from geothermal source",
+         "reference" : "Assuming no climate control"
+      },
+      "uPad" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the pad and fan",
+         "reference" : "Assuming no climate control"
+      },
+      "uMechCool" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the mechanical cooling",
+         "reference" : "Assuming no climate control"
+      },
+      "uFog" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the fogging",
+         "reference" : "Assuming no climate control"
+      },
+      "uRoof" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the roof ventilation",
+         "reference" : "Assuming no climate control"
+      },
+      "uSide" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the side ventilation",
+         "reference" : "Assuming no climate control"
+      },
+      "uVentForced" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the forced ventilation",
+         "reference" : "Assuming no climate control"
+      },
+      "uExtCo2" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Control of the external CO2 source",
+         "reference" : "Assuming no climate control"
+      },
+      "uShScr" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Closure of external shading screen, 0 is open (folded screen), 1 is closed (spread out screen)",
+         "reference" : "Assuming no climate control"
+      },
+      "uShScrPer" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Closure of semi-permanent shading screen (whitewash), 0 is open (no whitewash), 1 is closed (whitewash applied)",
+         "reference" : "Assuming no climate control"
+      },
+      "uThScr" : {
+         "unit" : "-",
+         "type" : "aux",
+         "definition" : "0",
+         "description" : "Closure of thermal screen, 0 is open (folded screen), 1 is closed (spread out screen)",
+         "reference" : "Assuming no climate control"
+      }
+   },
+   "Functions" : {
+      "ifElse(condition, ifTrue, ifFalse)" : {
+         "unit" : "-",
+         "type" : "function",
+         "definition" : "condition*ifTrue + (1-condition)*ifFalse",
+         "description" : "Non-smooth if/else switch"
+      },
+      "min(a,b)": {
+        "type": "function",
+        "definition": "(a<b)*a + (b<=a)*b",
+        "description": "Minimum of two variables, defined here so it will work regardless of solver used"
+      },
+      "max(a,b)": {
+         "type": "function",
+         "definition": "(a>b)*a + (b>=a)*b",
+         "description": "Maximum of two variables, defined here so it will work regardless of solver used"
+      }
+   },
+   "Inputs" : {
+      "about" : "Input variables required for the model. Here they are given as constants. In order to run meaningful simulations, a file with tim eseries input data should be provided",
+      "co2Out" : {
+         "unit" : "mg m**-3",
+         "type" : "input",
+         "definition" : "700",
+         "description" : "Outdoor CO2 concentration",
+         "reference" : "The ambient CO2 concentration in 2011"
+      },
+      "iGlob" : {
+         "unit" : "W m**-2",
+         "type" : "input",
+         "definition" : "0",
+         "description" : "Outside global radiation from the sun"
+      },
+      "tOut" : {
+         "unit" : "°C",
+         "type" : "input",
+         "definition" : "20",
+         "description" : "Outdoor air temperature"
+      },
+      "tSky" : {
+         "unit" : "°C",
+         "type" : "input",
+         "definition" : "-20",
+         "description" : "Apparent sky temperature"
+      },
+      "tSoOut" : {
+         "unit" : "°C",
+         "type" : "input",
+         "definition" : "20",
+         "description" : "Soil temperature of outer soil layer"
+      },
+      "vpOut" : {
+         "unit" : "Pa",
+         "type" : "input",
+         "definition" : "1650",
+         "description" : "Outdoor air vapour pressure at 20°C and about 70% relative humidity"
+      },
+      "wind" : {
+         "unit" : "m s**-1",
+         "type" : "input",
+         "definition" : "0",
+         "description" : "Outdoor wind speed"
+      }
+   }
+}

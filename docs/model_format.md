@@ -1,0 +1,414 @@
+# Model format
+This file outlines the required formatting for models used by GreenLight. It is a precise but flexible format, aimed at being processable by machines but also easy to read and follow by humans. In particular, models defined for GreenLight can be linked to scientific publications, allowing to replicate models described in the literature.
+
+In this file:
+- [Examples](#examples)
+- [Basic model definition](#basic-model-definition)
+  - [File format](#file-format)
+  - [General structure of models in greenlight](#general-structure-of-models-in-greenlight)
+  - [Representation of a model in a JSON file](#representation-of-a-model-in-a-json-file)
+  - [Example of a model structure](#example-of-a-model-structure)
+    - [Important notes](#important-notes)
+  - [Mathematical expressions](#mathematical-expressions)
+  - [Inputs](#inputs)
+  - [Model-defined functions](#model-defined-functions)
+- [Simulation settings](#simulation-settings)
+- [Structure of the JSON files](#structure-of-the-json-files)
+- [Optional model information](#optional-model-information)
+  - [JSON files](#json-files)
+  - [Input CSV files](#input-csv-files)
+- [Combining files](#combining-files)
+
+
+## Examples
+This repository contains several examples of GreenLight-formatted models. Some useful ones to check, in order of complexity, are:
+ - [Van Henten greenhouse model](../models/van_henten_2003/definition/greenhouse_evh2003.json)
+ - [Vanthoor greenhouse model](../models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)
+ - [Vanthoor crop model](../models/katzin_2021/definition/vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json)
+ - [Katzin greenhouse model](../models/katzin_2021/definition/extension_greenhouse_katzin_2021_vanthoor_2011.json) (an extension to the Vanthoor models)
+
+Some more simple examples are included below.
+
+## Basic model definition
+### File format
+GreenLight models are defined using [JSON](https://www.json.org/) files. JSON files can be edited by any text editor.
+For Windows user's, the following might prove useful:
+- [Notepad++](https://notepad-plus-plus.org/)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [JSONedit](http://tomeko.net/software/JSONedit/testing.php)
+  - However, **note (especially when using JSONedit):** it is recommended to use a text editor with [UTF-8](https://en.wikipedia.org/wiki/UTF-8) support (to support symbols such as the degree symbol °), and therefore the [UTF-8 branch](http://tomeko.net/software/JSONedit/testing.php) of JSONedit is recommended.
+
+Model inputs are described using [comma-separated value (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) files. Such files may also be edited by text editors, but dedicated software (with UTF-8 support) is recommended. For Windows user's, CSV's edited using Microsoft Excel have been tested to work for GreenLight, including UTF-8 support.
+
+### General structure of models in greenlight
+Dynamic models in GreenLight are defined by [states](https://en.wikipedia.org/wiki/State-space_representation),
+which are variables defined by [first order](https://en.wikipedia.org/wiki/Differential_equation#Order) ordinary differential equations
+([ODEs](https://en.wikipedia.org/wiki/Ordinary_differential_equation); see also [this primer on ODE solving in Python](https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter22.00-ODE-Initial-Value-Problems.html)).
+
+In simple terms, a **state** is a variable whose rate of change depends on its own value (and possibly other factors). A state $y$ is therefore typically defined in an equation such as:
+
+$$
+\begin{equation}
+\frac{dy}{dt} = f(t, y)
+\end{equation}
+$$
+
+where $t$ represents time.
+In many published models, model parameters are included in the definition of $f(t, y)$. We call these parameters **constants** and denote them with $c$. The states may also depend on some **inputs**, which we denote $d$. In addition, some mathematical expressions are grouped into what we call here **auxiliary states**, which may themselves depend on the model states. We denote these auxiliary states here as $a$.
+
+### Representation of a model in a JSON file
+GreenLight recognizes 4 variable types:
+- States (`state`)
+- Constants (`const`)
+- Inputs (`input`)
+- Auxiliary states (`aux`)
+
+Another type, `function`, is used for defining model functions, and is described below.
+
+The variables defined in a model typically have (at least some) of the following information associated with them:
+- `type`: one of the types listed above.
+- `definition`: for states, this is the ODE describing the state. For auxiliary states, this is the mathematical expression describing the auxiliary state. For constants, it is the value of the constant.
+- `init`: only required for states. This is the initial value of the state.
+- `unit`: the unit in which the variable is measured or described. The unit will appear in the output file generated by GreenLight.
+- `description`: a description of the variable in human language. This will also appear in the output file.
+- `reference`: a reference (e.g., to a scientific publication) explaining where the variable or its definition come from.
+
+In order for a variable to be read by GreenLight when loading the model, the variable **must have either a `type` or a `definition` attribute**. A variable can be loaded without a `definition` (for example, input variables that are provided as data). If a variable has a `definition` but no `type`, it will be treated as an auxiliary state by `greenlight`.
+
+### Example of a model structure
+Consider a model with a single state $y$, two auxiliary states $a_1$ and $a_2$, an input $d$, and two constants $p_1$ and $p_2$:
+$$
+\begin{aligned}
+&\frac{dy}{dt} = d*(a_1 + a_2) \\
+&y(0) = 1 \\
+&a_1 = 1 - (p_1)^2 \\
+&a_2 = 1 - (p_2)^2 \\
+&p_1 = 5 \\
+&p_2 = 10 \\
+\end{aligned}
+$$
+
+The model is represented by the following JSON format:
+```yaml
+{
+  "y": {
+    "type": "state",
+    "definition": "d*(a1 + a2)",
+    "init": "1"
+  },
+  "a1": {
+    "type": "aux",
+    "definition": "1-p1**2"
+  },
+  "a2": {
+    "type": "aux",
+    "definition": "1-p2**2"
+  },
+  "p1": {
+    "type": "const",
+    "definition": "5"
+  },
+  "p2": {
+    "type": "const",
+    "definition": "10"
+  }
+}
+```
+
+#### Important notes
+**Note 1:** GreenLight uses Python notation for exponentials, therefore $(p_1)^2$, $(p_2)^2$ are represented by `p1**2`, `p2**2`, **and not by** `p1^2`, `p2^2`.
+
+**Note 2:** GreenLight expects the JSON values to be of type `str`. This means mathematical expressions, as well as numerical values, are expected to appear in quotes ```" "```.
+In other words, always use, e.g., ```"definition": "5"``` **and not** ```"definition": 5```.
+
+### Mathematical expressions
+GreenLight expects strings that represent mathematical expressions.
+For a list of mathematical functions that are accepted by GreenLight, see [Mathematical expressions](math_expressions.md).
+
+### Inputs
+The model definition does not include a description of the input $d$. This is because, as an input, it is expected that the user provides input data for $d$ and its evolution through time in a CSV file.
+
+Input CSV files should have as many columns as there are inputs, plus one column **which must be the first column** representing time. The first row of the CSV file must contain the input variable names, **with the time variable named `Time`**.
+
+The following rows may provide more information on the input variables. If there are precisely two non-numerical rows in the input CSV file, GreenLight assumes that the first row contains the variable names and the second row contains the variable units.
+
+If there are more than two non-numerical rows in the input CSV file, GreenLight assumed that the first row contains the variable names, the second row contains variable descriptions, and the third row contains the units of the variables. Other non-numerical rows are ignored.
+
+In the current example, the input $d$ may be provided by the following CSV file:
+
+| Time | d    |
+|:-----| :--- |
+| 0    | 0    |
+| 300  | 50   |
+| 600  | 150  |
+| 3600 | 1000 |
+
+when evaluating the value of $d$ at time $t$, where $t$ is not provided by the input (e.g., at time $t=250$) GreenLight will use interpolation to determine the intermediate value.
+
+For more information on model inputs, see [below](#input-csv-files).
+
+### Model-defined functions
+It is often the case that models have some expressions that reappear a lot in the model definition. In such cases, it is useful to define a **model function** which is a mathematical expression which may be reused in the model. In the example above, the expression $1 - x^2$ appears twice: once with $x = p_1$ and once with $x = p_2$. The model may then be rewritten as follows:
+```yaml
+{
+  "y": {
+    "type": "state",
+    "definition": "d*(a1 + a2)",
+    "init": "1"
+  },
+  "a1": {
+    "type": "aux",
+    "definition": "func(p1)"
+  },
+  "a2": {
+    "type": "aux",
+    "definition": "func(p2)"
+  },
+  "p1": {
+    "type": "const",
+    "definition": "5"
+  },
+  "p2": {
+    "type": "const",
+    "definition": "10"
+  },
+  "func(x)": {
+    "type": "function",
+    "definition": "1-x**2"
+  }
+}
+```
+
+More generally, functions are defined in the following way:
+- The node name includes parentheses and function arguments:
+  - General format: `<function_name>(arg1, arg2, ...)`
+  - Example: `func1(x, y, z)`
+- The node has a sub-node `"type": "function"`
+- The node has a sub-node `definition` where the function is defined according to the arguments given in the function name.
+  - Example: `"definition": "x + y*z"`
+- Other sub-nodes may be added for human-readability, just like with any model variables. See [Optional model information](#optional-model-information), below.
+
+## Simulation settings
+Simulations settings, such as the length of the simulated period, the algorithm used in solving, and settings regarding warnings and logging,
+can be set by an `options` node. This node must have the name `options`, with sub-nodes having value names corresponding to GreenLight's [Simulation options](simulation_options.md).
+The values of the various options must be given in string format, so between quotes `""`.
+
+For example, an `options` node may look like this:
+```yaml
+options = {
+            "t_start": "0",
+            "t_end": "86400",
+            "formatting_mode": "numpy",
+            "expand_variables": "False",
+            "expand_functions": "True",
+            "solving_method": "solve_ivp_from_str",
+            "interpolation": "linear",
+            "solver": "BDF",
+            "first_step": "None",
+            "max_step": "3600",
+            "atol": "1e-3",
+            "rtol": "1e-6",
+            "output_step": "3600",
+            "t_eval": "None",
+            "clip_large_nums": "True",
+            "nans_to_zeros": "True",
+            "warn_loading": "False",
+            "warn_runtime": "False",
+            "log_runtime_warnings": "True",
+        }
+```
+
+However, none of the above options are required to be included in the model definition file. Any option that is not explicitly specified will be set with the default value.
+See [Simulation options](simulation_options.md) for more information.
+
+## Structure of the JSON files
+When loading a model, GreenLight searches for JSON nodes representing variables.
+It does so by looking for nodes with a sub-node named `type` or `definition`.
+There are no other requirements from the machine perspective in terms of how the JSON file should be structured.
+This means, for example, that variables can be grouped in categories in whatever way that makes sense or helps organize the file for better readability. For example, the structure above may also be formatted as:
+
+```yaml
+{
+  "sub model describing <...>": {
+    "states related to <...>": {
+      "y": {
+        "type": "state",
+        "definition": "d*(a1 + a2)",
+        "init": "1"
+      },
+    },
+    "process1": {
+      "a1": {
+        "type": "aux",
+        "definition": "func(p1)"
+      },
+      "p1": {
+        "type": "const",
+        "definition": "5"
+      }
+    },
+    "process2": {
+      "a2": {
+        "type": "aux",
+        "definition": "func(p2)"
+      },
+      "p2": {
+        "type": "const",
+        "definition": "5"
+      }
+    },
+    "model functions": {
+      "func(x)": {
+        "type": "function",
+        "definition": "1-x**2"
+      }
+    }
+  }
+}
+```
+
+But it can also be organized as:
+```yaml
+{
+  "states" : {
+    "y": {
+      "type": "state",
+      "definition": "d*(a1 + a2)",
+      "init": "1"
+    }
+  },
+  "aux states" : {
+    "a1": {
+      "type": "aux",
+      "definition": "func(p1)"
+    },
+    "a2": {
+      "type": "aux",
+      "definition": "func(p2)"
+    }
+  },
+  "parameters" : {
+    "p1": {
+      "type": "const",
+      "definition": "5"
+    },
+    "p2": {
+      "type": "const",
+      "definition": "10"
+    }
+  },
+  "functions" : {
+    "func(x)": {
+      "type": "function",
+      "definition": "1-x**2"
+    }
+  }
+}
+```
+
+## Optional model information
+### JSON files
+The structure above is all that is needed for GreenLight to process the model and run it. At the same time, GreenLight allows for (and recommends!) further information to be included in the model description, increasing readability by humans. In particular, the model will use the attributes `unit`, `description`, and `reference` when creating outputs and logs of the model run. In addition, any other information may further be added to the model description. Consider the following example:
+
+```yaml
+{
+  "model description": {
+    "name": "The Creature",
+    "author": "Victor Frankenstein",
+    "year": "1818",
+    "reference": "Frankenstein, V. (1818), Journal of Dead and Living Matter (6), pp. 12--16"
+  },
+  "y": {
+    "type": "state",
+    "definition": "d*(a1 + a2)",
+    "init": "1",
+    "unit": "°C",
+    "description": "Blood temperature",
+    "reference": "Frankenstein 1818, Eq.1"
+  },
+  "a1": {
+    "type": "aux",
+    "definition": "func(p1)",
+    "unit": "°C J**-1",
+    "description": "Heat capacity of white blood cells",
+    "reference": "Frankenstein 1818, Eq.2"
+  },
+  "a2": {
+    "type": "aux",
+    "definition": "func(p2)",
+    "unit": "°C J**-1",
+    "description": "Heat capacity of red blood cells",
+    "reference": "Frankenstein 1818, Eq.3"
+  },
+  "p1": {
+    "type": "const",
+    "definition": "5",
+    "unit": "(°C J**-1)**0.5",
+    "description": "White blood cells heat response",
+    "reference": "Frankenstein 1818, Table 1"
+  },
+  "p2": {
+    "type": "const",
+    "definition": "5",
+    "unit": "(°C J**-1)**0.5",
+    "description": "Red blood cells heat response",
+    "reference": "Frankenstein 1818, Table 1"
+  },
+  "func(x)": {
+    "type": "function",
+    "definition": "1-x**2",
+    "description": "Blood cell curve fitting function",
+    "reference": "Frankenstein 1818, Eq. 4"
+  }
+}
+```
+It is also possible to add here information about the model inputs, for example:
+
+```yaml
+  "d": {
+      "type": "input",
+      "unit": "W",
+      "description": "Electricity input power",
+      "reference": "Frankenstein 1818, Table A1"
+  }
+```
+
+### Input CSV files
+As mentioned above, input CSV files may also have further information.
+The first row of the file must be the variable names. One non-numerical row (containing the variable names), is enough.
+However, more non-numerical rows can be added to provide further information:
+If there are precisely 2 rows of text, the second row is assumed to contain the units of the variables.
+If there are more than 2 rows of text, the second row is assumed to contain variable descriptions, and the third row is assumed to contain the units. Other non-numerical rows are ignored.
+
+The following examples will all load correctly:
+
+| Time | d                                               |
+|:-----|:------------------------------------------------|
+| 0    | 0                                               |
+| 300  | 50                                              |
+| 600  | 150                                             |
+| 3600 | 1000                                            |
+
+| Time | d                                               |
+|:-----|:------------------------------------------------|
+| s    | W                                               |
+| 0    | 0                                               |
+| 300  | 50                                              |
+| 600  | 150                                             |
+| 3600 | 1000                                            |
+
+
+
+| Time | d                                               |
+|:-----|:------------------------------------------------|
+|      | Electricity input power                         |
+| s    | W                                               |
+|      | Source: Frankenstein 1818 (electronic appendix) |
+| 0    | 0                                               |
+| 300  | 50                                              |
+| 600  | 150                                             |
+| 3600 | 1000                                            |
+
+
+## Combining files
+GreenLight allows for the combination of multiple model definition and data files, see [Modifying and combining models](modifying_and_combining_models.md)
