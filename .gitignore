@@ -103,7 +103,6 @@ cookiecutter-pypackage-env/
 data/
 **/input_data/
 !**/input_data/.gitkeep
-test_data/
 
 # Model output
 **/output/

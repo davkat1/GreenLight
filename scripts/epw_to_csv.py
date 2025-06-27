@@ -55,6 +55,7 @@ def epw_to_csv(epw_path, csv_path):
 
 
 if __name__ == "__main__":
+    print("DO NOT Use this script use energy plus tool. TODO fix the format")
     import argparse
 
     parser = argparse.ArgumentParser(description="Convert EPW weather file to CSV.")
