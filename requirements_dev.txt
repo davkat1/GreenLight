@@ -1,4 +1,4 @@
-\bumpversion
+bumpversion
 flake8
 jupyter
 jupytext
@@ -8,3 +8,4 @@ isort
 setuptools
 twine
 build
+

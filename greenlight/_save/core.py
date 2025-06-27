@@ -185,6 +185,9 @@ def _try_saving(df_to_save: pd.DataFrame, base_path: str, file_path: str) -> boo
     """
     while True:  # Try saving the file
         try:
+            # create the directory if it does not exist
+            full_dir = os.path.dirname(os.path.join(base_path, file_path))
+            os.makedirs(full_dir, exist_ok=True)
             df_to_save.to_csv(os.path.join(base_path, file_path), encoding="utf-8-sig", index=False)
             print(f"Output saved to file {file_path}")
             return True
