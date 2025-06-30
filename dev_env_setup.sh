@@ -41,5 +41,11 @@ echo "To activate, run: source .venv/bin/activate"
 # Install pre-commit hooks
 pre-commit install
 source .venv/bin/activate
+echo " starting tests...."
+#python3 scripts/epw_to_csv.py test_data/JPN_Tokyo.Hyakuri.477150_IWEC.epw models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
+#diff --suppress-common-lines models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
+cp test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
+python3 scripts/katzin_2021/katzin_2021_format_input_data.py
 python3 scripts/greenlight_example.py
 echo "Example script executed. You can now start developing with Greenlight."
+
