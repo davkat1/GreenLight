@@ -119,4 +119,9 @@ output/
 create_git_repo_windows.bat
 create_git_repo.sh
 
+.vscode
+.venv
 # Other files
+
+plots
+EnergyPlus-*.run

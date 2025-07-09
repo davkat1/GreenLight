@@ -9,6 +9,7 @@ An example script on how to use greenlight to run a greenhouse simulation, then 
 A Jupyter Notebook version of this script is available at notebooks/greenlight_example
 """
 
+# Detect headless environment and set backend accordingly
 import os
 import sys
 
@@ -17,10 +18,11 @@ import pandas as pd
 
 from greenlight import GreenLight
 
-matplotlib.use("TkAgg")  # Ensure that the TkAgg backend is used
+if not os.environ.get("DISPLAY"):
+    matplotlib.use("Agg")  # Headless (no display)
+else:
+    matplotlib.use("TkAgg")  # Interactive
 
-# "noqa: E402" is used to have the linter/pre-commit ignore the rule "E402 module level import not at top of file"
-# This allows to set the TkAgg backend for matplotlib
 import matplotlib.pyplot as plt  # noqa: E402
 
 # Set up directories
@@ -87,6 +89,7 @@ units_dict = dict(zip(variable_names, units))
 chosen_vars = ["tOut", "tAir", "tCan", "qLampIn", "cFruit", "mcFruitHar", "hBoilPipe", "hBoilGroPipe"]
 
 for var in chosen_vars:
+    fig, ax = plt.subplots()
     output_df.plot(
         x="Time",
         y=var,
@@ -94,8 +97,25 @@ for var in chosen_vars:
         ylabel=f"{var} ({units_dict[var]})",
         title=descriptions_dict[var],
         legend=None,
+        ax=ax,
     )
-    plt.show()
+    import errno
+
+    # Check if running in headless mode (no display)
+    headless = matplotlib.get_backend().lower() == "agg"
+
+    if headless:
+        plots_dir = os.path.join(project_dir, "plots")
+        try:
+            os.makedirs(plots_dir, exist_ok=True)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+        plot_path = os.path.join(plots_dir, f"{var}.png")
+        fig.savefig(plot_path)
+        print(f"Plot for {var} saved to {plot_path}")
+    else:
+        plt.show()
 
 """ Calculate yield, energy use, CO2 use, water use """
 # The time steps (in s) in the output data
@@ -122,6 +142,12 @@ print(f"Energy used for lighting: {energy_light} MJ/m2")
 tot_co2 = time_step * sum(output_df["mcExtAir"]) * 1e-6
 print(f"CO2 use: {tot_co2} kg/m2")
 
+# Assumed ratio between total transpiration and total irrigation
+# If drain is recirculated, transpiration is about 90% of irrigation, irrigation is about 1.1 times transpiration
+trans_to_irrig = 1.1
+# Total water use (for irrigation), kg m**2
+tot_h20 = time_step * trans_to_irrig * sum(output_df["mvCanAir"])
+print(f"Water use for irrigation: {tot_h20} liters/m2")
 # Assumed ratio between total transpiration and total irrigation
 # If drain is recirculated, transpiration is about 90% of irrigation, irrigation is about 1.1 times transpiration
 trans_to_irrig = 1.1
