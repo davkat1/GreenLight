@@ -9,7 +9,7 @@ Looking for the last MATLAB version of GreenLight? You can find it [here](https:
 This project is licensed under the [BSD 3-Clause-Clear License](https://choosealicense.com/licenses/bsd-3-clause-clear/). See the [LICENSE](LICENSE.txt) file for details.
 
 ## Active discussions on Discord
-Users are welcome to join the [GreenLight Discord server](https://discord.gg/nr62yfVe) to post their questions, wishes, ideas - and hopefully help each other.
+Users are welcome to join the [GreenLight Discord server](https://discord.gg/MwExawsgQc) to post their questions, wishes, ideas - and hopefully help each other.
 
 ## User's guide
 GreenLight is a platform for creating, modifying, and combining dynamic models.
