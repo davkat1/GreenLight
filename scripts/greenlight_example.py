@@ -148,9 +148,3 @@ trans_to_irrig = 1.1
 # Total water use (for irrigation), kg m**2
 tot_h20 = time_step * trans_to_irrig * sum(output_df["mvCanAir"])
 print(f"Water use for irrigation: {tot_h20} liters/m2")
-# Assumed ratio between total transpiration and total irrigation
-# If drain is recirculated, transpiration is about 90% of irrigation, irrigation is about 1.1 times transpiration
-trans_to_irrig = 1.1
-# Total water use (for irrigation), kg m**2
-tot_h20 = time_step * trans_to_irrig * sum(output_df["mvCanAir"])
-print(f"Water use for irrigation: {tot_h20} liters/m2")
