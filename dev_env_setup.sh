@@ -48,7 +48,17 @@ source .venv/bin/activate
 echo " starting tests...."
 mkdir -p $BASEDIR/models/katzin_2021/input_data/energyPlus_original/
 cp $BASEDIR/test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
-python3 scripts/katzin_2021/katzin_2021_format_input_data.py
-python3 scripts/greenlight_example.py
-python -m greenlight.main_cli   --base_path /workspaces/GreenLight/models   --model_file /workspaces/GreenLight/models/katzin_2021/definition/main_katzin_2021.json   --output_file /workspaces/GreenLight/output/greenlight_output_20240613_1200.csv   --start_date 1983-01-01   --end_date 1983-01-02   --input_data_file /workspaces/GreenLight/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv   --mods katzin_2021/definition/lamp_hps_katzin_2021.json
+python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
+python3 $BASEDIR/scripts/greenlight_example.py
+echo "=========================================================="
+echo "Executing greenlight.main_cli with example parameters..."
+echo "=========================================================="
+python -m greenlight.main_cli \
+  --base_path $BASEDIR/models \
+  --model_file $BASEDIR/models/katzin_2021/definition/main_katzin_2021.json \
+  --output_file $BASEDIR/output/greenlight_output_20240613_1200.csv \
+  --start_date 1983-01-01 \
+  --end_date 1983-01-02 \
+  --input_data_file $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv \
+  --mods $BASEDIR/models/katzin_2021/definition/lamp_hps_katzin_2021.json
 echo "Example script executed. You can now start developing with Greenlight."
