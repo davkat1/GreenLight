@@ -1,6 +1,10 @@
 #!/bin/bash
+#Copyright (c) 2025 Shanaka Prageeth, Keio University, Japan
+#SPDX-License-Identifier: BSD-3-Clause-Clear
 set -e
-
+DEBIAN_FRONTEND=noninteractive
+PROGRAM_NAME="$(basename $0)"
+BASEDIR=$(dirname $(realpath "$0"))
 echo "Setting up developer environment..."
 
 # Install Miniconda if not already installed
@@ -41,6 +45,20 @@ echo "To activate, run: source .venv/bin/activate"
 # Install pre-commit hooks
 pre-commit install
 source .venv/bin/activate
-python3 scripts/greenlight_example.py
+echo " starting tests...."
+mkdir -p $BASEDIR/models/katzin_2021/input_data/energyPlus_original/
+cp $BASEDIR/test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
+python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
+python3 $BASEDIR/scripts/greenlight_example.py
+echo "=========================================================="
+echo "Executing greenlight.main_cli with example parameters..."
+echo "=========================================================="
+python -m greenlight.main_cli \
+  --base_path $BASEDIR/models \
+  --model_file $BASEDIR/models/katzin_2021/definition/main_katzin_2021.json \
+  --output_file $BASEDIR/output/greenlight_output_20240613_1200.csv \
+  --start_date 1983-01-01 \
+  --end_date 1983-01-02 \
+  --input_data_file $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv \
+  --mods $BASEDIR/models/katzin_2021/definition/lamp_hps_katzin_2021.json
 echo "Example script executed. You can now start developing with Greenlight."
-
