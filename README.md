@@ -1,4 +1,7 @@
 # GreenLight
+
+[![CI](https://github.com/davkat1/GreenLight/actions/workflows/ci.yml/badge.svg)](https://github.com/davkat1/GreenLight/actions/workflows/ci.yml)
+
 A Python platform for creating, modifying, and combining dynamic models, with a focus on horticultural greenhouses and crops.
 
 ## Previous versions
