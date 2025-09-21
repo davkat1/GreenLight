@@ -47,7 +47,7 @@ pre-commit install
 source .venv/bin/activate
 echo " starting tests...."
 mkdir -p $BASEDIR/models/katzin_2021/input_data/energyPlus_original/
-cp $BASEDIR/test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
+cp $BASEDIR/ci_test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
 python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
 python3 $BASEDIR/scripts/greenlight_example.py
 echo "=========================================================="
