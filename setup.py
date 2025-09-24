@@ -35,6 +35,6 @@ setup(
     ),
     setup_requires=setup_requirements,
     url="https://github.com/davkat1/GreenLight",
-    version="2.0.2",
+    version="2.0.3",
     zip_safe=False,
 )

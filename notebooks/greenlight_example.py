@@ -21,7 +21,12 @@
 # SPDX-License-Identifier: BSD-3-Clause-Clear<br>
 # https://github.com/davkat1/GreenLight
 #
-# Note: a script version of this notebook is available at scripts/greenlight_example.py
+# **Note:** in order to get meaningful results, weather data (such as EnergyPlus data) should be included.
+# The same procedure that works for the main program also applies here,
+# see [docs/input_data.md#acquiring-input-data-for-the-greenlightmain-program](../docs/input_data.md#acquiring-input-data-for-the-greenlightmain-program)
+#
+#
+# A script version of this notebook is available at scripts/greenlight_example.py
 
 # %% [markdown]
 # ## Running greenlight
@@ -39,6 +44,7 @@ import sys
 
 import matplotlib  # If this fails, try to pip install matplotlib-inline
 import pandas as pd
+import warnings
 
 # Set up directories
 project_dir = os.path.abspath(os.path.join(os.path.abspath(""), ".."))
@@ -101,13 +107,35 @@ print(f"Number of days to simulate: {simulation_length}\nOther mods: {mods}")
 """
 Add weather data
 """
-# Convert original file into formatted file - with the required start and end date
-formatted_file_name = greenlight.convert_energy_plus(
-    os.path.join(original_file_directory, original_energyPlus_csv),
-    os.path.join(formatted_file_directory, formatted_csv_name),
-    t_out_start=start_date,
-    t_out_end=start_date + dt.timedelta(days=simulation_length),
-)
+# Weather data to use in case formatting the input weather data doesn't work
+fallback_directory = os.path.abspath(os.path.join(base_path, os.path.join("katzin_2021", "input_data", "test_data")))
+fallback_file = "Bleiswijk_from_20091020.csv"
+try:
+    formatted_file_name = greenlight.convert_energy_plus(
+        os.path.join(original_file_directory, original_energyPlus_csv),
+        os.path.join(formatted_file_directory, formatted_csv_name),
+        t_out_start=start_date,
+        t_out_end=start_date + dt.timedelta(days=simulation_length),
+    )
+except FileNotFoundError:
+    warnings.warn("Couldn't find file:\n"
+                  f"{os.path.abspath(os.path.join(original_file_directory, original_energyPlus_csv))}\n"
+                  "Using built-in weather data instead")
+
+    # Use built-in weather data
+    formatted_file_directory = fallback_directory
+    formatted_file_name = fallback_file
+except Exception:
+    warnings.warn("Failed to convert EnergyPlus file:\n"
+                  f"{os.path.abspath(os.path.join(original_file_directory, original_energyPlus_csv))}\n"
+                  "To formatted file:\n"
+                  f"{os.path.abspath(os.path.join(formatted_file_directory, formatted_csv_name))}\n"
+                  "Using built-in weather data instead"
+                  )
+
+    # Use built-in weather data
+    formatted_file_directory = fallback_directory
+    formatted_file_name = fallback_file
 
 # Include the generated file in the simulation
 mods.append(os.path.join(formatted_file_directory, formatted_file_name))
