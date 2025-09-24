@@ -9,21 +9,29 @@ An example script on how to use greenlight to run a greenhouse simulation, then 
 A Jupyter Notebook version of this script is available at notebooks/greenlight_example
 """
 
-# Detect headless environment and set backend accordingly
+import datetime as dt
 import os
 import sys
 
 import matplotlib
 import pandas as pd
 
-from greenlight import GreenLight
+import greenlight
 
+# Detect headless environment and set backend accordingly
 if not os.environ.get("DISPLAY"):
     matplotlib.use("Agg")  # Headless (no display)
 else:
     matplotlib.use("TkAgg")  # Interactive
 
 import matplotlib.pyplot as plt  # noqa: E402
+
+# Model simulation settings
+output_file_name = "greenlight_example_output.csv"  # Name of file containing the simulation output
+original_energyPlus_csv = "NLD_Amsterdam.062400_IWECEPW.csv"  # Name of the unprocessed EnergyPlus CSV
+formatted_csv_name = "weather_ams_katzin_2021.csv"  # Chosen name for the processed EnergyPlus data
+start_date = dt.datetime(year=2020, month=9, day=27)  # First day of simulation season
+simulation_length = 3  # Length of simulated season, in days
 
 # Set up directories
 if "__file__" in locals():  # Running this from script
@@ -33,40 +41,46 @@ else:
 sys.path.append(project_dir)
 
 # Base directory to be used by the model
-base_path = os.path.join(project_dir, "models")
+base_path = os.path.join(project_dir, "greenlight", "models")
 
 # Location (relative to base_path) of the main definition of the Katzin 2021 model, which will be used here
 model = os.path.join("katzin_2021", "definition", "main_katzin_2021.json")
+
+# Location of weather files, relative to base_path
+original_file_directory = os.path.join("katzin_2021", "input_data", "energyPlus_original")
+formatted_file_directory = os.path.join("katzin_2021", "input_data", "energyPlus_formatted")
+
+# Modify directories to absolute path
+original_file_directory = os.path.abspath(os.path.join(base_path, original_file_directory))
+formatted_file_directory = os.path.abspath(os.path.join(base_path, formatted_file_directory))
 
 # Outputs will be placed under katzin_2021/output
 output_dir = os.path.join("katzin_2021", "output")
 
 """ Simulation settings """
-# Numbers of days to simulate - use a low number for fast simulations
-n_days = 10
-options = {"options": {"t_end": str(n_days * 24 * 3600)}}
+# Numbers of days to simulate, in seconds
+options = {"options": {"t_end": str(simulation_length * 24 * 3600)}}
 
 # Any other modification to the model
 mods = [{"thetaLampMax": {"definition": "120"}}]  # Change the maximum lamp intensity to 120 W/m2
 
 """ Add weather data """
-# If there is weather data available, it can be added here
+# Convert original file into formatted file - with the required start and end date
+formatted_file_name = greenlight.convert_energy_plus(
+    os.path.join(original_file_directory, original_energyPlus_csv),
+    os.path.join(formatted_file_directory, formatted_csv_name),
+    t_out_start=start_date,
+    t_out_end=start_date + dt.timedelta(days=simulation_length),
+)
 
-# Location of weather file, relative to base_path
-weather_file_directory = os.path.join("katzin_2021", "input_data", "energyPlus_formatted")
-weather_file_name = "weather_ams_katzin_2021_from_sep_27_000000.csv"
+# Include the generated file in the simulation
+mods.append(os.path.join(formatted_file_directory, formatted_file_name))
 
-# If the file exists where it's expected, include it in the simulation
-if os.path.isfile(os.path.abspath(os.path.join(base_path, weather_file_directory, weather_file_name))):
-    mods.append(os.path.join(weather_file_directory, weather_file_name))
-
-"""Set location of output file"""
-output_file_name = "greenlight_example.csv"
 
 """Run the model"""
 input_arg = [model, options, mods]
 output_arg = os.path.join(output_dir, output_file_name)
-mdl = GreenLight(base_path=base_path, input_prompt=input_arg, output_path=output_arg)
+mdl = greenlight.GreenLight(base_path=base_path, input_prompt=input_arg, output_path=output_arg)
 mdl.run()
 
 """Load simulation result"""
@@ -86,7 +100,7 @@ units_dict = dict(zip(variable_names, units))
 """Show some graphs"""
 # Choose variables out of output_df.columns
 # For a description of a variable var, see descriptions_dict[var]. For the unit, see units_dict[var]
-chosen_vars = ["tOut", "tAir", "tCan", "qLampIn", "cFruit", "mcFruitHar", "hBoilPipe", "hBoilGroPipe"]
+chosen_vars = ["tOut", "tAir", "tCan", "qLampIn", "lai", "cFruit", "mcFruitHar", "hBoilPipe", "hBoilGroPipe"]
 
 for var in chosen_vars:
     fig, ax = plt.subplots()
@@ -105,7 +119,10 @@ for var in chosen_vars:
     headless = matplotlib.get_backend().lower() == "agg"
 
     if headless:
-        plots_dir = os.path.join(project_dir, "plots")
+        # Generate the plots in /plots folder instead of showing them
+
+        # Save plots to the same directory as the output file
+        plots_dir = os.path.join(base_path, output_dir, "plots")
         try:
             os.makedirs(plots_dir, exist_ok=True)
         except OSError as e:
@@ -145,6 +162,7 @@ print(f"CO2 use: {tot_co2} kg/m2")
 # Assumed ratio between total transpiration and total irrigation
 # If drain is recirculated, transpiration is about 90% of irrigation, irrigation is about 1.1 times transpiration
 trans_to_irrig = 1.1
+
 # Total water use (for irrigation), kg m**2
 tot_h20 = time_step * trans_to_irrig * sum(output_df["mvCanAir"])
 print(f"Water use for irrigation: {tot_h20} liters/m2")

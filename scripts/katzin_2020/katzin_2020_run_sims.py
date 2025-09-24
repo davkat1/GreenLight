@@ -30,7 +30,7 @@ else:
     project_dir = os.getcwd()  # Most likely the active directory is the project directory
 sys.path.append(project_dir)
 
-base_path = os.path.join(project_dir, "models")
+base_path = os.path.join(project_dir, "greenlight", "models")
 output_dir = os.path.join("katzin_2021", "output")
 model_def = os.path.join("katzin_2021", "definition", "main_katzin_2020.json")
 

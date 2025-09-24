@@ -1,4 +1,4 @@
-GreenLight/models/van_henten_2003/
+GreenLight/greenlight/models/van_henten_2003/
 Copyright (c) 2025 David Katzin, Wageningen Research Foundation
 SPDX-License-Identifier: BSD-3-Clause-Clear
 https://github.com/davkat1/GreenLight

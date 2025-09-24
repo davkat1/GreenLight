@@ -30,9 +30,11 @@ setup(
     include_package_data=True,
     keywords="greenlight",
     name="greenlight",
-    packages=find_packages(),
+    packages=find_packages(
+        include=["greenlight", "greenlight.*"]
+    ),
     setup_requires=setup_requirements,
     url="https://github.com/davkat1/GreenLight",
-    version="2.0.0.beta1",
+    version="2.0.2",
     zip_safe=False,
 )

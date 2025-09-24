@@ -9,7 +9,8 @@ Top-level package for greenlight -
     with a focus on horticultural greenhouses and crops.
 
 Modules:
-    - core.py:
+    - core.py: Defines the GreenLight class, which holds a GreenLight model
+    - utils.py: Utilities functions for working with GreenLight
     - main.py: Initial access to the package, with example functionality
     - energy_plus: Functions for converting an EnergyPlus CSV file to an input file that can be used by
         the GreenLight model (Katzin 2020, Katzin 2021).
@@ -26,6 +27,7 @@ Public classes:
 Public methods:
     - convert_energy_plus: Convert an EnergyPlus weather file from EnergyPlus' CSV format to the format needed by
         the GreenLight model (Katzin 2020, Katzin 2021)
+    - copy_builtin_models: Copy the built-in model files included in the greenlight package to a user-provided location
 """
 
 __author__ = "David Katzin, Wageningen University & Research"
@@ -45,5 +47,6 @@ except Exception:
 
 from .core import GreenLight
 from .energy_plus import convert_energy_plus
+from .utils import copy_builtin_models
 
-__all__ = ["GreenLight", "convert_energy_plus"]
+__all__ = ["GreenLight", "convert_energy_plus", "copy_builtin_models"]

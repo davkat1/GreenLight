@@ -103,14 +103,13 @@ cookiecutter-pypackage-env/
 data/
 **/input_data/
 !**/input_data/.gitkeep
-
-# Model output
-**/output/
-!**/output/.gitkeep
+!**/input_data/test_data
 
 # Model output
 # Use <model_name>/output/ for storing model outputs. Like other data, this is not included in git
 output/
+**/output/
+!**/output/.gitkeep
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
@@ -121,7 +120,7 @@ create_git_repo.sh
 
 .vscode
 .venv
-# Other files
 
-plots
+# Other files
+plots/
 EnergyPlus-*.run

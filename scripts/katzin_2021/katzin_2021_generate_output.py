@@ -40,7 +40,7 @@ else:
 sys.path.append(project_dir)
 
 # Location of simulation outputs
-output_dir = os.path.join(project_dir, "models", "katzin_2021", "output")
+output_dir = os.path.join(project_dir, "greenlight", "models", "katzin_2021", "output")
 
 """Get list of location names"""
 # Regex pattern for file names of the form "katzin_2021_<xxx>_led.csv"

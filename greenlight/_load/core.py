@@ -29,9 +29,11 @@ External dependencies:
     - pandas: for representing data from input CSV files
 """
 
+import importlib.resources as resources
 import json
 import logging
 import os
+from pathlib import Path, PurePath
 
 import numpy as np
 import pandas as pd
@@ -195,18 +197,53 @@ def _load_input_arg(mdl: GreenLightInternal, input_arg: str | dict, input_dir: s
     if input_dir:  # input_arg is a str which is a file path
         _, extension = os.path.splitext(input_arg)
         if extension == ".csv":
-            try:
-                _add_input_data(
-                    mdl, pd.read_csv(os.path.join(input_dir, input_arg), dtype=str, encoding="utf-8"), input_arg
+            # Check if the CSV file is part of greenlight's packaged resources
+            input_dir_path = PurePath(os.path.abspath(input_dir))
+            resources_path = PurePath(resources.files("greenlight"))
+            is_resource = input_dir_path == resources_path or resources_path in input_dir_path.parents
+
+            if is_resource:
+                resource_file = resources.files("greenlight").joinpath(
+                    Path(
+                        os.path.join(
+                            os.path.relpath(os.path.abspath(input_dir), resources.files("greenlight")), input_arg
+                        )
+                    )
                 )
-            except UnicodeDecodeError:  # The file was probably written in Excel but contains Unicode
-                _add_input_data(
-                    mdl, pd.read_csv(os.path.join(input_dir, input_arg), dtype=str, encoding="Windows-1252"), input_arg
-                )
+                try:
+                    with resource_file.open("rb") as csv_file:
+                        loaded_df = pd.read_csv(csv_file, dtype=str, encoding="utf-8")
+                except UnicodeDecodeError:  # The file was probably written in Excel but contains Unicode
+                    with resource_file.open("rb") as csv_file:
+                        loaded_df = pd.read_csv(csv_file, dtype=str, encoding="Windows-1252")
+            else:  # The file is not a package resource
+                try:
+                    loaded_df = pd.read_csv(os.path.join(input_dir, input_arg), dtype=str, encoding="utf-8")
+                except UnicodeDecodeError:  # The file was probably written in Excel but contains Unicode
+                    loaded_df = pd.read_csv(os.path.join(input_dir, input_arg), dtype=str, encoding="Windows-1252")
+
+            _add_input_data(mdl, loaded_df, input_arg)
+
         elif extension == ".json":
-            with open(os.path.join(input_dir, input_arg), "r", encoding="utf-8") as json_file:
-                #  Load the JSON as a dict
-                loaded_dict = json.load(json_file, object_pairs_hook=_utils.json_raise_on_duplicates)
+            # Check if the JSON file is part of greenlight's packaged resources
+            input_dir_path = PurePath(os.path.abspath(input_dir))
+            resources_path = PurePath(resources.files("greenlight"))
+            is_resource = input_dir_path == resources_path or resources_path in input_dir_path.parents
+
+            if is_resource:
+                resource_file = resources.files("greenlight").joinpath(
+                    Path(
+                        os.path.join(
+                            os.path.relpath(os.path.abspath(input_dir), resources.files("greenlight")), input_arg
+                        )
+                    )
+                )
+                with resource_file.open("r", encoding="utf-8") as json_file:
+                    loaded_dict = json.load(json_file, object_pairs_hook=_utils.json_raise_on_duplicates)
+            else:
+                with open(os.path.join(input_dir, input_arg), "r", encoding="utf-8") as json_file:
+                    #  Load the JSON as a dict
+                    loaded_dict = json.load(json_file, object_pairs_hook=_utils.json_raise_on_duplicates)
 
     elif isinstance(input_arg, str):  # input_arg is a str describing model structure in JSON format
         loaded_dict = json.loads(input_arg, object_pairs_hook=_utils.json_raise_on_duplicates)

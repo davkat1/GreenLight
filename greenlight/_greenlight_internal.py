@@ -12,10 +12,12 @@ import the greenlight structure (GreenLightInternal), while GreenLight can impor
 
 import datetime
 import importlib
+import importlib.resources as resources
 import os
 import platform
 import sys
 import warnings
+from pathlib import Path, PurePath
 from typing import Dict, List, Union
 
 import pandas as pd
@@ -60,7 +62,11 @@ class GreenLightInternal:
     """
 
     def __init__(
-        self, base_path: str = "", input_prompt: Union[str, Dict, List[Union[str, Dict]]] = "", output_path: str = ""
+        self,
+        base_path: str = "",
+        input_prompt: Union[str, Dict, List[Union[str, Dict]]] = "",
+        output_path: str = "",
+        optional_prompt: Union[str, Dict, List[Union[str, Dict]]] = "",
     ):
         """
         Constructor for the GreenLightInternal class. All attributes are set to default values, except the function arguments.
@@ -68,6 +74,8 @@ class GreenLightInternal:
         :param base_path: File path used as a basis for input and output file locations.
             Files in input_prompt and output_path are assumed to be relative to base_path, i.e., for saving output,
             os.path.join(base_path, output_path), is used. Similarly for files used for input
+            If the default value is given (""), the base_path will be set to the location of the models in
+            greenlight's package resources: PurePath(resources.files("greenlight") / "models")
         :param input_prompt: This can be a string, dict, or a list of strings and dicts.
             strings can be file names, pointing to either .json files (model descriptions) or .csv files (input data)
             The full file path is needed for the first file, after which only the file name is sufficient,
@@ -76,13 +84,42 @@ class GreenLightInternal:
                 e.g., f'''{{"options": {{"t_end": "{n_days * 24 * 3600}"}}}}'''
             dicts can be used instead of .json files or JSON-like expressions,
                 e.g., {"options": {"t_end": n_days * 24 * 3600}}
-            dicts, JSONs, etc. can also contain references to other files,
-            see docs/model_format.md and docs/modifying_and_combining_models.md.
+            dicts, JSONs, etc. can also contain references to other files, see docs/modifying_and_combining_models.md
+            If the default value is given (""), the input_prompt used will be the location of the Katzin 2021 model
+            in greenlight's package resources, and the location of the weather dataset used for testing:
+                [str(PurePath(resources.files("greenlight") / r"models/katzin_2021/definition/main_katzin_2021.json")),
+                    str(PurePath(resources.files(
+                    "greenlight") / r"models/katzin_2021/input_data/test_data/Bleiswijk_from_20091020.csv"))]
         :param output_path: Location of where the output file should be saved to.
-            Default is "" and then no file is saved
+                            If the default value is given (""), the file will be placed in
+                            PurePath(Path.cwd() / r"output/greenlight_output_<current_time>.csv")
+        :param optional_prompt: Any additional input that will be parsed together with input_prompt.
+            Included here so that input_prompt can default to the default model, but users can still make modifications
+            using additional_input
         """
+        if not base_path:  # Default to the package's models directory
+            base_path = str(PurePath(resources.files("greenlight") / "models"))
+        if not input_prompt:  # Default to the Katzin 2021 in the package's models directory
+            input_prompt = [
+                str(PurePath(resources.files("greenlight") / r"models/katzin_2021/definition/main_katzin_2021.json")),
+                str(
+                    PurePath(
+                        resources.files("greenlight")
+                        / r"models/katzin_2021/input_data/test_data/Bleiswijk_from_20091020.csv"
+                    )
+                ),
+            ]
+        if not output_path:  # Default to cwd/output
+            output_dir = Path.cwd() / "output"
+            file_name = "greenlight_output_" + datetime.datetime.now().strftime("%Y%m%d_%H%M") + ".csv"
+            output_path = str(PurePath(output_dir / file_name))
+            output_dir.mkdir(parents=True, exist_ok=True)
+
         self.base_path = base_path
-        self.input_prompt = input_prompt
+
+        # Combine input_prompt and additional_input. input_prompt defaults to the default model,
+        # but additional_input allows to make modifications to the default
+        self.input_prompt = [input_prompt, optional_prompt]
         self.output_path = output_path
 
         # Add to object log some system information

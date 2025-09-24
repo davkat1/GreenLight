@@ -49,10 +49,14 @@ else:
     project_dir = os.getcwd()  # Most likely the active directory is the project directory
 sys.path.append(project_dir)
 
-# Assuming that the original EnergyPlus files are in greenlight/models/katzin_2021/input_data/energyPlus_original
+# Assuming that the original EnergyPlus files are in greenlight/greenlight/models/katzin_2021/input_data/energyPlus_original
 # See docstring above on how to obtain these files
-input_dir = os.path.abspath(os.path.join(project_dir, "models", "katzin_2021", "input_data", "energyPlus_original"))
-output_dir = os.path.abspath(os.path.join(project_dir, "models", "katzin_2021", "input_data", "energyPlus_formatted"))
+input_dir = os.path.abspath(
+    os.path.join(project_dir, "greenlight", "models", "katzin_2021", "input_data", "energyPlus_original")
+)
+output_dir = os.path.abspath(
+    os.path.join(project_dir, "greenlight", "models", "katzin_2021", "input_data", "energyPlus_formatted")
+)
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 

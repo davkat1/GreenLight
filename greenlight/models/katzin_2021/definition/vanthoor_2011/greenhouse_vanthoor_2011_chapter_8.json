@@ -19,7 +19,7 @@
    "Time" : {
       "unit" : "s",
       "type" : "time",
-      "description" : "Time unit used in the model state equations (ordinary differential equations, ODEs)"
+      "description" : "Time unit used in the model state equations (ODEs)"
    },
    "State equations" : {
       "reference" : "Vanthoor 2011, Section 8.3.3",

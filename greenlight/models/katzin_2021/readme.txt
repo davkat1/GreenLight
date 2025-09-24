@@ -1,4 +1,4 @@
-GreenLight/models/katzin_2021/
+GreenLight/greenlight/models/katzin_2021/
 Copyright (c) 2025 David Katzin, Wageningen Research Foundation
 SPDX-License-Identifier: BSD-3-Clause-Clear
 https://github.com/davkat1/GreenLight

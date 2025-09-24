@@ -1,6 +1,7 @@
 # Documentation
 In README.md:
-- [Previous versions](../README.md#previous-versions)
+- [Quick start](../README.md#quick-start)
+- [Announcements](../README.md#announcements)
 - [User's guide](../README.md#users-guide)
   - [I just want to run a greenhouse simulation](../README.md#i-just-want-to-run-a-greenhouse-simulation)
   - [I want to run a simulation for a specific location](../README.md#i-want-to-run-a-simulation-for-a-specific-location)
@@ -9,19 +10,24 @@ In README.md:
   - [I want to learn more about the technical and numerical aspects of the GreenLight's models](../README.md#i-want-to-learn-more-about-the-technical-and-numerical-aspects-of-the-greenlights-models)
   - [I want to extend, combine, implement a model from literature or develop my own model](../README.md#i-want-to-extend-combine-implement-a-model-from-literature-or-develop-my-own-model)
   - [I want to further develop the GreenLight platform](../README.md#i-want-to-further-develop-the-greenlight-platform)
+- [License](../README.md#license)
 - [Repository structure](../README.md#repository-structure)
 - [Contributors](../README.md#contributors)
-
+- [Acknowledgements](../README.md#acknowledgements)
 
 In this folder:
 - [Installation and usage instructions](installation.md)
-  - [Installation and usage instructions](installation.md#installation-and-usage-instructions)
+  - [General installation guide](installation.md#general-installation-guide)
+  - [Installing this repository](installation.md#installing-this-repository)
+  - [Copying built-in models](installation.md#copying-built-in-models)
   - [Developer installation](installation.md#developer-installation)
-  - [Non-conda users](installation.md#non-conda-users)
+    - [Non-conda users](installation.md#non-conda-users)
   - [Pre-commit](installation.md#pre-commit)
   - [Jupyter Notebooks](installation.md#jupyter-notebooks)
 - [Using GreenLight](using_greenlight.md)
-  - [Initializing GreenLight](using_greenlight.md#initializing-greenlight)
+  - [Initializing GreenLight using built-in models](using_greenlight.md#initializing-greenlight-using-built-in-models)
+  - [Copying the built-in model definition files to a local location](using_greenlight.md#copying-the-built-in-model-definition-files-to-a-local-location)
+  - [Initializing GreenLight with local files](using_greenlight.md#initializing-greenlight-with-local-files)
   - [Running the model](using_greenlight.md#running-the-model)
   - [Using the model output](using_greenlight.md#using-the-model-output)
   - [More examples](using_greenlight.md#more-examples)

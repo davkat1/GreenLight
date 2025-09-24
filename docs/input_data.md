@@ -18,10 +18,7 @@ These files can be acquired in the following way:
 1. Go to the [EnergyPlus weather database](https://energyplus.net/weather) and find a weather file, download it in EPW format
 2. Go to [EnergyPlus downloads](https://energyplus.net/downloads) to download and install EnergyPlus
 3. Use EnergyPlus' "Weather statistics and Conversions" tool to convert the EPW files to CSV
-4. Place the converted CSV files in [models/katzin_2021/input_data/energyPlus_original](../models/katzin_2021/input_data/energyPlus_original)
-
-Now when you run `python -m greenlight.main`, the button under **Input data file** will open automatically at
-[energyPlus_original](../models/katzin_2021/input_data/energyPlus_original), and the new files can be chosen from there.
+4. Place the converted CSV files in a dedicated folder, e.g., [`greenlight/models/katzin_2021/input_data/energyPlus_original`](../models/katzin_2021/input_data/energyPlus_original)
 
 ## Acquiring input data for running scripts
 The main program `greenlight.main` takes the EnergyPlus CSV files and then, based on the input start date
@@ -34,18 +31,18 @@ When running scripts that are not `greenlight.main`, you must first create a for
 import datetime as dt
 import greenlight
 greenlight.convert_energy_plus(
-    "models/katzin_2021/input_data/energyPlus_original/NLD_Amsterdam.062400_IWECEPW.csv",
-    "models/katzin_2021/input_data/energyPlus_formatted/weather_ams_katzin_2021.csv",
+    "greenlight/models/katzin_2021/input_data/energyPlus_original/NLD_Amsterdam.062400_IWECEPW.csv",
+    "greenlight/models/katzin_2021/input_data/energyPlus_formatted/weather_ams_katzin_2021.csv",
     t_out_start=dt.datetime(year=2020, month=9, day=27),
     t_out_end=dt.datetime(year=2020, month=9, day=27)+dt.timedelta(days=350))
 ```
 
-7. Place the formatted CSV file (if it's not already there) in [energyPlus_formatted](../models/katzin_2021/input_data/energyPlus_formatted).
-This is where, for example, [scripts/greenlight_example.py](../scripts/greenlight_example.py) expects it.
+7. Place the formatted CSV file (if it's not already there) in a dedicated folder, e.g.
+[`greenlight/models/katzin_2021/input_data/energyPlus_formatted`](../greenlight/models/katzin_2021/input_data/energyPlus_formatted).
+This is where, for example, [`scripts/greenlight_example.py`](../scripts/greenlight_example.py) expects it.
 
 ## Input data length vs. simulation length
-Note: the length of the input simulation data (the difference between `t_out_end` and `t_out_start`)
-**does not influence the length of the simulated season**. The length of the simulated season is determined by the [simulation options](simulation_options.md),
+Note: the length of the input simulation data **does not influence the length of the simulated season**. The length of the simulated season is determined by the [simulation options](simulation_options.md),
 namely the difference between `options["t_end"]` and `options["t_start"]`.
 
 ## Using EnergyPlus data for other models

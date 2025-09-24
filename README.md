@@ -1,14 +1,37 @@
 # GreenLight
 A Python platform for creating, modifying, and combining dynamic models, with a focus on horticultural greenhouses and crops.
 
-## Previous versions
+## Quick start
+```shell
+pip install greenlight
+python -m greenlight.main
+```
+
+or:
+```shell
+pip install greenlight
+import greenlight
+mdl = greenlight.GreenLight()
+mdl.run()
+```
+
+## Announcements
+### Change in default branch name
+As of version `2.0.2`, the default branch name has changed from `master` to `main`.
+If you have a local clone, you can update it by running the following commands:
+
+```shell
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+```
+
+### Previous versions
 Versions 1.x of this repository are programmed in MATLAB, and their development is discontinued.
 Looking for the last MATLAB version of GreenLight? You can find it [here](https://github.com/davkat1/GreenLight/tree/4ec6018e0aad2775ad11085d34f3886a7b7dd052).
 
-## License
-This project is licensed under the [BSD 3-Clause-Clear License](https://choosealicense.com/licenses/bsd-3-clause-clear/). See the [LICENSE](LICENSE.txt) file for details.
-
-## Active discussions on Discord
+### Active discussions on Discord
 Users are welcome to join the [GreenLight Discord server](https://discord.gg/MwExawsgQc) to post their questions, wishes, ideas - and hopefully help each other.
 
 ## User's guide
@@ -28,16 +51,17 @@ Follow the instructions below based on what you want to do:
 
 
 ### I just want to run a greenhouse simulation
-After [installing greenlight](docs/installation.md), run the following in your terminal:
+The simplest way to do this is to install greenlight through `pip` and then run `main`:
 ```shell
+pip install greenlight
 python -m greenlight.main
 ```
 A dialog box will appear with various inputs, you can play around with those, hit **OK** and see what happens.
-<br>
-**Tip:** If you're just exploring, change the **End date** in the box to something closer to the start date, say 9/30/21, to run shorter simulations that will run faster.
+
+For more information about installation, see [installing GreenLight](docs/installation.md).
 
 ### I want to run a simulation for a specific location
-Simulations performed as above will not be very informative unless weather data is provided as input.
+Simulations performed as above will not be very informative unless specific weather data is provided as input.
 Follow the instructions in [input data](docs/input_data.md) on how to acquire weather data which will allow you to perform simulations for specific locations.
 
 ### I want to modify a model setting, then view and analyze simulation results
@@ -73,17 +97,26 @@ At this point you may dig deeper into the code. Have a look at the [GreenLight p
 ## Further documentation
 See [Documentation](./docs/index.md).
 
-## Repository structure
+## Notes
+### License
+This project is licensed under the [BSD 3-Clause-Clear License](https://choosealicense.com/licenses/bsd-3-clause-clear/). See the [LICENSE](LICENSE.txt) file for details.
+
+### Repository structure
 - `docs` contains detailed documentation on how to work with the repository
 - `greenlight` holds the Python module containing the platform implementations
-- `models` contains files that define models implemented on the platform
+- `greenlight/models` contains files that define models implemented on the platform
 - `notebooks` contain example notebooks that use the python module in this package
 - `scripts` contains Python scripts and examples that use this package
 
-## Contributors
+### Contributors
 - David Katzin, Wageningen University & Research, david.katzin@wur.nl
 - Pierre-Olivier Schwarz, Université Laval
 - Joshi Graf, Wageningen University & Research
 - Stef Maree, Wageningen University & Research
+- User [shanakaprageeth](https://github.com/shanakaprageeth) on [github.com](https://github.com)
+
+### Acknowledgements
+Thank you to [Ian McCracken](https://github.com/iancmcc) for providing the [PyPI GreenLight namespace](https://pypi.org/project/GreenLight/)
+
 
 *This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the [WUR Greenhouse Technology cookiecutter](https://git.wur.nl/glas/pyproject) project template.*

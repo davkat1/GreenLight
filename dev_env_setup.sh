@@ -53,12 +53,5 @@ python3 $BASEDIR/scripts/greenlight_example.py
 echo "=========================================================="
 echo "Executing greenlight.main_cli with example parameters..."
 echo "=========================================================="
-python -m greenlight.main_cli \
-  --base_path $BASEDIR/models \
-  --model_file $BASEDIR/models/katzin_2021/definition/main_katzin_2021.json \
-  --output_file $BASEDIR/output/greenlight_output_20240613_1200.csv \
-  --start_date 1983-01-01 \
-  --end_date 1983-01-02 \
-  --input_data_file $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv \
-  --mods $BASEDIR/models/katzin_2021/definition/lamp_hps_katzin_2021.json
+python -m greenlight.main_cli
 echo "Example script executed. You can now start developing with Greenlight."

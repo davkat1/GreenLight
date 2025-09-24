@@ -47,4 +47,17 @@ line_length = 120
 skip_glob = ["docs/*", "notebooks/*"]
 [tool.jupytext]
 formats = "ipynb,py:light"
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["greenlight*"]
 
+[tool.setuptools.package-data]
+"greenlight" = [
+    "models/**/definition/**",
+    "models/**/test_data/**",
+    "models/katzin_2021/readme.txt",
+    "models/van_henten_2003/readme.txt"
+]

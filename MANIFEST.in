@@ -1,7 +1,20 @@
 include README.md
+include LICENSE.txt
 
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
 recursive-include docs *.rst conf.py *.jpg *.png *.gif
+
+exclude greenlight/models/katzin_2021/input_data/energyPlus_formatted/*
+prune greenlight/models/katzin_2021/input_data/energyPlus_formatted/
+exclude greenlight/models/katzin_2021/input_data/energyPlus_original/*
+prune greenlight/models/katzin_2021/input_data/energyPlus_original/
+exclude greenlight/models/katzin_2021/input_data/katzin_2020_formatted/*
+prune greenlight/models/katzin_2021/input_data/katzin_2020_formatted/
+exclude greenlight/models/katzin_2021/input_data/katzin_2020_original/*
+prune greenlight/models/katzin_2021/input_data/katzin_2020_original/
+exclude greenlight/models/katzin_2021/input_data/readme.txt
+exclude greenlight/models/van_henten_2003/input_data/readme.txt
+exclude **/output/**

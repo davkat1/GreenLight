@@ -42,10 +42,10 @@ else:
 sys.path.append(project_dir)
 
 # Location of simulation outputs
-output_dir = os.path.join(project_dir, "models", "katzin_2021", "output")
+output_dir = os.path.join(project_dir, "greenlight", "models", "katzin_2021", "output")
 
 # Location of greenhouse data from Katzin (2020)
-data_dir = os.path.join(project_dir, "models", "katzin_2021", "input_data", "katzin_2020_original")
+data_dir = os.path.join(project_dir, "greenlight", "models", "katzin_2021", "input_data", "katzin_2020_original")
 
 """Load simulation results"""
 climate_sim_hps = ao.make_output_df(os.path.join(output_dir, "katzin_2020_climate_hps.csv"))

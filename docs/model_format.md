@@ -27,6 +27,12 @@ This repository contains several examples of GreenLight-formatted models. Some u
  - [Vanthoor crop model](../models/katzin_2021/definition/vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json)
  - [Katzin greenhouse model](../models/katzin_2021/definition/extension_greenhouse_katzin_2021_vanthoor_2011.json) (an extension to the Vanthoor models)
 
+These model files (all the files that are included as built-in in the `greenlight` package) can be copies to a local location by using, e.g.:
+```python
+import greenlight
+greenlight.copy_builtin_models(r"C:\builtin_models")
+```
+which copies all the built-in models to `C:\builtin_models\models`.
 Some more simple examples are included below.
 
 ## Basic model definition
