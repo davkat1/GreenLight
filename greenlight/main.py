@@ -11,6 +11,7 @@ Next, for information on running more elaborate simulations, see docs.
 """
 
 import csv
+import datetime
 import logging
 import os
 
@@ -65,7 +66,7 @@ def main():
                     prompt.result["input_data"],
                     formatted_weather_file,
                     prompt.result["start_date"],
-                    prompt.result["end_date"],
+                    prompt.result["start_date"] + datetime.timedelta(days=float(prompt.result["sim_length"])),
                     output_format="katzin2021",
                 )
             else:  # Assume that the file contains data that can be used

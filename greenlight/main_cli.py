@@ -181,7 +181,7 @@ def main():
                 sim_args["input_data"],
                 formatted_weather_file,
                 sim_args["start_date"],
-                sim_args["end_date"],
+                sim_args["start_date"] + datetime.timedelta(days=float(sim_args["sim_length"])),
                 output_format="katzin2021",
             )
         else:  # Assume that the file contains data that can be used

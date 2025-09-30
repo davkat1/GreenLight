@@ -323,7 +323,6 @@
    "State initial values" : {
       "about" : "The initial values, taken from the dataset (#TODO)",
       "Temperature states" : {
-         "reference" : "",
          "tCovE" : {
             "unit" : "°C",
             "type" : "state",
