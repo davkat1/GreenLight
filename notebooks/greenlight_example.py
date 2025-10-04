@@ -117,6 +117,7 @@ try:
         t_out_start=start_date,
         t_out_end=start_date + dt.timedelta(days=simulation_length),
     )
+    mods.append(os.path.join(formatted_file_directory, formatted_file_name))
 except FileNotFoundError:
     warnings.warn("Couldn't find file:\n"
                   f"{os.path.abspath(os.path.join(original_file_directory, original_energyPlus_csv))}\n"
@@ -136,9 +137,17 @@ except Exception:
     # Use built-in weather data
     formatted_file_directory = fallback_directory
     formatted_file_name = fallback_file
-
-# Include the generated file in the simulation
-mods.append(os.path.join(formatted_file_directory, formatted_file_name))
+    if os.path.exists(os.path.join(formatted_file_directory, formatted_file_name)):
+        warnings.warn(f"Fallback weather data file not found. \
+            file:{os.path.join(formatted_file_directory, formatted_file_name)}.\
+            Using built-in weather data"
+        )
+        mods.append(os.path.join(formatted_file_directory, formatted_file_name))
+    else:
+        warnings.warn(f"Fallback weather data file not found. \
+            file:{os.path.join(formatted_file_directory, formatted_file_name)}.\
+            Running without weather data"
+        )
 
 
 # %%

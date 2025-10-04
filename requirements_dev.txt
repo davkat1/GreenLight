@@ -8,4 +8,5 @@ isort
 setuptools
 twine
 build
+pytest
 
