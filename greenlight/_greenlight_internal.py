@@ -12,6 +12,7 @@ import the greenlight structure (GreenLightInternal), while GreenLight can impor
 
 import datetime
 import importlib
+import importlib.metadata
 import importlib.resources as resources
 import os
 import platform
@@ -123,8 +124,13 @@ class GreenLightInternal:
         self.output_path = output_path
 
         # Add to object log some system information
+        try:
+            version = importlib.metadata.version('greenlight')
+        except importlib.metadata.PackageNotFoundError:
+            version = "development"
+        
         self.log = (
-            f"GreenLight simulation running greenlight version {importlib.metadata.version('greenlight')}\n"
+            f"GreenLight simulation running greenlight version {version}\n"
             f"Python version: {platform.python_version()}\n"
             f"Platform: {platform.system()}\n"
             f"Platform release: {platform.release()}\n"
