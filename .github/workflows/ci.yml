@@ -21,3 +21,40 @@ jobs:
       - name: Simulate
         run: |
           ./dev_env_setup.sh
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build-and-test  # Only execute publish if Build and Test passes
+    if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, '[release]')
+    environment: publish
+    permissions:
+      id-token: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Debug commit message
+      run: |
+        echo "Commit message: '${{ github.event.head_commit.message }}'"
+        echo "Starts with [release]: ${{ startsWith(github.event.head_commit.message, '[release]') }}"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install build dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r requirements.txt
+
+    - name: Build package
+      run: |
+        python3 -m pip install --user build
+        python3 -m build --no-isolation
+
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: dist/
