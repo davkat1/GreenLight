@@ -33,6 +33,6 @@ setup(
     packages=find_packages(include=["greenlight", "greenlight.*"]),
     setup_requires=setup_requirements,
     url="https://github.com/davkat1/GreenLight",
-    version="2.0.4",
+    version="2.0.5",
     zip_safe=False,
 )
