@@ -12,7 +12,7 @@
    },
    "processing_order" : [
       "greenhouse_evh2003.json",
-      "..\\input_data\\energyPlus_ams_evh2003_from_jan_01_010000.csv",
+      "..\\input_data\\test_data\\Bleiswijk_evh_from_20091020.csv",
       {"options" : {
          "t_start" : "0",
          "t_end" : "4320000"
