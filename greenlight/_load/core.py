@@ -193,6 +193,10 @@ def _load_input_arg(mdl: GreenLightInternal, input_arg: str | dict, input_dir: s
     :return: None
     :raises: ValueError if the input argument is not a str or dict
     """
+
+    # Name of default resource used by GreenLight models if no other resource is specified
+    default_resource = "Bleiswijk_from_20091020.csv"
+
     loaded_dict = {}
     if input_dir:  # input_arg is a str which is a file path
         _, extension = os.path.splitext(input_arg)
@@ -210,7 +214,7 @@ def _load_input_arg(mdl: GreenLightInternal, input_arg: str | dict, input_dir: s
                     )
                 )
                 if not os.path.exists(resource_file):
-                    if "Bleiswijk_from_20091020.csv" in str(resource_file):
+                    if default_resource in str(resource_file):
                         # special case default argument but file not found - skip loading
                         return
                     raise FileNotFoundError(f"Input CSV file {resource_file} not found.")
@@ -222,9 +226,6 @@ def _load_input_arg(mdl: GreenLightInternal, input_arg: str | dict, input_dir: s
                         loaded_df = pd.read_csv(csv_file, dtype=str, encoding="Windows-1252")
             else:  # The file is not a package resource
                 if not os.path.exists(os.path.join(input_dir, input_arg)):
-                    if "Bleiswijk_from_20091020.csv" in str(resource_file):
-                        # special case default argument but file not found - skip loading
-                        return
                     raise FileNotFoundError(f"Input CSV file {os.path.join(input_dir, input_arg)} not found.")
                 try:
                     loaded_df = pd.read_csv(os.path.join(input_dir, input_arg), dtype=str, encoding="utf-8")
