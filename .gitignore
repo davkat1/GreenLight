@@ -102,8 +102,8 @@ cookiecutter-pypackage-env/
 # If you want, you can add some demo/dummy data by using git add -f data/...
 data/
 **/input_data/
-!**/input_data/.gitkeep
 !**/input_data/test_data
+!**/input_data/.gitkeep
 
 # Model output
 # Use <model_name>/output/ for storing model outputs. Like other data, this is not included in git

@@ -221,6 +221,7 @@ into two files: one which runs the simulations, and another one which loads the 
 
 ## More examples
 The following examples are included in the GreenLight repository:
-- `scripts/greenlight_example` simple example, available as a a [Python script](../scripts/greenlight_example.py) and a [Jupyter notebook](../notebooks/greenlight_example.ipynb)
+- `scripts/greenlight_example` simple example, available as a [Python script](../scripts/greenlight_example.py) and a [Jupyter notebook](../notebooks/greenlight_example.ipynb)
+- [`scripts/greenlight_example_sicily`](../scripts/greenlight_example_sicily.py) example simulation of a low-tech (arch-shaped plastic multi-tunnel) in Sicily
 - [`scripts/katzin_2020/`](../scripts/katzin_2020/Readme.txt) Rerun the simulations from [Katzin (2020)](https://doi.org/10.1016/j.biosystemseng.2020.03.010) and reproduce the results
 - [`scripts/katzin_2021/`](../scripts/katzin_2021/Readme.txt) Rerun the simulations from [Katzin (2021a)](https://doi.org/10.1016/j.apenergy.2020.116019) and reproduce the results
