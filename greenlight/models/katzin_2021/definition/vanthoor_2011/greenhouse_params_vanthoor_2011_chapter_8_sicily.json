@@ -1,0 +1,618 @@
+{
+    "Info" : {
+      "About" : "This file includes the greenhouse properties of the greenhouse in Sicily described in Vanthoor 2011, Chapter 2 (also published as Vanthoor 2011a), and Chapter 8 (also published as the electronic appendix of Vanthoor 2011a). Specifically, this file includes the information about the greenhouse in Sicily described in Table 8.2 of Vanthoor 2011. According to Table 2.1 in Vanthoor 2011, this greenhouse is an arch-shape multi-tunnel greenhouse, with a double-inflated polyethylene (PE) cover, with whitewash, measuring 1.3 ha in area, with continuous roof ventilation on one side of each span, covered with insect netting. Note that Table 8.2 provides no information on the parameter psi for Sicily, therefore some assumptions were made (see \"psi\" below)",
+      "Usage" : "This file contains only the parameters included in Vanthoor 2011, Table 8.2 for the greenhouse in Sicily. It is meant to use in addition to the files describing the greenhouse, crop, and climate control (see folder vanthoor_2011). In order to disable the use of a thermal screen, this file forces the thermal screen control uThScr to be constantly 0 (see \"uThScr\" below)",
+      "References" : {
+         "Vanthoor 2011" : "Vanthoor, Bram (2011). A model-based greenhouse design method. PhD thesis, Wageningen University. https://edepot.wur.nl/170301",
+         "Vanthoor 2011a" : "Vanthoor, B. H. E., Stanghellini, C., van Henten, E. J., & de Visser, P. H. B. (2011). A methodology for model-based greenhouse design: Part 1, a greenhouse climate model for a broad range of designs and climates. Biosystems Engineering, 110(4), 363–377. https://doi.org/10.1016/j.biosystemseng.2011.06.001"
+      },
+      "Notation" : "Notation follows Vanthoor (2011)",
+      "Authors" : "This file was written by Cristina Zepeda & David Katzin (Wageningen University & Research)",
+      "Date" : "This file was created in July 2026",
+      "URL" : "https://github.com/davkat1/GreenLight",
+      "File" : "GreenLight/models/katzin_2021/definition/vanthoor_2011/greenhouse_params_vanthoor_2011_chapter_8_sicily.json"
+    },
+    "etaGlobAir": {
+        "definition": "0.1",
+        "type": "const",
+        "unit": "-",
+        "description": "Ratio of global radiation absorbed by the greenhouse construction",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "psi": {
+        "definition": "36",
+        "type": "const",
+        "unit": "°",
+        "description": "Mean greenhouse cover slope",
+        "reference": "psi is used to calculate the ratio between half a span and the length of the cross-cut of the cover (used as cos(psi),  Equation 8.18, Vanthoor 2011). Consider a Venlo-type greenhouse (Netherlands in Table 8.2, Vanthoor 2011) with a span width of 3.4 m (assumed), gutter height of 3.8 m, and ridge height of 4.6 m (average greenhouse height): ridge minus gutter is 0.8 m, half a span is 1.7, and the slope of the cover is arctan(0.8/1.7) = 25°. Now consider an arch-shaped greenhouse (Sicily in Table 8.2, Vanthoor 2011), with gutter height 4 m, max height 5.6 m (average height 4.8 m), and span width of 8 m (assumed). The length of the arch is assumed to be the average between a length in the case of a Venlo greenhouse and the case of a rectangular greenhouse. For the case of Venlo: psi is arctan(height/halfspan), where height is 5.6 - 4 = 1.6 m, and halfspan is 8/2 = 4, therefore psi=21.8°. Then the length is halfspan/cos(22°) = 4.3. For the case of rectangle: the length is halfspan+height = 1.6+4 = 5.6. The average of these two lengths is (4.3+5.6)/2 = 4.95 m. For this length, the associated psi is arccos(halfspan/length) = arctan(4/4.95) = 36°"
+    },
+    "aCov": {
+        "definition": "1.7e4",
+        "type": "const",
+        "unit": "m**2",
+        "description": "Surface of the cover including side walls",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "aFlr": {
+        "definition": "1.3e4",
+        "type": "const",
+        "unit": "m**2",
+        "description": "Floor area of greenhouse",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cHecIn": {
+        "definition": "2.21",
+        "type": "const",
+        "unit": "W m**-2 K**-1",
+        "description": "Convective heat exchange between cover and outdoor air",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cHecOut1": {
+        "definition": "0.95",
+        "type": "const",
+        "unit": "W m**-2{cover} K**-1",
+        "description": "Convective heat exchange parameter between cover and outdoor air",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cHecOut2": {
+        "definition": "6.76",
+        "type": "const",
+        "unit": "J m**-3 K**-1",
+        "description": "Convective heat exchange parameter between cover and outdoor air",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cHecOut3": {
+        "definition": "0.49",
+        "type": "const",
+        "unit": "-",
+        "description": "Convective heat exchange parameter between cover and outdoor air",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "hAir": {
+        "definition": "4",
+        "type": "const",
+        "unit": "m",
+        "description": "Height of the main compartment (below the screen)",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "hGh": {
+        "definition": "4.8",
+        "type": "const",
+        "unit": "m",
+        "description": "Mean height of the greenhouse",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "etaShScrCd": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "Effect of shading screen on discharge coefficient",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no shading screen"
+    },
+    "etaShScrCw": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "Effect of shading screen on wind pressure coefficient",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no shading screen"
+    },
+    "zetaInsScr": {
+        "definition": "0.33",
+        "type": "const",
+        "unit": "-",
+        "description": "Porosity of the insect screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "aRoof": {
+        "definition": "0.26e4",
+        "type": "const",
+        "unit": "-",
+        "description": "Roof ventilation area",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily). aFlr is 1.3e4 and aRoof/aFlr is 0.2, so aRoof = 0.2*1.3e4 = 0.26e4"
+    },
+    "aSide": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "Side ventilation area",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cDgh": {
+        "definition": "0.75",
+        "type": "const",
+        "unit": "-",
+        "description": "Ventilation discharge coefficient",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cLeakage": {
+        "definition": "1e-4",
+        "type": "const",
+        "unit": "-",
+        "description": "Greenhouse leakage coefficient",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cWgh": {
+        "definition": "0.12",
+        "type": "const",
+        "unit": "-",
+        "description": "Ventilation global wind pressure coefficient",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "hSideRoof": {
+        "definition": "1",
+        "type": "const",
+        "unit": "m",
+        "description": "Vertical distance between mid-points of side wall and roof ventilation openings",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no side wall"
+    },
+    "hVent": {
+        "definition": "1.6",
+        "type": "const",
+        "unit": "m",
+        "description": "Vertical dimension of a single ventilation opening",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "epsRfFir": {
+        "definition": "0.9",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR emission coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoRf": {
+        "definition": "35",
+        "type": "const",
+        "unit": "kg m**-3",
+        "description": "Density of the roof layer",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoRfNir": {
+        "definition": "0.21",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR reflection coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoRfPar": {
+        "definition": "0.21",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR reflection coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoRfFir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR reflection coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "tauRfNir": {
+        "definition": "0.77",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR transmission coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "tauRfPar": {
+        "definition": "0.77",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR transmission coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "tauRfFir": {
+        "definition": "0.1",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR transmission coefficient of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "lambdaRf": {
+        "definition": "0.018",
+        "type": "const",
+        "unit": "W m**-1 K**-1",
+        "description": "Thermal heat conductivity of the roof",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cPRf": {
+        "definition": "2.5e3",
+        "type": "const",
+        "unit": "J K**-1 kg**-1",
+        "description": "Specific heat capacity of roof layer",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "hRf": {
+        "definition": "0.01",
+        "type": "const",
+        "unit": "m",
+        "description": "Thickness of roof layer",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "epsShScrPerFir": {
+        "definition": "0.9",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR emission coefficient of the whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoShScrPer": {
+        "definition": "1e3",
+        "type": "const",
+        "unit": "-",
+        "description": "Density of the whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoShScrPerNir": {
+        "definition": "0.2",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR reflection coefficient of whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoShScrPerPar": {
+        "definition": "0.2",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR reflection coefficient of whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoShScrPerFir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR reflection coefficient of whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "tauShScrPerNir": {
+        "definition": "0.7",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR transmission coefficient of whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "tauShScrPerPar": {
+        "definition": "0.7",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR transmission coefficient of whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "tauShScrPerFir": {
+        "definition": "0.1",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR transmission coefficient of whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "lambdaShScrPer": {
+        "definition": "1e10",
+        "type": "const",
+        "unit": "W m**-1 K**-1",
+        "description": "Thermal heat conductivity of the whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily - value is Inf (or very high))"
+    },
+    "cPShScrPer": {
+        "definition": "4.18e3",
+        "type": "const",
+        "unit": "J K**-1 kg**-1",
+        "description": "Specific heat capacity of the whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "hShScrPer": {
+        "definition": "0.2e-3",
+        "type": "const",
+        "unit": "m",
+        "description": "Thickness of the whitewash",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoShScrNir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR reflection coefficient of shading screen",
+        "reference": "Assuming no shading screen"
+    },
+    "rhoShScrPar": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR reflection coefficient of shading screen",
+        "reference": "Assuming no shading screen"
+    },
+    "rhoShScrFir": {
+        "definition": "0",
+        "formatted definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR reflection coefficient of shading screen",
+        "reference": "Assuming no shading screen"
+    },
+    "tauShScrNir": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR transmission coefficient of shading screen",
+        "reference": "Assuming no shading screen"
+    },
+    "tauShScrPar": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR transmission coefficient of shading screen",
+        "reference": "Assuming no shading screen"
+    },
+    "tauShScrFir": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR transmission coefficient of shading screen",
+        "reference": "Assuming no shading screen"
+    },
+    "kShScr": {
+        "definition": "0",
+        "type": "const",
+        "unit": "m**3 m**-2 K**(2/3) s**-1",
+        "description": "shading screen flux coefficient",
+        "reference": "Assuming no shading screen"
+    },
+    "epsThScrFir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR emissions coefficient of the thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "rhoThScr": {
+        "definition": "0.2e3",
+        "type": "const",
+        "unit": "kg m**-3",
+        "description": "Density of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen. This value can't be 0 because then the ODE's can't solve. Besides that, the value doesn't matter because there's no thermal screen"
+    },
+    "uThScr": {
+        "definition": "0",
+        "type": "aux",
+        "unit": "-",
+        "description": "Control of the thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "rhoThScrNir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR reflection coefficient of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "rhoThScrPar": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR reflection coefficient of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "rhoThScrFir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR reflection coefficient of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "tauThScrNir": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR transmission coefficient of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "tauThScrPar": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR transmission coefficient of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "tauThScrFir": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR transmission coefficient of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "cPThScr": {
+        "definition": "1.8e3",
+        "type": "const",
+        "unit": "J kg**-1 K**-1",
+        "description": "Specific heat capacity of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen. This value can't be 0 because then the ODE's can't solve. Besides that, the value doesn't matter because there's no thermal screen"
+    },
+    "hThScr": {
+        "definition": "0.35e-3",
+        "type": "const",
+        "unit": "m",
+        "description": "Thickness of thermal screen",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen. This value can't be 0 because then the ODE's can't solve. Besides that, the value doesn't matter because there's no thermal screen"
+    },
+    "kThScr": {
+        "definition": "0",
+        "type": "const",
+        "unit": "m**3 m**-2 K**(2/3) s**-1",
+        "description": "Thermal screen flux coefficient",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no thermal screen"
+    },
+    "epsFlr": {
+        "definition": "1",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR emission coefficient of the floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoFlr": {
+        "definition": "2300",
+        "type": "const",
+        "unit": "kg m**-3",
+        "description": "Density of the floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoFlrNir": {
+        "definition": "0.5",
+        "type": "const",
+        "unit": "-",
+        "description": "NIR reflection coefficient of the floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoFlrPar": {
+        "definition": "0.65",
+        "type": "const",
+        "unit": "-",
+        "description": "PAR reflection coefficient of the floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "lambdaFlr": {
+        "definition": "1.7",
+        "type": "const",
+        "unit": "W m**-1 K**-1",
+        "description": "Thermal heat conductivity of the floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "cPFlr": {
+        "definition": "0.88e3",
+        "type": "const",
+        "unit": "J kg**-1 K**-1",
+        "description": "Specific heat capacity of the floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "hFlr": {
+        "definition": "0.02",
+        "type": "const",
+        "unit": "m",
+        "description": "Thickness of floor",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "rhoCpSo": {
+        "definition": "1.73e6",
+        "type": "const",
+        "unit": "J m**-3 K**-1",
+        "description": "Volumetric heat capacity of the soil",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "lambdaSo": {
+        "definition": "0.85",
+        "type": "const",
+        "unit": "W m**-1 K**-1",
+        "description": "Thermal heat conductivity of the soil layers",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "epsPipe": {
+        "definition": "0.88",
+        "type": "const",
+        "unit": "-",
+        "description": "FIR emission coefficient of the heating pipes",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "phiPipeE": {
+        "definition": "51e-3",
+        "type": "const",
+        "unit": "m",
+        "description": "External diameter of heating pipes",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "phiPipeI": {
+        "definition": "47e-3",
+        "type": "const",
+        "unit": "m",
+        "description": "Internal diameter of heating pipes",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily)"
+    },
+    "lPipe": {
+        "definition": "1.25",
+        "type": "const",
+        "unit": "m m**-2",
+        "description": "Length of heating pipes per greenhouse floor area",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily). Note that it's possible for a greenhouse to have heating pipes but no heating, in this case the pipes are used as rails for the trolleys in the greenhouse"
+    },
+    "etaPad": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "Efficiency of the pad and fan system",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no pad and fan"
+    },
+    "phiFog": {
+        "definition": "0",
+        "type": "const",
+        "unit": "kg {water} s**-1",
+        "description": "Capacity of the fogging system",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no fogging"
+    },
+    "phiPad": {
+        "definition": "0",
+        "type": "const",
+        "unit": "m**3 s**-1",
+        "description": "Capacity of the air flux through the pad and fan",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no pad and fan"
+    },
+    "phiVentForced": {
+        "definition": "0",
+        "type": "const",
+        "unit": "m**3 s**-1",
+        "description": "Air flow capacity of the forced ventilation system",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no forced ventilation"
+    },
+    "phiExtCo2": {
+        "definition": "0",
+        "type": "const",
+        "unit": "mg s**-1",
+        "description": "Capacity of external CO2 source",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no external CO2"
+    },
+    "copMechCool": {
+        "definition": "0",
+        "type": "const",
+        "unit": "-",
+        "description": "Coefficient of performance of the mechanical cooling system",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no mechanical cooling"
+    },
+    "hecPasAir": {
+        "definition": "0",
+        "type": "const",
+        "unit": "W m**-2 K**-1",
+        "description": "Convective heat exchange coefficient between passive heat storage and greenhouse air",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no heat storage"
+    },
+    "pBlow": {
+        "definition": "0",
+        "type": "const",
+        "unit": "W",
+        "description": "Heat capacity of heat blowers",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no heat blowers"
+    },
+    "pBoil": {
+        "definition": "0",
+        "type": "const",
+        "unit": "W",
+        "description": "Heat capacity of boiler",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no boiler. Note that it's possible for a greenhouse to have heating pipes but no heating, in this case the pipes are used as rails for the trolleys in the greenhouse"
+    },
+    "pGeo": {
+        "definition": "0",
+        "type": "const",
+        "unit": "W",
+        "description": "Heat capacity of geothermal heat source",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no geothermal heat"
+    },
+    "pInd": {
+        "definition": "0",
+        "type": "const",
+        "unit": "W",
+        "description": "Heat capacity of industrial heat source",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no industrial heat"
+    },
+    "pMechCool": {
+        "definition": "0",
+        "type": "const",
+        "unit": "W",
+        "description": "Electrical capacity of mechanical cooling system",
+        "reference": "Vanthoor 2011, Table 8.2 (Sicily) - no mechanical cooling"
+    }
+}
