@@ -112,6 +112,7 @@ This project is licensed under the [BSD 3-Clause-Clear License](https://chooseal
 - David Katzin, Wageningen University & Research, david.katzin@wur.nl
 - Pierre-Olivier Schwarz, Université Laval
 - Joshi Graf, Wageningen University & Research
+- Cristina Zepeda, Wageningen University & Research
 - Stef Maree, Wageningen University & Research
 - User [shanakaprageeth](https://github.com/shanakaprageeth) on [github.com](https://github.com)
 
