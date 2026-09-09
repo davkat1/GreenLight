@@ -61,6 +61,9 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Sphinx-generated documentation
+/docs/build
+
 # Unit test / coverage reports
 htmlcov/
 .tox/

@@ -1,35 +1,13 @@
 # Simulation options
 Models in GreenLight are represented as [ordinary differential equations (ODEs) - initial value problems](https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter22.00-ODE-Initial-Value-Problems.html).
 Simulations are therefore performed by ODE solvers, which inherently require choices regarding the simulation settings and algorithm.
-The `options` attribute of a GreenLight object ([which can be set with an options node in the model definition](model_format.md#simulation-settings)) influences which method is used for solving the problem, which numerical algorithm is used, and various settings and parameters related to the algorithm.
-
-In this file:
-- [Modifying the simulation options](#modifying-the-simulation-options)
-- [Options for GreenLight objects](#options-for-greenlight-objects)
-  - [options\["t\_start"\] and options\["t\_end"\]](#optionst_start-and-optionst_end)
-  - [options\["expand\_variables"\]](#optionsexpand_variables)
-  - [options\["expand\_functions"\]](#optionsexpand_functions)
-  - [options\["solving\_method"\]](#optionssolving_method)
-    - ["solve\_ivp"](#solve_ivp)
-    - ["solve\_ivp\_from\_str"](#solve_ivp_from_str)
-  - [options\["interpolation"\]](#optionsinterpolation)
-  - [options\["solver"\]](#optionssolver)
-  - [options\["first\_step"\], options\["max\_step"\], options\["atol"\], \`options\["rtol"\]](#optionsfirst_step-optionsmax_step-optionsatol-optionsrtol)
-  - [options\["output\_step"\]](#optionsoutput_step)
-  - [options\["t\_eval"\]](#optionst_eval)
-  - [options\["clip\_large\_nums"\]](#optionsclip_large_nums)
-  - [options\["nans\_to\_zeros"\]](#optionsnans_to_zeros)
-  - [options\["warn\_loading"\]](#optionswarn_loading)
-  - [options\["warn\_runtime"\]](#optionswarn_runtime)
-  - [options\["log\_runtime\_warnings"\]](#optionslog_runtime_warnings)
-- [Supported combinations](#supported-combinations)
-
+The `options` attribute of a GreenLight object {ref}`which can be set with an options node in the model definition <mod_format-sim_settings>` influences which method is used for solving the problem, which numerical algorithm is used, and various settings and parameters related to the algorithm.
 
 **NOTE:** experimenting with the simulation settings will quickly show that **these settings will surely influence the resulting output**. For example, choosing too low tolerances will cause the numerical approximation to be too rough, introducing large numerical errors to the results. It is therefore crucial to test model settings and find values that create a decent balance between running time, smoothness, and accuracy.
 
 ## Modifying the simulation options
-See [simulation settings](model_format.md#simulation-settings) in [model format](model_format.md).
-For a simple example showing how to modify options directly in the input argument, see [modifying and combining models](modifying_and_combining_models.md#combining-all-of-the-above).
+See {ref}`simulation settings <mod_format-sim_settings>` in [model format](model_format.md).
+For a simple example showing how to modify options directly in the input argument, see {ref}`modifying and combining models <mod_models-combining>`.
 
 ## Options for GreenLight objects
 GreenLight objects have an `options` attribute, which is represented by a `dict`. In order to remain consistent with [how models are defined in GreenLight](model_format.md), the `dict`'s keys and values are all strings. The following keys are used by GreenLight:
@@ -72,7 +50,7 @@ At the same time, it seems that with very complex models, the expanded expressio
 
 ### options["expand_functions"]
 This option is similar to `"expand_variables"`, but is related to model functions instead.
-Recall that [model-defined functions](model_format.md#model-defined-functions) are mathematical expressions defined in the model that may be used repeatedly.
+Recall that {ref}`model-defined functions <mod_format-functions>` are mathematical expressions defined in the model that may be used repeatedly.
 For example, consider a model with the following:
 - A model function `"func1(a,b) = a + b**2"`
 - A variable `y = func1(v1, v2+v3) + v4`
@@ -89,13 +67,13 @@ This option determines which method of `greenlight._solve` is used for solving t
 
 #### "solve_ivp"
 This method uses [scipy.integrate.solve_ivp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html)
-in a rather straightforward way. No considerable efforts have been made here to improve performance. See [greenlight/_solve/_solve_ivp.py](../greenlight/_solve/_solve_ivp.py)
+in a rather straightforward way. No considerable efforts have been made here to improve performance. See {func}`greenlight._solve._solve_ivp`
 
 #### "solve_ivp_from_str"
 This method also uses [scipy.integrate.solve_ivp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html), however, it uses a reformatting of the entire model as a string,
 which is then used to define a Python function which can be sent directly to `scipy.integrate.solve_ivp`.
 From an algorithmic viewpoint, this method should generate the same output as the method `"solve_ivp"`, but it seems to improve running time considerably.
-See [greenlight/_solve/_solve_ivp_from_str.py](../greenlight/_solve/_solve_ivp_from_str.py)
+See {func}`greenlight._solve._solve_ivp_from_str`
 
 **Default value:** `"solve_ivp_from_str"`
 
@@ -153,6 +131,7 @@ If this value is `"True"`, the solver will replace any NaN value it encounters b
 
 **Default value:** `"True"`
 
+(sim_opts-warn_load)=
 ### options["warn_loading"]
 If this value is `"True"`, the solver will issue warnings to the Python console about events happening during model loading. This includes when a variable definition, unit, description, or reference is overwritten. This often happens when a model is composed of multiple files or when an input prompt changes model settings, see [Combining and modifying models](modifying_and_combining_models.md).
 

@@ -1,16 +1,6 @@
 # Modifying and combining models
 Files created according to GreenLight's [model format](model_format.md) can be modified, extended, or combined.
 
-In this file:
-- [Modifying and combining models using a processing\_order file](#modifying-and-combining-models-using-a-processing_order-file)
-  - [processing\_order files](#processing_order-files)
-- [Modifying and combining models using input arguments](#modifying-and-combining-models-using-input-arguments)
-  - [Input argument format](#input-argument-format)
-- [Modifying model variables with input data](#modifying-model-variables-with-input-data)
-- [File location and path](#file-location-and-path)
-- [Combining all of the above](#combining-all-of-the-above)
-
-
 ## Modifying and combining models using a processing_order file
 When combining multiple files or definitions, it is essential to let GreenLight know about the order of precedence: for example,
 if file `file1.json` defines the variable `var`, and file `file2.json` modifies the same variable, GreenLight needs to know which file to use.
@@ -49,7 +39,7 @@ The same logic can be used for combining files. Example:
 In such a case, first the definitions in `model_def_file1.json` will be loaded, and afterwards the definitions in `model_def_file2.json`
 will be loaded. If there is any variable that is defined both in `model_def_file1.json` and in `model_def_file2.json`, the definitions in
 `model_def_file2.json` will overwrite the definitions in `model_def_file1.json`. GreenLight will log this overwriting in its log,
-and, if `options["warn_loading"]` is `"True"` (see [Simulation options](simulation_options.md#optionswarn_loading)), a warning will be issued to the Python console.
+and, if `options["warn_loading"]` is `"True"` (see {ref}`Simulation options <sim_opts-warn_load>`, a warning will be issued to the Python console.
 
 **Note:** GreenLight allows and expects these kinds of duplicate definitions, because in this case it is clear which definition should take precedence.
 However, GreenLight does not allow for the same variable to be defined twice in the same file (or the same input argument, see below),
@@ -63,6 +53,8 @@ Therefore, another way to ensure that `model_def_file2.json` extends (possibly o
 from greenlight import GreenLight
 mdl = GreenLight(base_path, ["model_def_file1.json", "model_def_file2.json"])
 ```
+
+(mod_models-input)=
 
 ### Input argument format
 Input arguments given can be one of the following:
@@ -93,7 +85,7 @@ Input arguments given can be one of the following:
 Any model variable can be modified by providing a CSV file with data for that variable.
 GreenLight will load this data onto the variable, and will not compute it as a model variable.
 In order to do this, simply provide data for the variable as a model input,
-see the section [inputs](model_format.md#inputs) in [model format](model_format.md)
+see the section {ref}`inputs <mod_format-inputs>` in [model format](model_format.md)
 
 ## File location and path
 There is a subtle difference between how GreenLight processes file locations,
@@ -122,6 +114,8 @@ So if `main_model.json` looks like this:
 ```
 Then GreenLight will expect `model_def_file1.json` and `model_def_file2.json` to be in the
 same folder as `main_model.json`.
+
+(mod_models-combining)=
 
 ## Combining all of the above
 
