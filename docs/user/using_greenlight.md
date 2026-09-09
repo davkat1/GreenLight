@@ -1,24 +1,11 @@
 # Using GreenLight
 
-GreenLight can be run using the `main` function (see [I just want to run a greenhouse simulation](../README.md#i-just-want-to-run-a-greenhouse-simulation))
+GreenLight can be run using the `main` function (see {ref}`I just want to run a greenhouse simulation <quick_start-sim_gh>`)
 but for more elaborate contexts it is probably best to modify model component and to use scripts in order to run simulations.
 This file contains some more information.
 
-In this file:
-- [Initializing GreenLight using built-in models](#initializing-greenlight-using-built-in-models)
-  - [Initializing with default values](#initializing-with-default-values)
-  - [Initializing the default model with input weather data and custom season length](#initializing-the-default-model-with-input-weather-data-and-custom-season-length)
-- [Copying the built-in model definition files to a local location](#copying-the-built-in-model-definition-files-to-a-local-location)
-- [Initializing GreenLight with local files](#initializing-greenlight-with-local-files)
-- [Running the model](#running-the-model)
-  - [Example - running](#example---running)
-  - [Example - output](#example---output)
-- [Using the model output](#using-the-model-output)
-  - [Example - viewing the model output](#example---viewing-the-model-output)
-- [More examples](#more-examples)
-
 ## Initializing GreenLight using built-in models
-The [GreenLight constructor](../greenlight/core.py) takes 4 optional arguments:
+The {func}`greenlight.GreenLight` constructor takes 4 optional arguments:
 
 - `base_path`
 - `input_prompt`
@@ -73,7 +60,7 @@ In the above, `input_prompt` takes the default value, so GreenLight uses the def
 But since `optional_prompt` modifies the `"t_end"` option, the simulation is longer.
 
 Most users will usually prefer to use a dataset that is relevant for their needs. For this, see
-[Acquiring input data for running scripts](input_data.md#acquiring-input-data-for-running-scripts).
+{ref}`Acquiring input data for running scripts <input_data-acquiring>`.
 For example, if the data is acquired, formatted, and placed under the current active directory, in a subdirectory called
 `C:\input_data\weather_ams_katzin_2021_from_sep_27_000000.csv`, it can be loaded onto the model like this:
 ```python
@@ -98,7 +85,7 @@ parameters, or other settings. However, in many cases there is a need to modify 
 In this case, it is best to copy all the model settings files into a local, user-chosen location,
 where they can be modified or extended.
 
-For this, the function [`copy_builtin_models`](../greenlight/utils.py) can be used. This function takes a single argument,
+For this, the function {func}`greenlight.copy_builtin_models` can be used. This function takes a single argument,
 a string pointing to a location where the built-in models should be copied to. For example:
 ```python
 import greenlight
@@ -109,7 +96,7 @@ From here, users can modify the models in their local copies without worrying ab
 
 ## Initializing GreenLight with local files
 Once the built-in models are copied to a local location, GreenLight can be initialized with custom settings.
-As stated above, the [GreenLight constructor](../greenlight/core.py) takes 4 arguments:
+As stated above, the {func}`greenlight.GreenLight` constructor takes 4 arguments:
 - `base_path`
 - `input_prompt`
 - `output_path`
@@ -121,7 +108,7 @@ this value is not included in the logs and outputs created by GreenLight.
 
 `input_prompt` is a string, dict, or a list of strings and dicts. In its simplest form, it is just the location (relative to `base_path`)
 of a model definition file, written according to the [GreenLight model format](model_format.md).
-However, multiple definitions can be combined, see [Modifying and combining files](modifying_and_combining_models.md#input-argument-format).
+However, multiple definitions can be combined, see {ref}`Modifying and combining files <mod_models-input>`.
 
 `output_path` is a location (relative to `base_path`) of where the model output data (in CSV format) should be saved.
 If you don't want to save output data, simply leave this as `""`. In addition to the output data, GreenLight will also create
@@ -163,8 +150,7 @@ These three commands can also be executed by running:
 mdl.run()
 ```
 
-The details of what is done during loading, solving, and saving depends on the
-[input prompt](modifying_and_combining_models.md#combining-all-of-the-above)
+The details of what is done during loading, solving, and saving depends on the {ref}`input prompt <mod_models-combining>`
 and the [simulation options](simulation_options.md).
 In the saving phase, besides the model output data, also a simulation log and a model structure log are created.
 
@@ -219,9 +205,10 @@ plt.show()
 However, this is often inconvenient, because model runs take quite some time. For practical purposes, it is better to split these scripts
 into two files: one which runs the simulations, and another one which loads the simulation data, displays and analyzes it.
 
+(using_gl-more_examples)=
 ## More examples
 The following examples are included in the GreenLight repository:
-- `scripts/greenlight_example` simple example, available as a [Python script](../scripts/greenlight_example.py) and a [Jupyter notebook](../notebooks/greenlight_example.ipynb)
-- [`scripts/greenlight_example_sicily`](../scripts/greenlight_example_sicily.py) example simulation of a low-tech (arch-shaped plastic multi-tunnel) in Sicily
-- [`scripts/katzin_2020/`](../scripts/katzin_2020/Readme.txt) Rerun the simulations from [Katzin (2020)](https://doi.org/10.1016/j.biosystemseng.2020.03.010) and reproduce the results
-- [`scripts/katzin_2021/`](../scripts/katzin_2021/Readme.txt) Rerun the simulations from [Katzin (2021a)](https://doi.org/10.1016/j.apenergy.2020.116019) and reproduce the results
+- `scripts/greenlight_example` simple example, available as a [Python script](https://github.com/davkat1/GreenLight/blob/main/scripts/greenlight_example.py) and a [Jupyter notebook](https://github.com/davkat1/GreenLight/blob/main/notebooks/greenlight_example.ipynb)
+- [`scripts/greenlight_example_sicily`](https://github.com/davkat1/GreenLight/blob/main/scripts/greenlight_example_sicily.py) example simulation of a low-tech (arch-shaped plastic multi-tunnel) in Sicily
+- [`scripts/katzin_2020/`](https://github.com/davkat1/GreenLight/tree/main/scripts/katzin_2020) Rerun the simulations from [Katzin (2020)](https://doi.org/10.1016/j.biosystemseng.2020.03.010) and reproduce the results
+- [`scripts/katzin_2021/`](https://github.com/davkat1/GreenLight/tree/main/scripts/katzin_2021) Rerun the simulations from [Katzin (2021a)](https://doi.org/10.1016/j.apenergy.2020.116019) and reproduce the results

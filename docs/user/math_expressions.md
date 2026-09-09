@@ -1,20 +1,9 @@
 # Mathematical expressions
-In this file:
-- [`math` expressions](#math-expressions)
-- [`numexpr` expressions](#numexpr-expressions)
-- [What happens with these expressions?](#what-happens-with-these-expressions)
-  - [If options\["formatting\_mode"\] is "math"](#if-optionsformatting_mode-is-math)
-  - [If options\["formatting\_mode"\] is "numpy"](#if-optionsformatting_mode-is-numpy)
-  - [If options\["formatting\_mode"\] is "numexpr"](#if-optionsformatting_mode-is-numexpr)
-- [max, min, and pi](#max-min-and-pi)
-  - [max and min](#max-and-min)
-  - [pi](#pi)
-
 
 Model definitions that are formatted according to [GreeLight's model format](model_format.md) include mathematical
 expressions that are described using strings. There is currently a limited set of mathematical expressions that are
 recognized by GreenLight and can be processed by the various formatting modes. These are the following
-(see [greenlight/_load/_parse_model.py](../greenlight/_load/_parse_model.py)):
+(see {func}`greenlight._load._parse_model`):
 
 ## `math` expressions:
 Expressions that are supported in Python's `math` library:
@@ -86,13 +75,13 @@ np.max(5,6)
 Instead, the NumPy equivalent of `max(5,6)` is `np.maximum(5,6)`.
 
 Due to this ambiguity, in GreenLight `max` and `min` are not builtin expressions. If you want to these expressions in
-your model, you will have to define it yourself, for example (see [greenhouse_vanthoor_2011_chapter_8.json](../models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)):
+your model, you will have to define it yourself, for example (see [greenhouse_vanthoor_2011_chapter_8.json](https://github.com/davkat1/GreenLight/blob/main/greenlight/models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)):
 ```yaml
 "min(a,b)": {
     "type": "function",
     "definition": "(a<b)*a + (b<=a)*b",
     "description": "Minimum of two variables"
-},
+}
 "max(a,b)": {
     "type": "function",
     "definition": "(a>b)*a + (b>=a)*b",
@@ -103,7 +92,7 @@ your model, you will have to define it yourself, for example (see [greenhouse_va
 ### pi
 `pi` is also a very common expression in Python but NumExpr does not know how to evaluate it. Therefore, in order
 to allow consistent solving regardless of the method chosen, `pi` is not a builtin expression in GreenLight. You may define it yourself
-(again, see [greenhouse_vanthoor_2011_chapter_8.json](../models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)):
+(again, see [greenhouse_vanthoor_2011_chapter_8.json](https://github.com/davkat1/GreenLight/blob/main/greenlight/models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)):
 ```yaml
 "pi" : {
     "unit" : "",

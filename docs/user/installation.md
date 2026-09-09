@@ -1,15 +1,6 @@
 # Installation and usage instructions
 This repository contains the `greeenlight` package. Here we describe how to install it.
 
-In this file:
-- [General installation guide](#general-installation-guide)
-- [Installing this repository](#installing-this-repository)
-- [Copying built-in models](#copying-built-in-models)
-- [Developer installation](#developer-installation)
-  - [Non-conda users](#non-conda-users)
-- [Pre-commit](#pre-commit)
-- [Jupyter Notebooks](#jupyter-notebooks)
-
 ## General installation guide
 For use of GreenLight in other Python projects, simply install as any other package:
 

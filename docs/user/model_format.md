@@ -1,31 +1,12 @@
 # Model format
 This file outlines the required formatting for models used by GreenLight. It is a precise but flexible format, aimed at being processable by machines but also easy to read and follow by humans. In particular, models defined for GreenLight can be linked to scientific publications, allowing to replicate models described in the literature.
 
-In this file:
-- [Examples](#examples)
-- [Basic model definition](#basic-model-definition)
-  - [File format](#file-format)
-  - [General structure of models in greenlight](#general-structure-of-models-in-greenlight)
-  - [Representation of a model in a JSON file](#representation-of-a-model-in-a-json-file)
-  - [Example of a model structure](#example-of-a-model-structure)
-    - [Important notes](#important-notes)
-  - [Mathematical expressions](#mathematical-expressions)
-  - [Inputs](#inputs)
-  - [Model-defined functions](#model-defined-functions)
-- [Simulation settings](#simulation-settings)
-- [Structure of the JSON files](#structure-of-the-json-files)
-- [Optional model information](#optional-model-information)
-  - [JSON files](#json-files)
-  - [Input CSV files](#input-csv-files)
-- [Combining files](#combining-files)
-
-
 ## Examples
 This repository contains several examples of GreenLight-formatted models. Some useful ones to check, in order of complexity, are:
- - [Van Henten greenhouse model](../models/van_henten_2003/definition/greenhouse_evh2003.json)
- - [Vanthoor greenhouse model](../models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)
- - [Vanthoor crop model](../models/katzin_2021/definition/vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json)
- - [Katzin greenhouse model](../models/katzin_2021/definition/extension_greenhouse_katzin_2021_vanthoor_2011.json) (an extension to the Vanthoor models)
+ - [Van Henten greenhouse model](https://github.com/davkat1/GreenLight/blob/main/greenlight/models/van_henten_2003/definition/greenhouse_evh2003.json)
+ - [Vanthoor greenhouse model](https://github.com/davkat1/GreenLight/blob/main/greenlight/models/katzin_2021/definition/vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json)
+ - [Vanthoor crop model](https://github.com/davkat1/GreenLight/blob/main/greenlight/models/katzin_2021/definition/vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json)
+ - [Katzin greenhouse model](https://github.com/davkat1/GreenLight/blob/main/greenlight/models/katzin_2021/definition/extension_greenhouse_katzin_2021_vanthoor_2011.json) (an extension to the Vanthoor models)
 
 These model files (all the files that are included as built-in in the `greenlight` package) can be copies to a local location by using, e.g.:
 ```python
@@ -131,6 +112,7 @@ In other words, always use, e.g., ```"definition": "5"``` **and not** ```"defini
 GreenLight expects strings that represent mathematical expressions.
 For a list of mathematical functions that are accepted by GreenLight, see [Mathematical expressions](math_expressions.md).
 
+(mod_format-inputs)=
 ### Inputs
 The model definition does not include a description of the input $d$. This is because, as an input, it is expected that the user provides input data for $d$ and its evolution through time in a CSV file.
 
@@ -151,8 +133,9 @@ In the current example, the input $d$ may be provided by the following CSV file:
 
 when evaluating the value of $d$ at time $t$, where $t$ is not provided by the input (e.g., at time $t=250$) GreenLight will use interpolation to determine the intermediate value.
 
-For more information on model inputs, see [below](#input-csv-files).
+For more information on model inputs, see {ref}`below <model_format-input_csv_files>`.
 
+(mod_format-functions)=
 ### Model-defined functions
 It is often the case that models have some expressions that reappear a lot in the model definition. In such cases, it is useful to define a **model function** which is a mathematical expression which may be reused in the model. In the example above, the expression $1 - x^2$ appears twice: once with $x = p_1$ and once with $x = p_2$. The model may then be rewritten as follows:
 ```yaml
@@ -192,15 +175,16 @@ More generally, functions are defined in the following way:
 - The node has a sub-node `"type": "function"`
 - The node has a sub-node `definition` where the function is defined according to the arguments given in the function name.
   - Example: `"definition": "x + y*z"`
-- Other sub-nodes may be added for human-readability, just like with any model variables. See [Optional model information](#optional-model-information), below.
+- Other sub-nodes may be added for human-readability, just like with any model variables. See {ref}`Optional model information <model_format-optional>`, below.
 
+(mod_format-sim_settings)=
 ## Simulation settings
 Simulations settings, such as the length of the simulated period, the algorithm used in solving, and settings regarding warnings and logging,
 can be set by an `options` node. This node must have the name `options`, with sub-nodes having value names corresponding to GreenLight's [Simulation options](simulation_options.md).
 The values of the various options must be given in string format, so between quotes `""`.
 
 For example, an `options` node may look like this:
-```yaml
+```python
 options = {
             "t_start": "0",
             "t_end": "86400",
@@ -312,6 +296,7 @@ But it can also be organized as:
 }
 ```
 
+(model_format-optional)=
 ## Optional model information
 ### JSON files
 The structure above is all that is needed for GreenLight to process the model and run it. At the same time, GreenLight allows for (and recommends!) further information to be included in the model description, increasing readability by humans. In particular, the model will use the attributes `unit`, `description`, and `reference` when creating outputs and logs of the model run. In addition, any other information may further be added to the model description. Consider the following example:
@@ -378,6 +363,8 @@ It is also possible to add here information about the model inputs, for example:
       "reference": "Frankenstein 1818, Table A1"
   }
 ```
+
+(model_format-input_csv_files)=
 
 ### Input CSV files
 As mentioned above, input CSV files may also have further information.

@@ -1,64 +1,31 @@
 # Documentation
-In README.md:
-- [Quick start](../README.md#quick-start)
-- [Announcements](../README.md#announcements)
-- [User's guide](../README.md#users-guide)
-  - [I just want to run a greenhouse simulation](../README.md#i-just-want-to-run-a-greenhouse-simulation)
-  - [I want to run a simulation for a specific location](../README.md#i-want-to-run-a-simulation-for-a-specific-location)
-  - [I want to modify a model setting, then view and analyze simulation results](../README.md#i-want-to-modify-a-model-setting-then-view-and-analyze-simulation-results)
-  - [I want to learn more about the definitions and architecture of GreenLight's greenhouse models](../README.md#i-want-to-learn-more-about-the-definitions-and-architecture-of-greenlights-greenhouse-models)
-  - [I want to learn more about the technical and numerical aspects of the GreenLight's models](../README.md#i-want-to-learn-more-about-the-technical-and-numerical-aspects-of-the-greenlights-models)
-  - [I want to extend, combine, implement a model from literature or develop my own model](../README.md#i-want-to-extend-combine-implement-a-model-from-literature-or-develop-my-own-model)
-  - [I want to further develop the GreenLight platform](../README.md#i-want-to-further-develop-the-greenlight-platform)
-- [License](../README.md#license)
-- [Repository structure](../README.md#repository-structure)
-- [Contributors](../README.md#contributors)
-- [Acknowledgements](../README.md#acknowledgements)
 
-In this folder:
-- [Installation and usage instructions](user/installation.md)
-  - [General installation guide](user/installation.md#general-installation-guide)
-  - [Installing this repository](user/installation.md#installing-this-repository)
-  - [Copying built-in models](user/installation.md#copying-built-in-models)
-  - [Developer installation](user/installation.md#developer-installation)
-    - [Non-conda users](user/installation.md#non-conda-users)
-  - [Pre-commit](user/installation.md#pre-commit)
-  - [Jupyter Notebooks](user/installation.md#jupyter-notebooks)
-- [Using GreenLight](user/using_greenlight.md)
-  - [Initializing GreenLight using built-in models](user/using_greenlight.md#initializing-greenlight-using-built-in-models)
-  - [Copying the built-in model definition files to a local location](user/using_greenlight.md#copying-the-built-in-model-definition-files-to-a-local-location)
-  - [Initializing GreenLight with local files](user/using_greenlight.md#initializing-greenlight-with-local-files)
-  - [Running the model](user/using_greenlight.md#running-the-model)
-  - [Using the model output](user/using_greenlight.md#using-the-model-output)
-  - [More examples](user/using_greenlight.md#more-examples)
-- [Input data](user/input_data.md)
-  - [Acquiring input data for the `greenlight.main` program](user/input_data.md#acquiring-input-data-for-the-greenlightmain-program)
-  - [Acquiring input data for running scripts](user/input_data.md#acquiring-input-data-for-running-scripts)
-  - [Input data length vs. simulation length](user/input_data.md#input-data-length-vs-simulation-length)
-  - [Using EnergyPlus data for other models](user/input_data.md#using-energyplus-data-for-other-models)
-  - [Other data sources](user/input_data.md#other-data-sources)
-  - [Examples](user/input_data.md#examples)
-- [Model format](user/model_format.md)
-  - [Examples](user/model_format.md#examples)
-  - [Basic model definition](user/model_format.md#basic-model-definition)
-  - [Simulation settings](user/model_format.md#simulation-settings)
-  - [Structure of the JSON files](user/model_format.md#structure-of-the-json-files)
-  - [Optional model information](user/model_format.md#optional-model-information)
-  - [Combining files](user/model_format.md#combining-files)
-- [Simulation options](user/simulation_options.md)
-  - [Modifying the simulation options](user/simulation_options.md#modifying-the-simulation-options)
-  - [Options for GreenLight objects](user/simulation_options.md#options-for-greenlight-objects)
-  - [Supported combinations](user/simulation_options.md#supported-combinations)
-- [Mathematical expressions](user/math_expressions.md)
-  - [`math` expressions:](user/math_expressions.md#math-expressions)
-  - [`numexpr` expressions:](user/math_expressions.md#numexpr-expressions)
-  - [What happens with these expressions?](user/math_expressions.md#what-happens-with-these-expressions)
-  - [max, min, and pi](user/math_expressions.md#max-min-and-pi)
-- [Modifying and combining models](user/modifying_and_combining_models.md)
-  - [Modifying and combining models using a processing\_order file](user/modifying_and_combining_models.md#modifying-and-combining-models-using-a-processing_order-file)
-  - [Modifying and combining models using input arguments](user/modifying_and_combining_models.md#modifying-and-combining-models-using-input-arguments)
-  - [Modifying model variables with input data](user/modifying_and_combining_models.md#modifying-model-variables-with-input-data)
-  - [File location and path](user/modifying_and_combining_models.md#file-location-and-path)
-  - [Combining all of the above](user/modifying_and_combining_models.md#combining-all-of-the-above)
+```{toctree}
+:maxdepth: 2
+:caption: Users Guide
+
+user/index
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Open API (for most users)
+
+api/greenlight
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: For developers
+
+developer/greenlight
+```
+
+## Indices and tables
+
+* {ref}`genindex`
+* {ref}`modindex`
+* {ref}`search`
+
 
 

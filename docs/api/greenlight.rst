@@ -1,6 +1,9 @@
 greenlight package
 ==================
 
+The documentation below includes modules, classes, and methods available for users of the GreenLight package,
+i.e., those who use GreenLight by using ``import greenlight``.
+
 Submodules
 ----------
 
