@@ -128,7 +128,7 @@ class GreenLightInternal:
             version = importlib.metadata.version('greenlight')
         except importlib.metadata.PackageNotFoundError:
             version = "development"
-        
+
         self.log = (
             f"GreenLight simulation running greenlight version {version}\n"
             f"Python version: {platform.python_version()}\n"
